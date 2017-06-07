@@ -4,7 +4,8 @@ APPL_COBJS +=
 
 APPL_CXXOBJS += \
 	util.o \
-	var_entering.o
+	var_entering.o \
+	decoder.o
 
 SRCLANG := c++
 
