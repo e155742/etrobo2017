@@ -3,7 +3,8 @@ mkfile_path := $(dir $(lastword $(MAKEFILE_LIST)))
 APPL_COBJS +=
 
 APPL_CXXOBJS += \
-	util.o
+	util.o \
+	var_entering.o
 
 SRCLANG := c++
 
