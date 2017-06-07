@@ -2,9 +2,25 @@
 #define MY_UNTL_H_
 
 #include "ev3api.h"
+#include <vector>
+
+extern void inputInt(int& var);
+extern void inputInt(int& var, const char *str);
+extern void inputFloat(float& var);
+extern void inputFloat(float& var, const char *str);
+extern void inputFloat(float& var, int accuracy);
+extern void inputFloat(float& var, int accuracy, const char *str);
+
+extern void inputInt(std::vector<int>& vars);
+extern void inputInt(std::vector<int>& vars, const char *str);
+extern void inputFloat(std::vector<float>& vars);
+extern void inputFloat(std::vector<float>& vars, const char *str);
+extern void inputFloat(std::vector<float>& vars, int accuracy);
+extern void inputFloat(std::vector<float>& vars, int accuracy, const char *str);
 
 extern void init_f(const char *str);
 extern void msg_f(const char *str, int32_t line);
+extern void msg_clear();
 
 extern void msg_f(int8_t n, int32_t line);
 extern void msg_f(uint8_t n, int32_t line);
