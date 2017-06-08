@@ -8,65 +8,65 @@
 // **    画面入力    **
 // *******************
 void inputInt(int& var) {
-  VarEntering varEntering;
+  ie::VarEntering varEntering;
   varEntering.inputInt(var);
 }
 
 void inputInt(int& var, const char *title) {
-  VarEntering varEntering;
+  ie::VarEntering varEntering;
   varEntering.inputInt(var, title);
 }
 
 void inputFloat(float& var) {
-  VarEntering varEntering;
+  ie::VarEntering varEntering;
   varEntering.inputFloat(var);
 }
 
 void inputFloat(float& var, const char *title) {
-  VarEntering varEntering;
+  ie::VarEntering varEntering;
   varEntering.inputFloat(var, title);
 }
 
 void inputFloat(float& var, int accuracy) {
-  VarEntering varEntering;
+  ie::VarEntering varEntering;
   varEntering.setAccuracy(accuracy);
   varEntering.inputFloat(var);
 }
 
 void inputFloat(float& var, int accuracy, const char *title) {
-  VarEntering varEntering;
+  ie::VarEntering varEntering;
   varEntering.setAccuracy(accuracy);
   varEntering.inputFloat(var, title);
 }
 
 void inputInt(std::vector<int>& vars) {
-  VarEntering varEntering;
+  ie::VarEntering varEntering;
   varEntering.inputInt(vars);
 }
 
 void inputInt(std::vector<int>& vars, const char *title) {
-  VarEntering varEntering;
+  ie::VarEntering varEntering;
   varEntering.inputInt(vars, title);
 }
 
 void inputFloat(std::vector<float>& vars) {
-  VarEntering varEntering;
+  ie::VarEntering varEntering;
   varEntering.inputFloat(vars);
 }
 
 void inputFloat(std::vector<float>& vars, const char *title) {
-  VarEntering varEntering;
+  ie::VarEntering varEntering;
   varEntering.inputFloat(vars, title);
 }
 
 void inputFloat(std::vector<float>& vars, int accuracy) {
-  VarEntering varEntering;
+  ie::VarEntering varEntering;
   varEntering.setAccuracy(accuracy);
   varEntering.inputFloat(vars);
 }
 
 void inputFloat(std::vector<float>& vars, int accuracy, const char *title) {
-  VarEntering varEntering;
+  ie::VarEntering varEntering;
   varEntering.setAccuracy(accuracy);
   varEntering.inputFloat(vars, title);
 }

@@ -10,6 +10,8 @@
 #include <cmath>
 #include "util.h"
 
+namespace ie {
+
 /**
  * 本体のボタンから変数を変更。<br>
  * int型用。
@@ -268,4 +270,6 @@ void VarEntering::setAccuracy(int accuracy) {
         return;
     }
     accuracy_ = accuracy;
+}
+
 }

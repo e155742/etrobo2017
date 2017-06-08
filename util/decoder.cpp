@@ -7,6 +7,8 @@
 #include "decoder.hpp"
 #include <cmath>
 
+namespace ie {
+
 /**
  * 引数なしで初期化すると初期位置コード0でデコードされる。
  */
@@ -101,4 +103,6 @@ int Decoder::getYellowPosition() const {
  */
 int Decoder::getBluePosition() const {
     return blockPositionsMinusOne_[3] + 1;
+}
+
 }

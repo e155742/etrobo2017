@@ -5,6 +5,8 @@
 #ifndef DECODER_HPP
 #define DECODER_HPP
 
+namespace ie {
+
 class Decoder{
 public:
     Decoder();
@@ -20,5 +22,7 @@ public:
 private:
     int blockPositionsMinusOne_[4]; // 0:黒 1:赤 2:黄 3:青
 };
+
+}
 
 #endif

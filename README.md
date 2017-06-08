@@ -1,6 +1,7 @@
 ETロボコン EV3 HackEV
 ====
 ### 現在の状態
+自作クラスに名前空間ieを設定
 RGBをHSVに変換するHsvConverterクラス追加  
 初期位置コードをデコードするDecoderクラス追加
 msg_fからVarEnteringクラスを使用できるように変更  

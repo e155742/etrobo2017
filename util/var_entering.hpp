@@ -8,6 +8,8 @@
 #include <vector>
 #include <Clock.h>
 
+namespace ie {
+
 class VarEntering {
 public:
     void inputInt(int& num);
@@ -32,5 +34,7 @@ private:
     void pushButton(std::vector<int>& nums, int maxIndex, int32_t selectLineStr);
     void pushButtonFloat(std::vector<int>& numInts, int maxIndex, int32_t selectLineStr);
 };
+
+}
 
 #endif

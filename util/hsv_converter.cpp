@@ -7,6 +7,8 @@
  */
 #include "hsv_converter.hpp"
 
+namespace ie {
+
 /**
  * 引数なしで初期化するとRGB(0,0,0)をHSVに変換する。要は黒。
  */
@@ -114,4 +116,6 @@ hsv_t HsvConverter::getSaturation() const {
  */
 hsv_t HsvConverter::getLightness() const {
     return lightness_;
+}
+
 }
