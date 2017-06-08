@@ -6,7 +6,8 @@ APPL_CXXOBJS += \
 	util.o \
 	var_entering.o \
 	decoder.o \
-	hsv_converter.o
+	hsv_converter.o \
+	file_output.o
 
 SRCLANG := c++
 

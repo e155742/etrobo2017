@@ -3,6 +3,7 @@
 #include "util.h"
 #include "decoder.hpp"
 #include "hsv_converter.hpp"
+#include "file_output.hpp"
 
 void main_task(intptr_t unused) {
     std::vector<ie::rgb_t> rgb = {0, 0, 0};
@@ -22,4 +23,10 @@ void main_task(intptr_t unused) {
     msg_f("Black, Red, Yellow, Blue", 7);
     sprintf(str, "%d,    %d,   %d,      %d", d.getBlackPosition(), d.getRedPosition(), d.getYellowPosition(), d.getBluePosition());
     msg_f(str, 8);
+
+    ie::FileOutput fo("test.txt");
+    for (double i = 10.12345678900; i < 10.12345678915; i+=0.00000000001) {
+        fo.fileWrite(i, "%2.13f");
+    }
+    fo.close();
 }
