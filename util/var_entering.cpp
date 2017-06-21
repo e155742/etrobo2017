@@ -263,7 +263,7 @@ void VarEntering::inputFloat(std::vector<float>& nums, const char* title) {
  * float型を変更する際の精度を設定。100だと1/100刻み、1000だと1/1000刻みで値を変更できる。<br>
  * 普通は10のべき乗倍を入れる。0は入れるな。
  *
- * @accuracy float型の精度
+ * @param accuracy float型の精度
  */
 void VarEntering::setAccuracy(int accuracy) {
     if (accuracy == 0) {

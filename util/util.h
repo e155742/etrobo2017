@@ -41,4 +41,11 @@ extern void msg_f(uint64_t n, int32_t line);
 extern void msg_f(float n, int32_t line);
 extern void msg_f(double n, int32_t line);
 
+template <class X, class Y, class Z>
+void msg_template(X n, Y line, Z format) {
+  char str[64];
+  sprintf(str, format, n);
+  msg_f(str, line);
+}
+
 #endif  // MY_UNTL_H_

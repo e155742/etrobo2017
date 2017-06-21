@@ -103,79 +103,53 @@ void msg_clear() {
 }
 
 void msg_f(int8_t n, int32_t line) {
-  char str[64];
-  sprintf(str, "%d", n);
-  msg_f(str, line);
+  msg_template(n, line, "%d");
 }
 
 void msg_f(uint8_t n, int32_t line) {
-  char str[64];
-  sprintf(str, "%d", n);
-  msg_f(str, line);
+  msg_template(n, line, "%d");
 }
 
 void msg_f(char n, int32_t line) {
-  char str[64];
-  sprintf(str, "%d", n);
-  msg_f(str, line);
+  msg_template(n, line, "%d");
 }
 
 void msg_f(int16_t n, int32_t line) {
-  char str[64];
-  sprintf(str, "%d", n);
-  msg_f(str, line);
+  msg_template(n, line, "%d");
 }
 
 void msg_f(uint16_t n, int32_t line) {
-  char str[64];
-  sprintf(str, "%d", n);
-  msg_f(str, line);
+  msg_template(n, line, "%d");
 }
 
 void msg_f(int n, int32_t line) {
-  char str[64];
-  sprintf(str, "%d", n);
-  msg_f(str, line);
+  msg_template(n, line, "%d");
 }
 
 void msg_f(unsigned int n, int32_t line) {
-  char str[64];
-  sprintf(str, "%d", n);
-  msg_f(str, line);
+  msg_template(n, line, "%d");
 }
 
 void msg_f(int32_t n, int32_t line) {
-  char str[64];
-  sprintf(str, "%ld", n);
-  msg_f(str, line);
+  msg_template(n, line, "%ld");
 }
 
 void msg_f(uint32_t n, int32_t line) {
-  char str[64];
-  sprintf(str, "%ld", n);
-  msg_f(str, line);
+  msg_template(n, line, "%ld");
 }
 
 void msg_f(int64_t n, int32_t line) {
-  char str[64];
-  sprintf(str, "%lld", n);
-  msg_f(str, line);
+  msg_template(n, line, "%lld");
 }
 
 void msg_f(uint64_t n, int32_t line) {
-  char str[64];
-  sprintf(str, "%lld", n);
-  msg_f(str, line);
+  msg_template(n, line, "%lld");
 }
 
 void msg_f(float n, int32_t line) {
-  char str[64];
-  sprintf(str, "%f", n);
-  msg_f(str, line);
+  msg_template(n, line, "%f");
 }
 
 void msg_f(double n, int32_t line) {
-  char str[64];
-  sprintf(str, "%lf", n);
-  msg_f(str, line);
+  msg_template(n, line, "%lf");
 }
