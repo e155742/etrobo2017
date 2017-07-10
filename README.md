@@ -1,7 +1,14 @@
 ETロボコン EV3 HackEV
 ====
 ### 現在の状態
-moveクラスはまだない
+moveクラスはまだない  
+  
+FileOutput  
+Decoder  
+HsvConverter  
+自作util.cpp  
+  
+名前空間はie  
 
 ### 更新履歴
 util.cppをtemplateを使用した版に更新  
