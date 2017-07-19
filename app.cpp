@@ -1,11 +1,17 @@
 #include <vector>
 #include "app.h"
 #include "util.h"
+
 #include "decoder.hpp"
 #include "hsv_converter.hpp"
 #include "file_output.hpp"
 
-void main_task(intptr_t unused) {
+#include "control.hpp"
+#include "pid_control.hpp"
+#include "onoff_control.hpp"
+#include "move.hpp"
+
+void ioTest() {
     std::vector<ie::rgb_t> rgb = {0, 0, 0};
     inputInt(rgb, "Enter RGB");
     msg_clear();
@@ -29,4 +35,50 @@ void main_task(intptr_t unused) {
         fo.fileWrite(i, "%2.13f");
     }
     fo.close();
+}
+
+void moveTest() {
+    // PIDの各種定数
+    const float kp = 3.0; // 比例定数
+    const float ki = 0.0; // 積分定数
+    const float kd = 0.0; // 微分定数
+
+    const float threshold = 36.5;
+
+    ev3api::Motor left(PORT_C);
+    ev3api::Motor right(PORT_B);
+    ie::PIDControl* ltControl = new ie::PIDControl(threshold, kp, ki, kd);
+    ie::OnOffControl* stControl = new ie::OnOffControl(0, 0, 0.3, 0);
+    ie::Move move;
+
+    move.raiseArm(60, 10);
+    move.raiseArm(15, 5);
+    move.rotateTail(360, 10);
+    move.goStraight(*stControl, 10 * 15, 10);
+    move.spin(*stControl, -360, 15);
+
+    // move.goStraight(*stPid, 10 * -15, 20) と同じ
+    ie::PIDControl* stPid = new ie::PIDControl(left.getCount() - right.getCount(), 2, 0, 0);
+    int begin = move.getMileage();
+    while (true) {
+        if (10 * 15 < std::abs(move.getMileage() - begin)) {
+            delete stPid;
+            break;
+        }
+        move.goStraight(*stPid, -20);
+    }
+
+    while (true) {
+        move.lineTrace(*ltControl, 30);
+    }
+    move.stop();
+    delete ltControl;
+    delete stControl;
+}
+
+void main_task(intptr_t unused) {
+    ioTest();
+    dly_tsk(1000 * 3);
+    msg_clear();
+    moveTest();
 }

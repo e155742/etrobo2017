@@ -1,16 +1,19 @@
 ETロボコン EV3 HackEV
 ====
 ### 現在の状態
-moveクラスはまだない  
-  
+move  
+各種control  
 FileOutput  
 Decoder  
 HsvConverter  
 自作util.cpp  
   
 名前空間はie  
+  
+タスクはひとつ  
 
 ### 更新履歴
+moveクラスと各controlクラスを追加  
 util.cppをtemplateを使用した版に更新  
 初期位置コードをデコードするDecoderクラス追加  
 msg_fからVarEnteringクラスを使用できるように変更  
