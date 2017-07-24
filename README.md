@@ -13,7 +13,8 @@ HsvConverter
 タスクはひとつ  
 
 ### 更新履歴
-moveクラスと各controlクラスを追加  
+Moveクラスに左右ホイールの独立した操作とステアリング操作を追加  
+Moveクラスと各controlクラスを追加  
 util.cppをtemplateを使用した版に更新  
 初期位置コードをデコードするDecoderクラス追加  
 msg_fからVarEnteringクラスを使用できるように変更  

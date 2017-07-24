@@ -20,7 +20,9 @@ public:
     void rotateTail(int degree, int pwm);
     void raiseArm(int degree, int pwm);
     void stop();
-
+    void left(int pwm);
+    void right(int pwm);
+    void steering(int power, int turnRatio);
     void goStraight(Control& control, float distance /* mm */, int pwm);
     void goStraight(Control& control, int pwm);
     void spin(Control& control, int degree, int pwm);

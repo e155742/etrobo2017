@@ -93,6 +93,35 @@ void Move::stop() {
 }
 
 /**
+ * 指定したパワーで左ホイールを動かす
+ *
+ * @param pwm モーターのパワー
+ */
+void Move::left(int pwm){
+    leftWheel_.setPWM(pwm);   
+}
+
+/**
+ * 指定したパワーで右ホイールを動かす
+ *
+ * @param pwm モーターのパワー
+ */
+void Move::right(int pwm){
+    rightWheel_.setPWM(pwm);
+}                                                        
+
+/**
+ * ステアリング操作を行う<br>
+ * Steering.setPower()を呼び出している。
+ *
+ * @param pwm モーターのパワー
+ * @param turnRatio ステアリングの度合い。マイナスの値は左への転回、プラスの値は右への転回
+ */
+void Move::steering(int power, int turnRatio){
+    steering_.setPower (power, turnRatio);
+}
+
+/**
  * 指定したパワーで直進する。距離指定あり。パワーがマイナスだと後退。<br>
  * パワーの範囲は-100~100だが、これ未満の値や超過する値入れても自動でカンストするから平気。<br>
  * Controlクラスのtargetは0を指定すること。
