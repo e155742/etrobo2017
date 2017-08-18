@@ -13,6 +13,15 @@
 #include "ports_assignment.hpp"
 
 /**
+ * 20ms間隔で呼び出される周期ハンドラ
+ */
+void sub_cyc(intptr_t exinf) {
+    static int a = 0;
+    a++;
+    msg_f(a, 12);
+}
+
+/**
  * 入出力のテスト<br>
  * RGB-HSV変換とブロック並べのデコード<br>
  * for文によるファイル出力テスト
@@ -86,8 +95,10 @@ void moveTest() {
 }
 
 void main_task(intptr_t unused) {
+    ev3_sta_cyc(SUB_CYC);
     ioTest();
     dly_tsk(1000 * 3);
     msg_clear();
     moveTest();
+    ev3_stp_cyc(SUB_CYC);
 }
