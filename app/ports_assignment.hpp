@@ -10,14 +10,18 @@
 
 #include <Port.h>
 
-ePortM ARM_MOTOR_PORT    = PORT_A;
-ePortM RIGHT_WHEEL_PORT  = PORT_B;
-ePortM LEFT_WHEEL_PORT   = PORT_C;
-ePortM TAIL_MOTOR_PORT   = PORT_D;
+namespace ie {
 
-ePortS TOUCH_SENSOR_PORT = PORT_1;
-ePortS SONAR_SENSOR_PORT = PORT_2;
-ePortS COLOR_SENSOR_PORT = PORT_3;
-ePortS GYRO_SENSOR_PORT  = PORT_4;
+static constexpr ePortM ARM_MOTOR_PORT    = PORT_A;
+static constexpr ePortM RIGHT_WHEEL_PORT  = PORT_B;
+static constexpr ePortM LEFT_WHEEL_PORT   = PORT_C;
+static constexpr ePortM TAIL_MOTOR_PORT   = PORT_D;
+
+static constexpr ePortS TOUCH_SENSOR_PORT = PORT_1;
+static constexpr ePortS SONAR_SENSOR_PORT = PORT_2;
+static constexpr ePortS COLOR_SENSOR_PORT = PORT_3;
+static constexpr ePortS GYRO_SENSOR_PORT  = PORT_4;
+
+}
 
 #endif

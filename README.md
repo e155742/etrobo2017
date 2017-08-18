@@ -13,6 +13,7 @@ HsvConverter
 タスクはひとつ  
 
 ### 更新履歴
+ports_assignment.hpp更新  
 Moveクラスに左右ホイールの独立した操作とステアリング操作を追加  
 Moveクラスと各controlクラスを追加  
 util.cppをtemplateを使用した版に更新  

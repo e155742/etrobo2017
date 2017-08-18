@@ -10,7 +10,13 @@
 #include "pid_control.hpp"
 #include "onoff_control.hpp"
 #include "move.hpp"
+#include "ports_assignment.hpp"
 
+/**
+ * 入出力のテスト<br>
+ * RGB-HSV変換とブロック並べのデコード<br>
+ * for文によるファイル出力テスト
+ */
 void ioTest() {
     std::vector<ie::rgb_t> rgb = {0, 0, 0};
     inputInt(rgb, "Enter RGB");
@@ -37,6 +43,9 @@ void ioTest() {
     fo.close();
 }
 
+/**
+ * 実際に動かして見る
+ */
 void moveTest() {
     // PIDの各種定数
     const float kp = 3.0; // 比例定数
@@ -45,8 +54,8 @@ void moveTest() {
 
     const float threshold = 36.5;
 
-    ev3api::Motor left(PORT_C);
-    ev3api::Motor right(PORT_B);
+    ev3api::Motor left(ie::LEFT_WHEEL_PORT);
+    ev3api::Motor right(ie::RIGHT_WHEEL_PORT);
     ie::PIDControl* ltControl = new ie::PIDControl(threshold, kp, ki, kd);
     ie::OnOffControl* stControl = new ie::OnOffControl(0, 0, 0.3, 0);
     ie::Move move;
