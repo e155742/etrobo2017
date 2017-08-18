@@ -2,6 +2,7 @@ ETロボコン EV3 HackEV
 ====
 ### 現在の状態
 move  
+自己位置推定  
 各種control  
 FileOutput  
 Decoder  
@@ -10,10 +11,11 @@ HsvConverter
   
 名前空間はie  
   
-タスクはメイン一つと周期ハンドラ一つ  
+タスクはメイン1つと自己位置推定用の周期ハンドラ1つ  
 
 
 ### 更新履歴
+localizationクラス(自己位置推定)追加  
 周期ハンドラを追加  
 ports_assignment.hpp更新  
 Moveクラスに左右ホイールの独立した操作とステアリング操作を追加  

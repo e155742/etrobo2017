@@ -6,8 +6,8 @@
  */
 #include "move.hpp"
 #include "util.h"
-#include "ports_assignment.hpp"
 #include "onoff_control.hpp"
+#include "robo_meta_datas.hpp"
 
 namespace ie {
 
@@ -98,7 +98,7 @@ void Move::stop() {
  * @param pwm モーターのパワー
  */
 void Move::left(int pwm){
-    leftWheel_.setPWM(pwm);   
+    leftWheel_.setPWM(pwm);
 }
 
 /**
@@ -108,7 +108,7 @@ void Move::left(int pwm){
  */
 void Move::right(int pwm){
     rightWheel_.setPWM(pwm);
-}                                                        
+}
 
 /**
  * ステアリング操作を行う<br>
@@ -194,9 +194,8 @@ void Move::spin(Control& control, int degree, int pwm) {
 
     while(true) {
         // 目標回転角度 <= 左右のホイールの平均回転角度
-        if (targetWheelAngle
-         <= std::abs((leftWheel_.getCount() - beginLeftCount
-                    + beginRightCount - rightWheel_.getCount()) / 2)) {
+        if (targetWheelAngle <= std::abs((leftWheel_.getCount() - beginLeftCount
+                                        + beginRightCount - rightWheel_.getCount()) / 2)) {
             stop();
             return;
         }

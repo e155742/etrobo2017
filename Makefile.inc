@@ -10,7 +10,8 @@ APPL_CXXOBJS += \
 	file_output.o \
 	pid_control.o \
 	onoff_control.o \
-	move.o
+	move.o \
+	localization.o
 
 SRCLANG := c++
 

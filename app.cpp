@@ -5,20 +5,27 @@
 #include "decoder.hpp"
 #include "hsv_converter.hpp"
 #include "file_output.hpp"
+#include "localization.hpp"
 
 #include "control.hpp"
 #include "pid_control.hpp"
 #include "onoff_control.hpp"
 #include "move.hpp"
-#include "ports_assignment.hpp"
+#include "robo_meta_datas.hpp"
 
+ie::Localization* localization;
 /**
  * 20ms間隔で呼び出される周期ハンドラ
  */
 void sub_cyc(intptr_t exinf) {
-    static int a = 0;
-    a++;
-    msg_f(a, 12);
+    static bool f = true;
+    if (f) {
+        // global領域で初期化するとなぜか動かない
+        localization = new ie::Localization();
+        f = false;
+    }
+
+    localization->updatePoint();
 }
 
 /**
@@ -86,7 +93,7 @@ void moveTest() {
         move.goStraight(*stPid, -20);
     }
 
-    while (true) {
+    while (move.getMileage() < 3.5 * 1000) {
         move.lineTrace(*ltControl, 30);
     }
     move.stop();
@@ -95,10 +102,11 @@ void moveTest() {
 }
 
 void main_task(intptr_t unused) {
-    ev3_sta_cyc(SUB_CYC);
     ioTest();
     dly_tsk(1000 * 3);
     msg_clear();
+    ev3_sta_cyc(SUB_CYC);
     moveTest();
     ev3_stp_cyc(SUB_CYC);
+    delete localization;
 }
