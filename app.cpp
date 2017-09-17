@@ -1,21 +1,25 @@
 #include <vector>
+#include <cmath>
 #include "app.h"
 #include "util.h"
+
+#include <ColorSensor.h>
+#include "robo_meta_datas.hpp"
 
 #include "decoder.hpp"
 #include "hsv_converter.hpp"
 #include "file_output.hpp"
-#include "localization.hpp"
 
 #include "control.hpp"
 #include "pid_control.hpp"
 #include "onoff_control.hpp"
+#include "localization.hpp"
 #include "move.hpp"
-#include "robo_meta_datas.hpp"
 
 ie::Localization* localization;
 /**
- * 20ms間隔で呼び出される周期ハンドラ
+ * 20ms間隔で呼び出される周期ハンドラ<br>
+ * 自己位置推定を行っている
  */
 void sub_cyc(intptr_t exinf) {
     static bool f = true;
@@ -79,14 +83,14 @@ void moveTest() {
     move.raiseArm(60, 10);
     move.raiseArm(15, 5);
     move.rotateTail(360, 10);
-    move.goStraight(*stControl, 10 * 15, 10);
+    move.goStraight(*stControl, 15 * 10, 10);
     move.spin(*stControl, -360, 15);
 
-    // move.goStraight(*stPid, 10 * -15, 20) と同じ
+    // move.goStraight(*stPid, -15 * 10, 20) と同じ
     ie::PIDControl* stPid = new ie::PIDControl(left.getCount() - right.getCount(), 2, 0, 0);
     int begin = move.getMileage();
     while (true) {
-        if (10 * 15 < std::abs(move.getMileage() - begin)) {
+        if (15 * 10 < std::abs(move.getMileage() - begin)) {
             delete stPid;
             break;
         }
@@ -94,19 +98,45 @@ void moveTest() {
     }
 
     while (move.getMileage() < 3.5 * 1000) {
-        move.lineTrace(*ltControl, 30);
+        move.lineTrace(*ltControl, 30, true);
     }
+
     move.stop();
     delete ltControl;
     delete stControl;
 }
 
+/*
+ * ブロック並べフィールドを移動。入口からスタート。
+ * 黒マーカーでいうところの以下の番号を通る。
+ * 10 -> 5 -> 1 -> 13 -> 2 -> 10
+ */
+void goPointTest() {
+    ie::OnOffControl* stControl = new ie::OnOffControl(0, 0, 2, 0);
+    ie::OnOffControl* spControl = new ie::OnOffControl(0, 0, 0.3, 0);
+    ie::Move move;
+
+    localization->setDirection(30 * M_PI/180.0); // 入口のラインの角度が30度
+                                                    // X座標 Y座標 出力 回転出力
+    move.goPoint(*stControl, *spControl, *localization, 225, 389.7, 20, 15);
+    move.goPoint(*stControl, *spControl, *localization, -164.7, 614.7, 20, 15);
+    move.goPoint(*stControl, *spControl, *localization, 839.7, -225, 20, 15);
+    move.goPoint(*stControl, *spControl, *localization, 614.7, 614.7, 20, 15);
+    move.goPoint(*stControl, *spControl, *localization, 0, 0, 20, 15);
+
+    move.stop();
+    delete stControl;
+    delete spControl;
+}
+
 void main_task(intptr_t unused) {
     ioTest();
-    dly_tsk(1000 * 3);
+    dly_tsk(3 * 1000);
     msg_clear();
+
     ev3_sta_cyc(SUB_CYC);
     moveTest();
+    // goPointTest();
     ev3_stp_cyc(SUB_CYC);
     delete localization;
 }

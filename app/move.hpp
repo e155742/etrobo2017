@@ -10,7 +10,7 @@
 #include <Steering.h>
 #include <ColorSensor.h>
 #include "control.hpp"
-#include "onoff_control.hpp"
+#include "localization.hpp"
 
 namespace ie {
 
@@ -26,8 +26,10 @@ public:
     void goStraight(Control& control, float distance /* mm */, int pwm);
     void goStraight(Control& control, int pwm);
     void spin(Control& control, int degree, int pwm);
-    void lineTrace(Control& control, int pwm);
-    void oldLineTrace(Control& control, float threshold, int pwm);
+    void goPoint(Control& control, Control& spinControl, Localization& localization,
+                 point_t pointX, point_t pointY, int pwm, int spinPwm);
+    void lineTrace(Control& control, int pwm, bool isRightSide);
+    void oldLineTrace(Control& control, float threshold, int pwm, bool isRightSide);
     float getMileage() const;
 
 private:
@@ -38,6 +40,9 @@ private:
     ev3api::Motor arm_;
     ev3api::ColorSensor colorSensor_;
     template <class X , class Y> void plusMinusNormalize(X& value , Y& subValue) const;
+    double radianNormalize(double radian);
+    void spinForGoPoint(Control& control, Localization& localization,
+                        point_t pointX, point_t pointY, point_t& diffRadian, int32_t beginLeftCount, int32_t beginRightCount, int spinPwm);
     void showControlData(int brightness, int controlValue) const;
 };
 

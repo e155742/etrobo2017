@@ -3,15 +3,15 @@ mkfile_path := $(dir $(lastword $(MAKEFILE_LIST)))
 APPL_COBJS +=
 
 APPL_CXXOBJS += \
-	util.o \
-	var_entering.o \
 	decoder.o \
-	hsv_converter.o \
 	file_output.o \
-	pid_control.o \
-	onoff_control.o \
+	hsv_converter.o \
+	localization.o \
 	move.o \
-	localization.o
+	onoff_control.o \
+	pid_control.o \
+	util.o \
+	var_entering.o
 
 SRCLANG := c++
 

@@ -63,8 +63,8 @@ void Localization::updateDirection() {
 void Localization::updatePoint() {
     updateDistance();
     updateDirection();
-    pointX_ += changeDistance_ * std::cos(lastDirection_ + (changeDirection_ / 2.0));
-    pointY_ += changeDistance_ * std::sin(lastDirection_ + (changeDirection_ / 2.0));
+    pointX_ += changeDistance_ * std::sin(lastDirection_ + (changeDirection_ / 2.0));
+    pointY_ += changeDistance_ * std::cos(lastDirection_ + (changeDirection_ / 2.0));
 
     #ifdef PRINT_LOCALIZATION
     msg_f("pointX_", 3);
@@ -84,7 +84,7 @@ void Localization::updatePoint() {
 }
 
 /**
- * 任意の座標をセット
+ * 任意の座標をセット (単位:mm)
  *
  * @param pointX セットするX座標
  * @param pointY セットするY座標
@@ -95,7 +95,7 @@ void Localization::setPoint(point_t pointX, point_t pointY) {
 }
 
 /**
- * 任意の自機方位をセット
+ * 任意の自機方位をセット (単位:radian)
  *
  * @param direction セットする方位
  */
@@ -104,7 +104,7 @@ void Localization::setDirection(point_t direction) {
 }
 
 /**
- * 自機のX座標を取得
+ * 自機のX座標を取得 (単位:mm)
  *
  * @return 自機のX座標
  */
@@ -113,7 +113,7 @@ point_t Localization::getPointX() const {
 }
 
 /**
- * 自機のY座標を取得
+ * 自機のY座標を取得 (単位:mm)
  *
  * @return 自機のY座標
  */
@@ -122,7 +122,7 @@ point_t Localization::getPointY() const {
 }
 
 /**
- * 自機の方位を取得
+ * 自機の方位を取得 (単位:radian)
  *
  * @return 自機の方位
  */

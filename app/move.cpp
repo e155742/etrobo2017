@@ -166,9 +166,7 @@ void Move::goStraight(Control& control, int pwm) {
 
     float countDiff = leftWheel_.getCount() - rightWheel_.getCount();
     int controlValue = static_cast<int>(std::roundf(control.getControlValue(countDiff)));
-    if (pwm < 0) {
-        controlValue *= -1;
-    }
+    if (pwm < 0) { controlValue *= -1; }
     steering_.setPower(pwm, controlValue);
 }
 
@@ -210,6 +208,91 @@ void Move::spin(Control& control, int degree, int pwm) {
     }
 }
 
+/**
+ * 角度を -PI < radian <= PI に正規化
+ *
+ * @param   radian 正規化したい角度
+ * @preturn radian 正規化された角度
+ */
+double Move::radianNormalize(double radian) {
+    if (radian <= -M_PI || M_PI < radian) {
+        radian = fmod(radian, 2.0 * M_PI);
+        if (radian <= -M_PI) {
+            radian +=  2 * M_PI;
+        } else if (M_PI < radian) {
+            radian -= 2 * M_PI;
+        }
+    }
+    return radian;
+}
+
+/**
+ * 指定の座標に移動
+ */
+void Move::goPoint(Control& control, Control& spinControl, Localization& l,
+                   point_t pointX, point_t pointY, int pwm, int spinPwm) {
+    // 回転させる
+    point_t diffRadian = std::atan2(pointX - l.getPointX(), pointY - l.getPointY())
+                       - l.getDirection();
+diffRadian = radianNormalize(diffRadian);
+    int32_t beginLeftCount  = leftWheel_.getCount();
+    int32_t beginRightCount = rightWheel_.getCount();
+    if (OnOffControl* onoff = dynamic_cast<OnOffControl*>(&spinControl)) {
+        onoff->setPwm(spinPwm);
+    }
+
+    // 右回転か左回転かを決める
+    if (0 < diffRadian) {
+        while (0 < diffRadian) {
+            spinForGoPoint(spinControl, l, pointX, pointY, diffRadian,
+                           beginLeftCount, beginRightCount, spinPwm);
+        }
+    } else {
+        spinPwm *= -1;
+        while (diffRadian < 0) {
+            spinForGoPoint(spinControl, l, pointX, pointY, diffRadian,
+                           beginLeftCount, beginRightCount, spinPwm);
+        }
+    }
+    // 回転ここまで
+
+    dly_tsk(100); // そのままだと機体が揺れて誤差が出る気がするので少し止めておく
+    // 移動させる
+    if (OnOffControl* onoff = dynamic_cast<OnOffControl*>(&control)) {
+        onoff->setPwm(pwm);
+    }
+
+    while(true) {
+        if (std::sqrt(std::pow(pointX - l.getPointX(), 2) + std::pow(pointY - l.getPointY(), 2)) < 30) {
+            stop();
+            break;
+        }
+        // 正だと左旋回
+        diffRadian = std::atan2(pointX - l.getPointX(), pointY - l.getPointY())
+                   - l.getDirection();
+diffRadian = radianNormalize(diffRadian);
+        int controlValue = static_cast<int>(std::roundf(control.getControlValue(diffRadian)));
+        steering_.setPower(pwm, -controlValue);
+    }
+    // 移動ここまで
+
+}
+
+void Move::spinForGoPoint(Control& control, Localization& l, point_t pointX, point_t pointY, point_t& diffRadian,
+                          int32_t beginLeftCount, int32_t beginRightCount, int spinPwm) {
+
+        float countDiff = std::abs(leftWheel_.getCount() - beginLeftCount)
+                        - std::abs(rightWheel_.getCount() - beginRightCount);
+        int controlValue = static_cast<int>(std::roundf(control.getControlValue(countDiff) / 2));
+        if (spinPwm < 0) { controlValue *= -1; }
+
+        leftWheel_.setPWM(spinPwm - controlValue);
+        rightWheel_.setPWM(-(spinPwm + controlValue));
+        diffRadian = std::atan2(pointX - l.getPointX(), pointY - l.getPointY())
+                   - l.getDirection();
+diffRadian = radianNormalize(diffRadian);
+}
+
 void Move::showControlData(int brightness, int controlValue) const {
     const int max = 200;
     static int a = max;
@@ -226,22 +309,25 @@ void Move::showControlData(int brightness, int controlValue) const {
  * 指定したパワーでライントレースする。<br>
  * Steeringクラスを使用した実装。
  *
- * @param control ライントレース制御用のControlクラス
- * @param pwm     モーターのパワー
+ * @param control     ライントレース制御用のControlクラス
+ * @param pwm         モーターのパワー
+ * @param isRightSide ラインの右側走るならtrue、左を走るならfalse
  */
-void Move::lineTrace(Control& control, int pwm) {
+void Move::lineTrace(Control& control, int pwm, bool isRightSide) {
     if (OnOffControl* onoff = dynamic_cast<OnOffControl*>(&control)) {
         onoff->setPwm(pwm);
     }
     float value = static_cast<float>(colorSensor_.getBrightness());
     int controlValue = static_cast<int>(std::roundf(control.getControlValue(value)));
+    if (!isRightSide) {
+        controlValue *= -1;
+    }
     steering_.setPower(pwm, controlValue);
-
     showControlData(value, controlValue);
 }
 
 // 従来のSteeringクラスを使用しない実装
-void Move::oldLineTrace(Control& control, float threshold, int pwm) {
+void Move::oldLineTrace(Control& control, float threshold, int pwm, bool isRightSide) {
     if (OnOffControl* onoff = dynamic_cast<OnOffControl*>(&control)) {
         onoff->setPwm(pwm);
     }
@@ -250,6 +336,9 @@ void Move::oldLineTrace(Control& control, float threshold, int pwm) {
 
     showControlData(value, controlValue);
 
+    if (!isRightSide) {
+        controlValue *= -1;
+    }
     if(value > threshold) {
         leftWheel_.setPWM(pwm - controlValue);
         rightWheel_.setPWM(pwm);

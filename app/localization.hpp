@@ -9,8 +9,8 @@
 #ifndef LOCALIZATION_HPP
 #define LOCALIZATION_HPP
 
-//#define PRINT_LOCALIZATION // 座標と方位と移動距離を画面出力
-#define OUTPUT_LOCALIZATION // 座標の変位をファイル出力
+// #define PRINT_LOCALIZATION  // 座標と方位と移動距離を画面出力
+// #define OUTPUT_LOCALIZATION // 座標の変位をファイル出力
 
 namespace ie {
 
@@ -39,10 +39,10 @@ private:
     FileOutput fox_;
     FileOutput foy_;
     #endif
-    point_t pointX_    = 0; // 前がプラス
-    point_t pointY_    = 0; // 右がプラス
+    point_t pointX_    = 0; // 右がプラス
+    point_t pointY_    = 0; // 前がプラス
     point_t distance_  = 0; // 移動距離
-    point_t direction_ = 0; // 自機方位 (ラジアン) 時計回り
+    point_t direction_ = 0; // 自機方位 (ラジアン) 時計回りに正
     point_t changeDistance_  = 0; // 移動距離変化量
     point_t changeDirection_ = 0; // 自機方位変化量
     point_t lastDistance_   = 0;
