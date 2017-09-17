@@ -15,6 +15,8 @@ HsvConverter
 
 
 ### 更新履歴
+ライントレースのエッジの左右を選択式に  
+座標指定移動追加  
 localizationクラス(自己位置推定)追加  
 周期ハンドラを追加  
 ports_assignment.hpp更新  

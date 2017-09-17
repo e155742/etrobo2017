@@ -35,12 +35,8 @@ void Move::rotateTail(int degree, int pwm) {
     tail_.reset();
     plusMinusNormalize(degree, pwm);
     tail_.setPWM(pwm);
-    while (true) {
-        if (degree <= std::abs(tail_.getCount())) {
-            tail_.stop();
-            break;
-        }
-    }
+    while (std::abs(tail_.getCount() < degree)) {}
+    tail_.stop();
 }
 
 /**
@@ -57,31 +53,23 @@ void Move::raiseArm(int degree, int pwm) {
     } else if (90 < degree) {
         degree = 90;
     }
-    if (pwm < 0) {
-        pwm = 0;
-    }
+
+    if (pwm < 0) { pwm = 0; }
 
     // 上げる
     if (arm_.getCount() < degree) {
         arm_.setPWM(pwm);
-        while (true) {
-            if (degree <= arm_.getCount()) {
-                arm_.stop();
-                return;
-            }
-        }
+        while (arm_.getCount() < degree) {}
     }
 
     // 下げる
     if (degree < arm_.getCount()) {
         arm_.setPWM(-pwm);
-        while (true) {
-            if (arm_.getCount() <= degree) {
-                arm_.stop();
-                return;
-            }
-        }
+        while (degree < arm_.getCount()) {}
     }
+
+    arm_.stop();
+    return;
 }
 
 /**
@@ -139,17 +127,14 @@ void Move::goStraight(Control& control, float distance, int pwm) {
         onoff->setPwm(pwm);
     }
 
-    while(true) {
-        if (distance <= std::abs(beginDistance - getMileage())) {
-            stop();
-            break;
-        }
-        // 正だと左旋回
+    while(std::abs(beginDistance - getMileage()) < distance) {
+        // 左ホイールの回転角 - 右ホイールの回転角度  正だと左旋回
         float countDiff = std::abs(leftWheel_.getCount() - beginLeftCount)
                         - std::abs(rightWheel_.getCount() - beginRightCount);
         int controlValue = static_cast<int>(std::roundf(control.getControlValue(countDiff)));
         steering_.setPower(pwm, controlValue);
     }
+    stop();
 }
 
 /**
@@ -190,13 +175,9 @@ void Move::spin(Control& control, int degree, int pwm) {
     double targetWheelAngle = ANGLE_COEFFICIENT * static_cast<double>(degree)
                             * (ROBOT_TREAD / TIRE_OUT_DIAMETER);
 
-    while(true) {
-        // 目標回転角度 <= 左右のホイールの平均回転角度
-        if (targetWheelAngle <= std::abs((leftWheel_.getCount() - beginLeftCount
-                                        + beginRightCount - rightWheel_.getCount()) / 2)) {
-            stop();
-            return;
-        }
+    // 左右のホイールの平均回転角度 < 目標回転角度
+    while (std::abs((leftWheel_.getCount() - beginLeftCount + beginRightCount - rightWheel_.getCount()) / 2)
+         < targetWheelAngle) {
         // 正だと左寄り
         float countDiff = std::abs(leftWheel_.getCount() - beginLeftCount)
                         - std::abs(rightWheel_.getCount() - beginRightCount);
@@ -206,6 +187,7 @@ void Move::spin(Control& control, int degree, int pwm) {
         leftWheel_.setPWM(pwm - controlValue);
         rightWheel_.setPWM(-(pwm + controlValue));
     }
+    stop();
 }
 
 /**
@@ -234,7 +216,7 @@ void Move::goPoint(Control& control, Control& spinControl, Localization& l,
     // 回転させる
     point_t diffRadian = std::atan2(pointX - l.getPointX(), pointY - l.getPointY())
                        - l.getDirection();
-diffRadian = radianNormalize(diffRadian);
+    diffRadian = radianNormalize(diffRadian);
     int32_t beginLeftCount  = leftWheel_.getCount();
     int32_t beginRightCount = rightWheel_.getCount();
     if (OnOffControl* onoff = dynamic_cast<OnOffControl*>(&spinControl)) {
@@ -262,18 +244,15 @@ diffRadian = radianNormalize(diffRadian);
         onoff->setPwm(pwm);
     }
 
-    while(true) {
-        if (std::sqrt(std::pow(pointX - l.getPointX(), 2) + std::pow(pointY - l.getPointY(), 2)) < 30) {
-            stop();
-            break;
-        }
+    while(30 <= std::sqrt(std::pow(pointX - l.getPointX(), 2) + std::pow(pointY - l.getPointY(), 2))) {
         // 正だと左旋回
         diffRadian = std::atan2(pointX - l.getPointX(), pointY - l.getPointY())
                    - l.getDirection();
-diffRadian = radianNormalize(diffRadian);
+        diffRadian = radianNormalize(diffRadian);
         int controlValue = static_cast<int>(std::roundf(control.getControlValue(diffRadian)));
         steering_.setPower(pwm, -controlValue);
     }
+    stop();
     // 移動ここまで
 
 }
@@ -281,16 +260,16 @@ diffRadian = radianNormalize(diffRadian);
 void Move::spinForGoPoint(Control& control, Localization& l, point_t pointX, point_t pointY, point_t& diffRadian,
                           int32_t beginLeftCount, int32_t beginRightCount, int spinPwm) {
 
-        float countDiff = std::abs(leftWheel_.getCount() - beginLeftCount)
-                        - std::abs(rightWheel_.getCount() - beginRightCount);
-        int controlValue = static_cast<int>(std::roundf(control.getControlValue(countDiff) / 2));
-        if (spinPwm < 0) { controlValue *= -1; }
+    float countDiff = std::abs(leftWheel_.getCount() - beginLeftCount)
+                    - std::abs(rightWheel_.getCount() - beginRightCount);
+    int controlValue = static_cast<int>(std::roundf(control.getControlValue(countDiff) / 2));
+    if (spinPwm < 0) { controlValue *= -1; }
 
-        leftWheel_.setPWM(spinPwm - controlValue);
-        rightWheel_.setPWM(-(spinPwm + controlValue));
-        diffRadian = std::atan2(pointX - l.getPointX(), pointY - l.getPointY())
-                   - l.getDirection();
-diffRadian = radianNormalize(diffRadian);
+    leftWheel_.setPWM(spinPwm - controlValue);
+    rightWheel_.setPWM(-(spinPwm + controlValue));
+    diffRadian = std::atan2(pointX - l.getPointX(), pointY - l.getPointY())
+               - l.getDirection();
+    diffRadian = radianNormalize(diffRadian);
 }
 
 void Move::showControlData(int brightness, int controlValue) const {

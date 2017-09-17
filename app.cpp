@@ -130,9 +130,9 @@ void goPointTest() {
 }
 
 void main_task(intptr_t unused) {
-    ioTest();
-    dly_tsk(3 * 1000);
-    msg_clear();
+    // ioTest();
+    // dly_tsk(3 * 1000);
+    // msg_clear();
 
     ev3_sta_cyc(SUB_CYC);
     moveTest();
