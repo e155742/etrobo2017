@@ -22,17 +22,17 @@ public:
     void raiseArm(int degree, int pwm);
     void stop();
 
-    void left(int pwm);
-    void left(Stopper& stopper, int pwm);
+    void setPwmLeft(int pwm);
+    void setPwmLeft(Stopper& stopper, int pwm);
 
-    void right(int pwm);
-    void right(Stopper& stopper, int pwm);
+    void setPwmRight(int pwm);
+    void setPwmRight(Stopper& stopper, int pwm);
 
-    void wheel(int leftPwm, int lightPwm);
-    void wheel(Stopper& stopper, int leftPwm, int lightPwm);
+    void setPwmBoth(int leftPwm, int lightPwm);
+    void setPwmBoth(Stopper& stopper, int leftPwm, int lightPwm);
 
-    void steering(int pwm, int turnRatio);
-    void steering(Stopper& stopper, int pwm, int turnRatio);
+    void setSteeringPower(int pwm, int turnRatio);
+    void setSteeringPower(Stopper& stopper, int pwm, int turnRatio);
 
     void goStraight(Control& control, int pwm);
     void goStraight(Stopper& stopper, Control& control, int pwm);

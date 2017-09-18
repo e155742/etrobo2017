@@ -139,15 +139,15 @@ void motionTest() {
     ev3api::Motor right(ie::RIGHT_WHEEL_PORT);
     ie::Motion motion;
     // ie::MileageStopper ms(150);
-    // motion.left(ms, 50);
+    // motion.setPwmLeft(ms, 50);
     // ms.setMileage(250);
-    // motion.right(ms, 50);
+    // motion.setPwmRight(ms, 50);
 
     ie::AngleStopper as(270.0);
-    ie::OnOffControl stControl(left.getCount() + right.getCount(), 0, 0.3, 0);
+    ie::OnOffControl stControl(0, 0.3, 0);
     motion.spin(as, stControl, 30);
     as.setAngle(-90.0);
-    motion.steering(as, 50, 50);
+    motion.setSteeringPower(as, 50, 50);
     msg_f("end", 1);
 }
 

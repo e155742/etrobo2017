@@ -80,7 +80,7 @@ void Motion::stop() {
  *
  * @param pwm モーターのパワー
  */
-void Motion::left(int pwm){
+void Motion::setPwmLeft(int pwm){
     leftWheel_.setPWM(pwm);
 }
 
@@ -90,9 +90,9 @@ void Motion::left(int pwm){
  * @param stopper 停止判定用のStopperクラス
  * @param pwm     モーターのパワー
  */
-void Motion::left(Stopper& stopper, int pwm){
+void Motion::setPwmLeft(Stopper& stopper, int pwm){
     while (!stopper.doStop()) {
-        left(pwm);
+        setPwmLeft(pwm);
     }
     leftWheel_.stop();
 }
@@ -102,7 +102,7 @@ void Motion::left(Stopper& stopper, int pwm){
  *
  * @param pwm モーターのパワー
  */
-void Motion::right(int pwm){
+void Motion::setPwmRight(int pwm){
     rightWheel_.setPWM(pwm);
 }
 
@@ -112,9 +112,9 @@ void Motion::right(int pwm){
  * @param stopper 停止判定用のStopperクラス
  * @param pwm     モーターのパワー
  */
-void Motion::right(Stopper& stopper, int pwm){
+void Motion::setPwmRight(Stopper& stopper, int pwm){
     while (!stopper.doStop()) {
-        right(pwm);
+        setPwmRight(pwm);
     }
     rightWheel_.stop();
 }
@@ -126,7 +126,7 @@ void Motion::right(Stopper& stopper, int pwm){
  * @param leftPwm  左モーターのパワー
  * @param rightPwm 右モーターのパワー
  */
-void Motion::wheel(int leftPwm, int lightPwm) {
+void Motion::setPwmBoth(int leftPwm, int lightPwm) {
     leftWheel_.setPWM(leftPwm);
     rightWheel_.setPWM(lightPwm);
 }
@@ -139,9 +139,9 @@ void Motion::wheel(int leftPwm, int lightPwm) {
  * @param leftPwm  左モーターのパワー
  * @param rightPwm 右モーターのパワー
  */
-void Motion::wheel(Stopper& stopper, int leftPwm, int lightPwm) {
+void Motion::setPwmBoth(Stopper& stopper, int leftPwm, int lightPwm) {
     while (!stopper.doStop()) {
-        wheel(leftPwm, lightPwm);
+        setPwmBoth(leftPwm, lightPwm);
     }
     stop();
 }
@@ -153,7 +153,7 @@ void Motion::wheel(Stopper& stopper, int leftPwm, int lightPwm) {
  * @param pwm       モーターのパワー
  * @param turnRatio ステアリングの度合い。負で左転回、正で右転回
  */
-void Motion::steering(int pwm, int turnRatio){
+void Motion::setSteeringPower(int pwm, int turnRatio){
     steering_.setPower (pwm, turnRatio);
 }
 
@@ -165,9 +165,9 @@ void Motion::steering(int pwm, int turnRatio){
  * @param pwm       モーターのパワー
  * @param turnRatio ステアリングの度合い。負で左転回、正で右転回
  */
- void Motion::steering(Stopper& stopper, int pwm, int turnRatio){
+ void Motion::setSteeringPower(Stopper& stopper, int pwm, int turnRatio){
     while (!stopper.doStop()) {
-        steering_.setPower (pwm, turnRatio);
+        setSteeringPower(pwm, turnRatio);
     }
     stop();
 }
