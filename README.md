@@ -10,9 +10,11 @@ left
 right  
 wheel  
 直進  
+回転  
 
 #### Stopper
-距離検知
+距離検知  
+車体回転角検知  
 
 ### 実装済
 move  

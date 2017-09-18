@@ -19,6 +19,7 @@
 #include "motion.hpp"
 
 #include "mileage_stopper.hpp"
+#include "angle_stopper.hpp"
 
 ie::Localization* localization;
 /**
@@ -134,11 +135,20 @@ void goPointTest() {
 }
 
 void motionTest() {
+    ev3api::Motor left(ie::LEFT_WHEEL_PORT);
+    ev3api::Motor right(ie::RIGHT_WHEEL_PORT);
     ie::Motion motion;
-    ie::OnOffControl* stControl = new ie::OnOffControl(0, 0, 0.3, 0);
-    ie::MileageStopper ms(1500);
-    motion.goStraight(ms, *stControl, 50);
-    delete stControl;
+    // ie::MileageStopper ms(150);
+    // motion.left(ms, 50);
+    // ms.setMileage(250);
+    // motion.right(ms, 50);
+
+    ie::AngleStopper as(270.0);
+    ie::OnOffControl stControl(left.getCount() + right.getCount(), 0, 0.3, 0);
+    motion.spin(as, stControl, 30);
+    as.setAngle(-90.0);
+    motion.steering(as, 50, 50);
+    msg_f("end", 1);
 }
 
 void main_task(intptr_t unused) {

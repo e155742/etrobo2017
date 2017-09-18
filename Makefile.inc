@@ -13,7 +13,8 @@ APPL_CXXOBJS += \
 	pid_control.o \
 	util.o \
 	var_entering.o \
-	mileage_stopper.o
+	mileage_stopper.o \
+	angle_stopper.o
 
 SRCLANG := c++
 

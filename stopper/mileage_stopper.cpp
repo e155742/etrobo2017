@@ -9,10 +9,6 @@
 
 namespace ie {
 
-// MileageStopper::MileageStopper(ev3api::Motor leftWheel, ev3api::Motor rightWheel):
-// leftWheel_(leftWheel), rightWheel_(rightWheel), beginMileage_(getMileage()) {
-// }
-
 MileageStopper::MileageStopper():
 leftWheel_(LEFT_WHEEL_PORT), rightWheel_(RIGHT_WHEEL_PORT),
 beginMileage_(getMileage()), targetMileage_(0.0) {

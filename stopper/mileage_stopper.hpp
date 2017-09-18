@@ -12,12 +12,10 @@ namespace ie {
 
 class MileageStopper : public Stopper {
 public:
-    // MileageStopper(ev3api::Motor leftWheel, ev3api::Motor rightWheel);
     MileageStopper();
     MileageStopper(double targetMileage);
-    void setMileage(double targetMileage);
-    void resetMileage();
     bool doStop() const;
+    void setMileage(double targetMileage);
 
 private:
     ev3api::Motor leftWheel_;

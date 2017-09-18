@@ -208,4 +208,47 @@ void Motion::goStraight(Stopper& stopper, Control& control, int pwm) {
     stop();
 }
 
+void Motion::spinHelper(Control& control, int pwm) {
+    // ターゲット値よりも大きければ右寄り
+    double countDiff = leftWheel_.getCount() + rightWheel_.getCount();
+    int controlValue = static_cast<int>(std::roundf(control.getControlValue(countDiff) / 2.0));
+    leftWheel_.setPWM(pwm - controlValue);
+    rightWheel_.setPWM(-(pwm + controlValue));
+}
+
+/**
+ * 指定した角度だけその場で回転する。正の角度が時計回り、負の角度が反時計回り。パワーが負になっても逆になる<br>
+ * パワーの範囲は-100~100だが、これ未満の値や超過する値入れても自動でカンストするから平気。<br>
+ * Controlクラスのtargetは(左ホイールのcount+右ホイールのcount)を指定すること。<br>
+ * <br>
+ * 回転するホイールの角度 = (車体を回転させたい角度)*(車体が一回転する円の外周/車輪の外周)
+ *
+ * @param control 回転制御用のControlクラス
+ * @param degree  回転したい角度
+ * @param pwm     モーターのパワー
+ */
+ void Motion::spin(Control& control, int pwm) {
+    onoffSetPwm(control, pwm);
+    spinHelper(control, pwm);
+}
+
+/**
+ * 指定した角度だけその場で回転する。正の角度が時計回り、負の角度が反時計回り。パワーが負になっても逆になる<br>
+ * パワーの範囲は-100~100だが、これ未満の値や超過する値入れても自動でカンストするから平気。<br>
+ * Controlクラスのtargetは(左ホイールのcount+右ホイールのcount)を指定すること。<br>
+ * <br>
+ * 回転するホイールの角度 = (車体を回転させたい角度)*(車体が一回転する円の外周/車輪の外周)
+ *
+ * @param control 回転制御用のControlクラス
+ * @param degree  回転したい角度
+ * @param pwm     モーターのパワー
+ */
+ void Motion::spin(Stopper& stopper, Control& control, int pwm) {
+    onoffSetPwm(control, pwm);
+    while (!stopper.doStop()) {
+        spinHelper(control, pwm);
+    }
+    stop();
+}
+
 }

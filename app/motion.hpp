@@ -37,6 +37,9 @@ public:
     void goStraight(Control& control, int pwm);
     void goStraight(Stopper& stopper, Control& control, int pwm);
 
+    void spin(Control& control, int pwm);
+    void spin(Stopper& stopper, Control& control, int pwm);
+
 private:
     ev3api::Motor leftWheel_;
     ev3api::Motor rightWheel_;
@@ -46,6 +49,7 @@ private:
     ev3api::ColorSensor colorSensor_;
     void onoffSetPwm(Control& control, int pwm);
     void goStraightHelper(Control& control, int pwm);
+    void spinHelper(Control& control, int pwm);
 };
 
 }

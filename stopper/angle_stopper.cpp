@@ -1,0 +1,45 @@
+/**
+ * @file angle_stopper.cpp
+ * @brief 走行距離で終了判定
+ *
+ * @author Suguru Kouchi
+ */
+#include "angle_stopper.hpp"
+#include "robo_meta_datas.hpp"
+
+namespace ie {
+
+AngleStopper::AngleStopper():
+leftWheel_(LEFT_WHEEL_PORT), rightWheel_(RIGHT_WHEEL_PORT) {
+    setAngle(0.0);
+}
+
+AngleStopper::AngleStopper(double targetAngle):
+leftWheel_(LEFT_WHEEL_PORT), rightWheel_(RIGHT_WHEEL_PORT) {
+    setAngle(targetAngle);
+}
+
+bool AngleStopper::doStop() const {
+    //  (左ホイール回転量 - 右ホイール回転量) / 2
+    int32_t diffCount = static_cast<int>(std::roundf(leftWheel_.getCount() - beginLeftCount_ + beginRightCount_ - rightWheel_.getCount()) / 2);
+    if (0 < targetWheelAngle_) {
+        if (targetWheelAngle_ < diffCount) {
+            return true;
+        }
+    } else {
+        if (diffCount < targetWheelAngle_) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void AngleStopper::setAngle(double targetAngle) {
+    beginLeftCount_  = leftWheel_.getCount();
+    beginRightCount_ = rightWheel_.getCount();
+
+    // 回転するホイールの角度 = (車体を回転させたい角度)*(車体が一回転する円の外周/車輪の外周)
+    targetWheelAngle_ = static_cast<int32_t>(std::roundf(ANGLE_COEFFICIENT * targetAngle * (ROBOT_TREAD / TIRE_OUT_DIAMETER)));
+}
+
+}
