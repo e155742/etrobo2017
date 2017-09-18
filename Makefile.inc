@@ -7,11 +7,13 @@ APPL_CXXOBJS += \
 	file_output.o \
 	hsv_converter.o \
 	localization.o \
+	motion.o \
 	move.o \
 	onoff_control.o \
 	pid_control.o \
 	util.o \
-	var_entering.o
+	var_entering.o \
+	mileage_stopper.o
 
 SRCLANG := c++
 
@@ -26,12 +28,14 @@ APPL_DIR += \
 	$(mkfile_path)app \
 	$(mkfile_path)unit \
 	$(mkfile_path)util \
-	$(mkfile_path)control
+	$(mkfile_path)control \
+	$(mkfile_path)stopper
 
 INCLUDES += \
 	-I$(mkfile_path)app \
 	-I$(mkfile_path)unit \
 	-I$(mkfile_path)util \
-	-I$(mkfile_path)control
+	-I$(mkfile_path)control \
+	-I$(mkfile_path)stopper
 
 COPTS += -fno-use-cxa-atexit

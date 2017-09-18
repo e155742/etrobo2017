@@ -13,8 +13,12 @@
 #include "control.hpp"
 #include "pid_control.hpp"
 #include "onoff_control.hpp"
+
 #include "localization.hpp"
 #include "move.hpp"
+#include "motion.hpp"
+
+#include "mileage_stopper.hpp"
 
 ie::Localization* localization;
 /**
@@ -129,14 +133,23 @@ void goPointTest() {
     delete spControl;
 }
 
+void motionTest() {
+    ie::Motion motion;
+    ie::OnOffControl* stControl = new ie::OnOffControl(0, 0, 0.3, 0);
+    ie::MileageStopper ms(1500);
+    motion.goStraight(ms, *stControl, 50);
+    delete stControl;
+}
+
 void main_task(intptr_t unused) {
-    ioTest();
-    dly_tsk(3 * 1000);
-    msg_clear();
+    // ioTest();
+    // dly_tsk(3 * 1000);
+    // msg_clear();
 
     ev3_sta_cyc(SUB_CYC);
-    moveTest();
+    // moveTest();
     // goPointTest();
+    motionTest();
     ev3_stp_cyc(SUB_CYC);
     delete localization;
 }
