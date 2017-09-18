@@ -35,6 +35,11 @@ bool MileageStopper::doStop() const {
     }
 }
 
+/**
+ * 目標となる走行距離を指定。
+ *
+ * @param targetMileage 走行させたい距離(mm)
+ */
 void MileageStopper::setMileage(double targetMileage) {
     beginMileage_ = getMileage();
     targetMileage_ = targetMileage;

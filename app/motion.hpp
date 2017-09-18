@@ -31,8 +31,8 @@ public:
     void wheel(int leftPwm, int lightPwm);
     void wheel(Stopper& stopper, int leftPwm, int lightPwm);
 
-    void steering(int power, int turnRatio);
-    void steering(Stopper& stopper, int power, int turnRatio);
+    void steering(int pwm, int turnRatio);
+    void steering(Stopper& stopper, int pwm, int turnRatio);
 
     void goStraight(Control& control, int pwm);
     void goStraight(Stopper& stopper, Control& control, int pwm);

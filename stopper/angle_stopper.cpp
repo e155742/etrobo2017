@@ -1,6 +1,6 @@
 /**
  * @file angle_stopper.cpp
- * @brief 走行距離で終了判定
+ * @brief 旋回角度で終了判定
  *
  * @author Suguru Kouchi
  */
@@ -34,6 +34,11 @@ bool AngleStopper::doStop() const {
     return false;
 }
 
+/**
+ * 目標となる車体の旋回角度を指定。
+ *
+ * @param targetAngle 旋回させたい角度
+ */
 void AngleStopper::setAngle(double targetAngle) {
     beginLeftCount_  = leftWheel_.getCount();
     beginRightCount_ = rightWheel_.getCount();

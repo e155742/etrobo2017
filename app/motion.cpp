@@ -87,7 +87,8 @@ void Motion::left(int pwm){
 /**
  * 指定したパワーで左ホイールを動かす。
  *
- * @param pwm モーターのパワー
+ * @param stopper 停止判定用のStopperクラス
+ * @param pwm     モーターのパワー
  */
 void Motion::left(Stopper& stopper, int pwm){
     while (!stopper.doStop()) {
@@ -108,7 +109,8 @@ void Motion::right(int pwm){
 /**
  * 指定したパワーで右ホイールを動かす。
  *
- * @param pwm モーターのパワー
+ * @param stopper 停止判定用のStopperクラス
+ * @param pwm     モーターのパワー
  */
 void Motion::right(Stopper& stopper, int pwm){
     while (!stopper.doStop()) {
@@ -133,6 +135,7 @@ void Motion::wheel(int leftPwm, int lightPwm) {
  * 指定したパワーで左ホイールと右ホイールを動かす。<br>
  * 制御は行わないので同じ値を入れても直進しません。
  *
+ * @param stopper  停止判定用のStopperクラス
  * @param leftPwm  左モーターのパワー
  * @param rightPwm 右モーターのパワー
  */
@@ -147,23 +150,24 @@ void Motion::wheel(Stopper& stopper, int leftPwm, int lightPwm) {
  * ステアリング操作を行う<br>
  * Steering.setPower()を呼び出している。
  *
- * @param pwm モーターのパワー
- * @param turnRatio ステアリングの度合い。マイナスの値は左への転回、プラスの値は右への転回
+ * @param pwm       モーターのパワー
+ * @param turnRatio ステアリングの度合い。負で左転回、正で右転回
  */
-void Motion::steering(int power, int turnRatio){
-    steering_.setPower (power, turnRatio);
+void Motion::steering(int pwm, int turnRatio){
+    steering_.setPower (pwm, turnRatio);
 }
 
 /**
  * ステアリング操作を行う<br>
  * Steering.setPower()を呼び出している。
  *
- * @param pwm モーターのパワー
- * @param turnRatio ステアリングの度合い。マイナスの値は左への転回、プラスの値は右への転回
+ * @param stopper   停止判定用のStopperクラス
+ * @param pwm       モーターのパワー
+ * @param turnRatio ステアリングの度合い。負で左転回、正で右転回
  */
- void Motion::steering(Stopper& stopper, int power, int turnRatio){
+ void Motion::steering(Stopper& stopper, int pwm, int turnRatio){
     while (!stopper.doStop()) {
-        steering_.setPower (power, turnRatio);
+        steering_.setPower (pwm, turnRatio);
     }
     stop();
 }
@@ -185,8 +189,8 @@ void Motion::goStraightHelper(Control& control, int pwm) {
  * 指定したパワーで直進する。距離指定なし。パワーがマイナスだと後退。<br>
  * Controlクラスのtargetは(左ホイールのcount-右ホイールのcount)を指定すること。
  *
- * @param control  直進制御用のControlクラス
- * @param pwm      モーターのパワー
+ * @param control 直進制御用のControlクラス
+ * @param pwm     モーターのパワー
  */
 void Motion::goStraight(Control& control, int pwm) {
     onoffSetPwm(control, pwm);
@@ -197,8 +201,9 @@ void Motion::goStraight(Control& control, int pwm) {
  * 指定したパワーで直進する。距離指定なし。パワーがマイナスだと後退。<br>
  * Controlクラスのtargetは(左ホイールのcount-右ホイールのcount)を指定すること。
  *
- * @param control  直進制御用のControlクラス
- * @param pwm      モーターのパワー
+ * @param stopper 停止判定用のStopperクラス
+ * @param control 直進制御用のControlクラス
+ * @param pwm     モーターのパワー
  */
 void Motion::goStraight(Stopper& stopper, Control& control, int pwm) {
     onoffSetPwm(control, pwm);
@@ -217,33 +222,26 @@ void Motion::spinHelper(Control& control, int pwm) {
 }
 
 /**
- * 指定した角度だけその場で回転する。正の角度が時計回り、負の角度が反時計回り。パワーが負になっても逆になる<br>
- * パワーの範囲は-100~100だが、これ未満の値や超過する値入れても自動でカンストするから平気。<br>
- * Controlクラスのtargetは(左ホイールのcount+右ホイールのcount)を指定すること。<br>
- * <br>
- * 回転するホイールの角度 = (車体を回転させたい角度)*(車体が一回転する円の外周/車輪の外周)
+ * 正のpwmで時計回り、負のpwmで反時計回りに回転する。<br>
+ * Controlクラスのtargetは(左ホイールのcount+右ホイールのcount)を指定すること。
  *
  * @param control 回転制御用のControlクラス
- * @param degree  回転したい角度
  * @param pwm     モーターのパワー
  */
- void Motion::spin(Control& control, int pwm) {
+void Motion::spin(Control& control, int pwm) {
     onoffSetPwm(control, pwm);
     spinHelper(control, pwm);
 }
 
 /**
- * 指定した角度だけその場で回転する。正の角度が時計回り、負の角度が反時計回り。パワーが負になっても逆になる<br>
- * パワーの範囲は-100~100だが、これ未満の値や超過する値入れても自動でカンストするから平気。<br>
- * Controlクラスのtargetは(左ホイールのcount+右ホイールのcount)を指定すること。<br>
- * <br>
- * 回転するホイールの角度 = (車体を回転させたい角度)*(車体が一回転する円の外周/車輪の外周)
+ * 正のpwmで時計回り、負のpwmで反時計回りに回転する。<br>
+ * Controlクラスのtargetは(左ホイールのcount+右ホイールのcount)を指定すること。
  *
+ * @param stopper 停止判定用のStopperクラス
  * @param control 回転制御用のControlクラス
- * @param degree  回転したい角度
  * @param pwm     モーターのパワー
  */
- void Motion::spin(Stopper& stopper, Control& control, int pwm) {
+void Motion::spin(Stopper& stopper, Control& control, int pwm) {
     onoffSetPwm(control, pwm);
     while (!stopper.doStop()) {
         spinHelper(control, pwm);
