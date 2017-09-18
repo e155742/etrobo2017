@@ -1,5 +1,6 @@
 #include "util.h"
 #include <cstdio>
+#include <cmath>
 #include "var_entering.hpp"
 
 // 演習用のユーティリティ
@@ -152,4 +153,26 @@ void msg_f(float n, int32_t line) {
 
 void msg_f(double n, int32_t line) {
   msg_template(n, line, "%lf");
+}
+
+// *******************
+// **      計算      **
+// *******************
+
+/**
+ * 角度を -PI < radian <= PI に正規化
+ *
+ * @param   radian 正規化したい角度
+ * @preturn radian 正規化された角度
+ */
+ double radianNormalize(double radian) {
+  if (radian <= -M_PI || M_PI < radian) {
+    radian = fmod(radian, 2.0 * M_PI);
+    if (radian <= -M_PI) {
+      radian +=  2 * M_PI;
+    } else if (M_PI < radian) {
+    radian -= 2 * M_PI;
+    }
+  }
+  return radian;
 }

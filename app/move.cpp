@@ -191,24 +191,6 @@ void Move::spin(Control& control, int degree, int pwm) {
 }
 
 /**
- * 角度を -PI < radian <= PI に正規化
- *
- * @param   radian 正規化したい角度
- * @preturn radian 正規化された角度
- */
-double Move::radianNormalize(double radian) {
-    if (radian <= -M_PI || M_PI < radian) {
-        radian = fmod(radian, 2.0 * M_PI);
-        if (radian <= -M_PI) {
-            radian +=  2 * M_PI;
-        } else if (M_PI < radian) {
-            radian -= 2 * M_PI;
-        }
-    }
-    return radian;
-}
-
-/**
  * 指定の座標に移動
  */
 void Move::goPoint(Control& control, Control& spinControl, Localization& l,

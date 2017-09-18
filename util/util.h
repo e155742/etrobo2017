@@ -48,4 +48,22 @@ void msg_template(X n, Y line, Z format) {
   msg_f(str, line);
 }
 
+double radianNormalize(double radian);
+
+/**
+ * valueが負の場合、これを正にしてsubValueの正負を反転させます<br>
+ * pwmや距離、角度等を正規化する際に使用します<br>
+ * 符号付きの整数型まはた浮動小数型で使うこと。
+ *
+ * @param value    こいつを正にする
+ * @param subValue valueが負ならこいつの符号が逆転する
+ */
+template <class X, class Y>
+void plusMinusNormalize(X& value, Y& subValue) {
+  if (value < 0) {
+    value *= -1;
+    subValue *= -1;
+  }
+}
+
 #endif  // MY_UNTL_H_

@@ -39,28 +39,10 @@ private:
     ev3api::Motor tail_;
     ev3api::Motor arm_;
     ev3api::ColorSensor colorSensor_;
-    template <class X , class Y> void plusMinusNormalize(X& value , Y& subValue) const;
-    double radianNormalize(double radian);
     void spinForGoPoint(Control& control, Localization& localization,
                         point_t pointX, point_t pointY, point_t& diffRadian, int32_t beginLeftCount, int32_t beginRightCount, int spinPwm);
     void showControlData(int brightness, int controlValue) const;
 };
-
-/**
- * valueが負の場合、これを正にしてsubValueの正負を反転させます<br>
- * pwmや距離、角度等を正規化する際に使用します<br>
- * 符号付きの整数型まはた浮動小数型で使うこと。
- *
- * @param value    こいつを正にする
- * @param subValue valueが負ならこいつの符号が逆転する
- */
-template <class X, class Y>
-void Move::plusMinusNormalize(X& value, Y& subValue) const {
-    if (value < 0) {
-        value *= -1;
-        subValue *= -1;
-    }
-}
 
 }
 

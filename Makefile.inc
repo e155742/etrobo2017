@@ -25,11 +25,13 @@ endif
 APPL_DIR += \
 	$(mkfile_path)app \
 	$(mkfile_path)unit \
-	$(mkfile_path)util
+	$(mkfile_path)util \
+	$(mkfile_path)control
 
 INCLUDES += \
 	-I$(mkfile_path)app \
 	-I$(mkfile_path)unit \
-	-I$(mkfile_path)util
+	-I$(mkfile_path)util \
+	-I$(mkfile_path)control
 
 COPTS += -fno-use-cxa-atexit
