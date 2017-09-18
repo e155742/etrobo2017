@@ -187,19 +187,20 @@ void Motion::goStraightHelper(Control& control, int pwm) {
 
 /**
  * 指定したパワーで直進する。距離指定なし。パワーがマイナスだと後退。<br>
- * Controlクラスのtargetは(左ホイールのcount-右ホイールのcount)を指定すること。
+ * Controlクラスのtargetは自動で指定される。(左ホイールのcount-右ホイールのcount)
  *
  * @param control 直進制御用のControlクラス
  * @param pwm     モーターのパワー
  */
 void Motion::goStraight(Control& control, int pwm) {
     onoffSetPwm(control, pwm);
+    control.setTarget(leftWheel_.getCount() - rightWheel_.getCount());
     goStraightHelper(control, pwm);
 }
 
 /**
  * 指定したパワーで直進する。距離指定なし。パワーがマイナスだと後退。<br>
- * Controlクラスのtargetは(左ホイールのcount-右ホイールのcount)を指定すること。
+ * Controlクラスのtargetは自動で指定される。(左ホイールのcount-右ホイールのcount)
  *
  * @param stopper 停止判定用のStopperクラス
  * @param control 直進制御用のControlクラス
@@ -207,6 +208,7 @@ void Motion::goStraight(Control& control, int pwm) {
  */
 void Motion::goStraight(Stopper& stopper, Control& control, int pwm) {
     onoffSetPwm(control, pwm);
+    control.setTarget(leftWheel_.getCount() - rightWheel_.getCount());
     while (!stopper.doStop()) {
         goStraightHelper(control, pwm);
     }
@@ -223,19 +225,20 @@ void Motion::spinHelper(Control& control, int pwm) {
 
 /**
  * 正のpwmで時計回り、負のpwmで反時計回りに回転する。<br>
- * Controlクラスのtargetは(左ホイールのcount+右ホイールのcount)を指定すること。
+ * Controlクラスのtargetは自動で指定される。(左ホイールのcount+右ホイールのcount)
  *
  * @param control 回転制御用のControlクラス
  * @param pwm     モーターのパワー
  */
 void Motion::spin(Control& control, int pwm) {
     onoffSetPwm(control, pwm);
+    control.setTarget(leftWheel_.getCount() + rightWheel_.getCount());
     spinHelper(control, pwm);
 }
 
 /**
  * 正のpwmで時計回り、負のpwmで反時計回りに回転する。<br>
- * Controlクラスのtargetは(左ホイールのcount+右ホイールのcount)を指定すること。
+ * Controlクラスのtargetは自動で指定される。(左ホイールのcount+右ホイールのcount)
  *
  * @param stopper 停止判定用のStopperクラス
  * @param control 回転制御用のControlクラス
@@ -243,6 +246,7 @@ void Motion::spin(Control& control, int pwm) {
  */
 void Motion::spin(Stopper& stopper, Control& control, int pwm) {
     onoffSetPwm(control, pwm);
+    control.setTarget(leftWheel_.getCount() + rightWheel_.getCount());
     while (!stopper.doStop()) {
         spinHelper(control, pwm);
     }

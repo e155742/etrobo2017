@@ -19,6 +19,16 @@ PIDControl::PIDControl(float target):
 target_(target) {}
 
 /**
+ * 各種定数のみ設定。
+ *
+ * @param kp     比例定数
+ * @param ki     積分定数
+ * @param kd     微分定数
+ */
+PIDControl::PIDControl(float kp, float ki, float kd):
+kp_(kp), ki_(ki), kd_(kd) {}
+
+/**
  * 目標値と各種定数を設定。
  *
  * @param target 目標値
@@ -49,6 +59,10 @@ void PIDControl::resetErrors() {
     errorValues_[0]  = 0;
     errorValues_[1]  = 0;
     cumulativeError_ = 0;
+}
+
+void PIDControl::setTarget(float target) {
+    target_ = target;
 }
 
 /**

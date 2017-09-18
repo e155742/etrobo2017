@@ -11,17 +11,27 @@
 namespace ie {
 
 /**
- * 制御用の二次方程式の係数を指定しないで初期化。<br>
+ * 目標値のみ指定して初期化。<br>
  * Steeringクラスで使用時に、単純な0%-100%のon/off制御になる。
  */
 OnOffControl::OnOffControl(float target):
 target_(target) {}
 
 /**
- * 制御用の二次方程式の係数を指定して初期化。
+ * 制御用の二次方程式の係数のみ指定して初期化。
+ */
+OnOffControl::OnOffControl(float a, float b, float c):
+a_(a), b_(b), c_(c) {}
+
+/**
+ * 目標値と制御用の二次方程式の係数を指定して初期化。
  */
 OnOffControl::OnOffControl(float target, float a, float b, float c):
 target_(target), a_(a), b_(b), c_(c) {}
+
+void OnOffControl::setTarget(float target) {
+    target_ = target;
+}
 
 /**
  * 制御量を求めるの式の係数a,b,cを指定する。式は単純な二次方程式で以下のようになる。<br>

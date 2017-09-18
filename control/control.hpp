@@ -10,6 +10,7 @@ namespace ie {
 class Control {
 public:
     virtual ~Control(){};
+    virtual void setTarget(float target) = 0;
     virtual float getControlValue(float value) = 0;
 };
 
