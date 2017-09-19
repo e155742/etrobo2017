@@ -7,6 +7,7 @@
  * @author Suguru Kouchi
  */
 #include "pid_control.hpp"
+#include "robo_meta_datas.hpp"
 
 namespace ie {
 
@@ -72,13 +73,13 @@ void PIDControl::setTarget(float target) {
  * @return      制御量
  */
 float PIDControl::getControlValue(float value) {
-    errorValues_[1] = errorValues_[0];                         // 前回の偏差
-    errorValues_[0] = value - target_;                         // 今回の偏差
-    cumulativeError_ += errorValues_[0];                       // 偏差の累積
+    errorValues_[1] = errorValues_[0];                                         // 前回の偏差
+    errorValues_[0] = value - target_;                                         // 今回の偏差
+    cumulativeError_ += (errorValues_[0] + errorValues_[1]) / 2.0 * DELTA_T; // 偏差の累積
 
-    float controlValue = kp_ * errorValues_[0];                // 比例
-    controlValue += ki_ * cumulativeError_;                    // 積分
-    controlValue += kd_ * (errorValues_[0] - errorValues_[1]); // 微分
+    float controlValue = kp_ * errorValues_[0];                          // 比例
+    controlValue += ki_ * cumulativeError_;                              // 積分
+    controlValue += kd_ * (errorValues_[0] - errorValues_[1]) / DELTA_T; // 微分
 
     return controlValue;
 }

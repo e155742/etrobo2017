@@ -8,6 +8,7 @@
 #include "motion.hpp"
 #include "onoff_control.hpp"
 #include "robo_meta_datas.hpp"
+#include "util.h"
 
 namespace ie {
 
@@ -249,6 +250,44 @@ void Motion::spin(Stopper& stopper, Control& control, int pwm) {
     control.setTarget(leftWheel_.getCount() + rightWheel_.getCount());
     while (!stopper.doStop()) {
         spinHelper(control, pwm);
+    }
+    stop();
+}
+
+void Motion::lineTraceHelper(Control& control, int pwm, bool isRightSide) {
+    colorSensor_.getRawColor(rgb_);
+    float value = static_cast<float>(rgb_.r + rgb_.g + rgb_.b);
+    int controlValue = static_cast<int>(std::roundf(control.getControlValue(value)));
+    if (!isRightSide) { controlValue *= -1; }
+    steering_.setPower(pwm, controlValue);
+}
+
+/**
+ * 指定したパワーでライントレースする。<br>
+ * Steeringクラスを使用した実装。
+ *
+ * @param control     ライントレース制御用のControlクラス
+ * @param pwm         モーターのパワー
+ * @param isRightSide ラインの右側走るならtrue、左を走るならfalse
+ */
+void Motion::lineTrace(Control& control, int pwm, bool isRightSide) {
+    onoffSetPwm(control, pwm);
+    lineTraceHelper(control, pwm, isRightSide);
+}
+
+/**
+ * 指定したパワーでライントレースする。<br>
+ * Steeringクラスを使用した実装。
+ *
+ * @param stopper 停止判定用のStopperクラス
+ * @param control     ライントレース制御用のControlクラス
+ * @param pwm         モーターのパワー
+ * @param isRightSide ラインの右側走るならtrue、左を走るならfalse
+ */
+void Motion::lineTrace(Stopper& stopper, Control& control, int pwm, bool isRightSide) {
+    onoffSetPwm(control, pwm);
+    while (!stopper.doStop()) {
+        lineTraceHelper(control, pwm, isRightSide);
     }
     stop();
 }

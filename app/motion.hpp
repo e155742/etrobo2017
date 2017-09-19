@@ -11,7 +11,6 @@
 
 #include "control.hpp"
 #include "stopper.hpp"
-#include "util.h"
 
 namespace ie {
 
@@ -40,6 +39,9 @@ public:
     void spin(Control& control, int pwm);
     void spin(Stopper& stopper, Control& control, int pwm);
 
+    void lineTrace(Control& control, int pwm, bool isRightSide);
+    void lineTrace(Stopper& stopper, Control& control, int pwm, bool isRightSide);
+
 private:
     ev3api::Motor leftWheel_;
     ev3api::Motor rightWheel_;
@@ -47,9 +49,11 @@ private:
     ev3api::Motor tail_;
     ev3api::Motor arm_;
     ev3api::ColorSensor colorSensor_;
+    rgb_raw_t rgb_;
     void onoffSetPwm(Control& control, int pwm);
     void goStraightHelper(Control& control, int pwm);
     void spinHelper(Control& control, int pwm);
+    void lineTraceHelper(Control& control, int pwm, bool isRightSide);
 };
 
 }

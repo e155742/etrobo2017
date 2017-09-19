@@ -28,6 +28,8 @@ static constexpr double TIRE_OUT_DIAMETER = 1243.5 / 5;   // 360*5度回した�
 static constexpr double ROBOT_TREAD       = M_PI * 126.0; // 右タイヤの中心から左タイヤの中心まで
 static constexpr double ANGLE_COEFFICIENT = 1.043;        // 角度係数 スピン時の論理値と実測の差を埋める
 
+static constexpr double DELTA_T = 0.004;
+
 }
 
 #endif

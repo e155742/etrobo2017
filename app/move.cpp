@@ -280,9 +280,7 @@ void Move::lineTrace(Control& control, int pwm, bool isRightSide) {
     }
     float value = static_cast<float>(colorSensor_.getBrightness());
     int controlValue = static_cast<int>(std::roundf(control.getControlValue(value)));
-    if (!isRightSide) {
-        controlValue *= -1;
-    }
+    if (!isRightSide) { controlValue *= -1; }
     steering_.setPower(pwm, controlValue);
     showControlData(value, controlValue);
 }
@@ -297,9 +295,7 @@ void Move::oldLineTrace(Control& control, float threshold, int pwm, bool isRight
 
     showControlData(value, controlValue);
 
-    if (!isRightSide) {
-        controlValue *= -1;
-    }
+    if (!isRightSide) { controlValue *= -1; }
     if(value > threshold) {
         leftWheel_.setPWM(pwm - controlValue);
         rightWheel_.setPWM(pwm);

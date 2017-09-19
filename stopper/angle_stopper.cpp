@@ -5,6 +5,7 @@
  * @author Suguru Kouchi
  */
 #include "angle_stopper.hpp"
+#include "util.h"
 #include "robo_meta_datas.hpp"
 
 namespace ie {
@@ -21,7 +22,7 @@ leftWheel_(LEFT_WHEEL_PORT), rightWheel_(RIGHT_WHEEL_PORT) {
 
 bool AngleStopper::doStop() const {
     //  (左ホイール回転量 - 右ホイール回転量) / 2
-    int32_t diffCount = static_cast<int>(std::roundf(leftWheel_.getCount() - beginLeftCount_ + beginRightCount_ - rightWheel_.getCount()) / 2);
+    int32_t diffCount = static_cast<int32_t>(std::roundf(leftWheel_.getCount() - beginLeftCount_ + beginRightCount_ - rightWheel_.getCount()) / 2.0);
     if (0 < targetWheelAngle_) {
         if (targetWheelAngle_ < diffCount) {
             return true;

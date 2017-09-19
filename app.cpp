@@ -135,20 +135,20 @@ void goPointTest() {
 }
 
 void motionTest() {
-    ev3api::Motor left(ie::LEFT_WHEEL_PORT);
-    ev3api::Motor right(ie::RIGHT_WHEEL_PORT);
+    // PIDの各種定数
+    const float kp = 3.0; // 比例定数
+    const float ki = 0.0;   // 積分定数
+    const float kd = 0.00; // 微分定数
+    const float threshold = (30 + 708) * 0.47;
+    ie::PIDControl ltControl(threshold, kp, ki, kd);
+    // ie::OnOffControl ltControl(threshold, 0, 0, 100);
     ie::Motion motion;
-    // ie::MileageStopper ms(150);
-    // motion.setPwmLeft(ms, 50);
-    // ms.setMileage(250);
-    // motion.setPwmRight(ms, 50);
 
-    ie::AngleStopper as(270.0);
-    ie::OnOffControl stControl(0, 0.3, 0);
-    motion.spin(as, stControl, 30);
-    as.setAngle(-90.0);
-    motion.setSteeringPower(as, 50, 50);
-    msg_f("end", 1);
+    motion.raiseArm(15, 5);
+    dly_tsk(2000);
+
+    ie::MileageStopper ms(2000);
+    motion.lineTrace(ms, ltControl, 100, true);
 }
 
 void main_task(intptr_t unused) {
