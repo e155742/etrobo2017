@@ -22,7 +22,7 @@ leftWheel_(LEFT_WHEEL_PORT), rightWheel_(RIGHT_WHEEL_PORT) {
 
 bool AngleStopper::doStop() const {
     //  (左ホイール回転量 - 右ホイール回転量) / 2
-    int32_t diffCount = static_cast<int32_t>(std::roundf(leftWheel_.getCount() - beginLeftCount_ + beginRightCount_ - rightWheel_.getCount()) / 2.0);
+    int32_t diffCount = roundInt32_t((leftWheel_.getCount() - beginLeftCount_ + beginRightCount_ - rightWheel_.getCount()) / 2.0);
     if (0 < targetWheelAngle_) {
         if (targetWheelAngle_ < diffCount) {
             return true;
@@ -45,7 +45,7 @@ void AngleStopper::setAngle(double targetAngle) {
     beginRightCount_ = rightWheel_.getCount();
 
     // 回転するホイールの角度 = (車体を回転させたい角度)*(車体が一回転する円の外周/車輪の外周)
-    targetWheelAngle_ = static_cast<int32_t>(std::roundf(ANGLE_COEFFICIENT * targetAngle * (ROBOT_TREAD / TIRE_OUT_DIAMETER)));
+    targetWheelAngle_ = roundInt32_t(ANGLE_COEFFICIENT * targetAngle * (ROBOT_TREAD / TIRE_OUT_DIAMETER));
 }
 
 }

@@ -73,8 +73,8 @@ void PIDControl::setTarget(float target) {
  * @return      制御量
  */
 float PIDControl::getControlValue(float value) {
-    errorValues_[1] = errorValues_[0];                                         // 前回の偏差
-    errorValues_[0] = value - target_;                                         // 今回の偏差
+    errorValues_[1] = errorValues_[0];                                       // 前回の偏差
+    errorValues_[0] = value - target_;                                       // 今回の偏差
     cumulativeError_ += (errorValues_[0] + errorValues_[1]) / 2.0 * DELTA_T; // 偏差の累積
 
     float controlValue = kp_ * errorValues_[0];                          // 比例

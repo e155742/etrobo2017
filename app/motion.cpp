@@ -181,7 +181,7 @@ void Motion::onoffSetPwm(Control& control, int pwm) {
 
 void Motion::goStraightHelper(Control& control, int pwm) {
     float countDiff = leftWheel_.getCount() - rightWheel_.getCount();
-    int controlValue = static_cast<int>(std::roundf(control.getControlValue(countDiff)));
+    int controlValue = roundInt(control.getControlValue(countDiff));
     if (pwm < 0) { controlValue *= -1; }
     steering_.setPower(pwm, controlValue);
 }
@@ -219,7 +219,7 @@ void Motion::goStraight(Stopper& stopper, Control& control, int pwm) {
 void Motion::spinHelper(Control& control, int pwm) {
     // ターゲット値よりも大きければ右寄り
     double countDiff = leftWheel_.getCount() + rightWheel_.getCount();
-    int controlValue = static_cast<int>(std::roundf(control.getControlValue(countDiff) / 2.0));
+    int controlValue = roundInt(control.getControlValue(countDiff) / 2.0);
     leftWheel_.setPWM(pwm - controlValue);
     rightWheel_.setPWM(-(pwm + controlValue));
 }
@@ -257,7 +257,7 @@ void Motion::spin(Stopper& stopper, Control& control, int pwm) {
 void Motion::lineTraceHelper(Control& control, int pwm, bool isRightSide) {
     colorSensor_.getRawColor(rgb_);
     float value = static_cast<float>(rgb_.r + rgb_.g + rgb_.b);
-    int controlValue = static_cast<int>(std::roundf(control.getControlValue(value)));
+    int controlValue = roundInt(control.getControlValue(value));
     if (!isRightSide) { controlValue *= -1; }
     steering_.setPower(pwm, controlValue);
 }

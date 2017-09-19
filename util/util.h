@@ -2,6 +2,7 @@
 #define MY_UNTL_H_
 
 #include "ev3api.h"
+#include <cmath>
 #include <vector>
 
 extern void inputInt(int& var);
@@ -46,6 +47,22 @@ void msg_template(X n, Y line, Z format) {
   char str[64];
   sprintf(str, format, n);
   msg_f(str, line);
+}
+
+inline static int roundInt(float n) {
+  return static_cast<int>(std::roundf(n));
+}
+
+inline static int roundInt(double n) {
+  return static_cast<int>(std::round(n));
+}
+
+inline static int32_t roundInt32_t(float n) {
+  return static_cast<int32_t>(std::roundf(n));
+}
+
+inline static int32_t roundInt32_t(double n) {
+  return static_cast<int32_t>(std::round(n));
 }
 
 double radianNormalize(double radian);
