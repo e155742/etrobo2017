@@ -20,7 +20,7 @@ leftWheel_(LEFT_WHEEL_PORT), rightWheel_(RIGHT_WHEEL_PORT) {
     setAngle(targetAngle);
 }
 
-bool AngleStopper::doStop() const {
+bool AngleStopper::doStop() {
     //  (左ホイール回転量 - 右ホイール回転量) / 2
     int32_t diffCount = roundInt32_t((leftWheel_.getCount() - beginLeftCount_ + beginRightCount_ - rightWheel_.getCount()) / 2.0);
     if (0 < targetWheelAngle_) {

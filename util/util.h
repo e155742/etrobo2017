@@ -65,7 +65,27 @@ inline static int32_t roundInt32_t(double n) {
   return static_cast<int32_t>(std::round(n));
 }
 
-double radianNormalize(double radian);
+// *******************
+// **      計算      **
+// *******************
+
+/**
+ * 角度を -PI < radian <= PI に正規化
+ *
+ * @param   radian 正規化したい角度
+ * @preturn radian 正規化された角度
+ */
+inline static double radianNormalize(double radian) {
+  if (radian <= -M_PI || M_PI < radian) {
+    radian = fmod(radian, 2.0 * M_PI);
+    if (radian <= -M_PI) {
+      radian +=  2 * M_PI;
+    } else if (M_PI < radian) {
+      radian -= 2 * M_PI;
+    }
+  }
+  return radian;
+}
 
 /**
  * valueが負の場合、これを正にしてsubValueの正負を反転させます<br>
@@ -76,7 +96,7 @@ double radianNormalize(double radian);
  * @param subValue valueが負ならこいつの符号が逆転する
  */
 template <class X, class Y>
-void plusMinusNormalize(X& value, Y& subValue) {
+inline extern void plusMinusNormalize(X& value, Y& subValue) {
   if (value < 0) {
     value *= -1;
     subValue *= -1;

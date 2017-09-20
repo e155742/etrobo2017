@@ -7,6 +7,7 @@
 
 #include "motion.hpp"
 #include "onoff_control.hpp"
+#include "direction_stoper.hpp"
 #include "robo_meta_datas.hpp"
 #include "util.h"
 
@@ -81,7 +82,7 @@ void Motion::stop() {
  *
  * @param pwm モーターのパワー
  */
-void Motion::setPwmLeft(int pwm){
+void Motion::setLeftPwm(int pwm){
     leftWheel_.setPWM(pwm);
 }
 
@@ -91,9 +92,9 @@ void Motion::setPwmLeft(int pwm){
  * @param stopper 停止判定用のStopperクラス
  * @param pwm     モーターのパワー
  */
-void Motion::setPwmLeft(Stopper& stopper, int pwm){
+void Motion::setLeftPwm(Stopper& stopper, int pwm){
     while (!stopper.doStop()) {
-        setPwmLeft(pwm);
+        setLeftPwm(pwm);
     }
     leftWheel_.stop();
 }
@@ -103,7 +104,7 @@ void Motion::setPwmLeft(Stopper& stopper, int pwm){
  *
  * @param pwm モーターのパワー
  */
-void Motion::setPwmRight(int pwm){
+void Motion::setRightPwm(int pwm){
     rightWheel_.setPWM(pwm);
 }
 
@@ -113,9 +114,9 @@ void Motion::setPwmRight(int pwm){
  * @param stopper 停止判定用のStopperクラス
  * @param pwm     モーターのパワー
  */
-void Motion::setPwmRight(Stopper& stopper, int pwm){
+void Motion::setRightPwm(Stopper& stopper, int pwm){
     while (!stopper.doStop()) {
-        setPwmRight(pwm);
+        setRightPwm(pwm);
     }
     rightWheel_.stop();
 }
@@ -127,7 +128,7 @@ void Motion::setPwmRight(Stopper& stopper, int pwm){
  * @param leftPwm  左モーターのパワー
  * @param rightPwm 右モーターのパワー
  */
-void Motion::setPwmBoth(int leftPwm, int lightPwm) {
+void Motion::setBothPwm(int leftPwm, int lightPwm) {
     leftWheel_.setPWM(leftPwm);
     rightWheel_.setPWM(lightPwm);
 }
@@ -140,9 +141,9 @@ void Motion::setPwmBoth(int leftPwm, int lightPwm) {
  * @param leftPwm  左モーターのパワー
  * @param rightPwm 右モーターのパワー
  */
-void Motion::setPwmBoth(Stopper& stopper, int leftPwm, int lightPwm) {
+void Motion::setBothPwm(Stopper& stopper, int leftPwm, int lightPwm) {
     while (!stopper.doStop()) {
-        setPwmBoth(leftPwm, lightPwm);
+        setBothPwm(leftPwm, lightPwm);
     }
     stop();
 }
@@ -246,6 +247,15 @@ void Motion::spin(Control& control, int pwm) {
  * @param pwm     モーターのパワー
  */
 void Motion::spin(Stopper& stopper, Control& control, int pwm) {
+    // 方位停止の場合、pwmの正負を無視して近い方を回転方向とする。
+    if (DirectionStopper* ds = dynamic_cast<DirectionStopper*>(&stopper)) {
+        point_t diffDirection = ds->getTargetDirection() - ds->getDirection();
+        if (0 < diffDirection) {
+            pwm = std::abs(pwm);
+        } else {
+            pwm = std::abs(pwm) * -1;
+        }
+    }
     onoffSetPwm(control, pwm);
     control.setTarget(leftWheel_.getCount() + rightWheel_.getCount());
     while (!stopper.doStop()) {

@@ -7,6 +7,7 @@ move
   
 距離停止  
 角度停止  
+方位停止  
   
 各種control  
 FileOutput  
@@ -20,6 +21,7 @@ HsvConverter
 
 
 ### 更新履歴
+方位停止  
 角度停止  
 距離停止  
 Motionクラス作成  

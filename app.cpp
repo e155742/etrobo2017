@@ -20,6 +20,7 @@
 
 #include "mileage_stopper.hpp"
 #include "angle_stopper.hpp"
+#include "direction_stoper.hpp"
 
 ie::Localization* localization;
 /**
@@ -134,10 +135,10 @@ void goPointTest() {
     delete spControl;
 }
 
-void motionTest() {
+void pidTest() {
     // PIDの各種定数
-    const float kp = 3.0; // 比例定数
-    const float ki = 0.0;   // 積分定数
+    const float kp = 3.0;  // 比例定数
+    const float ki = 0.0;  // 積分定数
     const float kd = 0.00; // 微分定数
     const float threshold = (30 + 708) * 0.47;
     ie::PIDControl ltControl(threshold, kp, ki, kd);
@@ -149,6 +150,22 @@ void motionTest() {
 
     ie::MileageStopper ms(2000);
     motion.lineTrace(ms, ltControl, 100, true);
+}
+
+void motionTest() {
+    ie::OnOffControl spControl(0, 0.3, 0);
+    ie::Motion motion;
+
+    ie::AngleStopper as(645);
+    motion.spin(as, spControl, 20);
+    ie::MileageStopper ms(80);
+    motion.setLeftPwm(ms,10);
+    ms.setTargetMileage(50);
+    motion.setRightPwm(ms,10);
+
+    ie::DirectionStopper ds(*localization, 90.0 * M_PI/180.0);
+    // motion.spin(ds, spControl, 5);
+    motion.setBothPwm(ds, 10, -5);
 }
 
 void main_task(intptr_t unused) {

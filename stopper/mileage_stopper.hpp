@@ -14,8 +14,8 @@ class MileageStopper : public Stopper {
 public:
     MileageStopper();
     MileageStopper(double targetMileage);
-    bool doStop() const;
-    void setMileage(double targetMileage);
+    bool doStop();
+    void setTargetMileage(double targetMileage);
 
 private:
     ev3api::Motor leftWheel_;

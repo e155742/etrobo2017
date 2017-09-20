@@ -15,7 +15,7 @@ class AngleStopper : public Stopper {
 public:
     AngleStopper();
     AngleStopper(double targetAngle);
-    bool doStop() const;
+    bool doStop();
     void setAngle(double targetAngle);
 
 private:

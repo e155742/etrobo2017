@@ -9,7 +9,7 @@ namespace ie {
 
 class Stopper {
 public:
-    virtual bool doStop() const = 0;
+    virtual bool doStop() = 0;
 };
 
 }

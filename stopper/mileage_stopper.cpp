@@ -19,20 +19,17 @@ leftWheel_(LEFT_WHEEL_PORT), rightWheel_(RIGHT_WHEEL_PORT),
 beginMileage_(getMileage()), targetMileage_(targetMileage) {
 }
 
-bool MileageStopper::doStop() const {
+bool MileageStopper::doStop() {
     if (0 < targetMileage_) {
         if (getMileage() - beginMileage_ < targetMileage_) {
             return false;
-        } else {
-            return true;
         }
     } else {
         if (targetMileage_ < getMileage() - beginMileage_) {
             return false;
-        } else {
-            return true;
         }
     }
+    return true;
 }
 
 /**
@@ -40,7 +37,7 @@ bool MileageStopper::doStop() const {
  *
  * @param targetMileage 走行させたい距離(mm)
  */
-void MileageStopper::setMileage(double targetMileage) {
+void MileageStopper::setTargetMileage(double targetMileage) {
     beginMileage_ = getMileage();
     targetMileage_ = targetMileage;
 }
