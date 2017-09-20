@@ -34,7 +34,7 @@ void Localization::close() {
 /**
  * 移動距離更新 (単位:mm)
  */
-void Localization::updateDistance() {
+inline void Localization::updateDistance() {
     changeDistance_ = TIRE_OUT_DIAMETER
                     * ((rightWheel_.getCount() - lastRightCoutn_)
                     +  (leftWheel_.getCount()  - lastLeftCoutn_)) / (360.0 * 2.0);
@@ -45,7 +45,7 @@ void Localization::updateDistance() {
 /**
  * 方位更新 (単位:radian)
  */
-void Localization::updateDirection() {
+inline void Localization::updateDirection() {
     point_t leftCoutn  = (leftWheel_.getCount()  - lastLeftCoutn_ );
     point_t rightCoutn = (rightWheel_.getCount() - lastRightCoutn_);
     lastLeftCoutn_  = leftWheel_.getCount();

@@ -82,7 +82,7 @@ void Motion::stop() {
  *
  * @param pwm モーターのパワー
  */
-void Motion::setLeftPwm(int pwm){
+inline void Motion::setLeftPwm(int pwm){
     leftWheel_.setPWM(pwm);
 }
 
@@ -104,7 +104,7 @@ void Motion::setLeftPwm(Stopper& stopper, int pwm){
  *
  * @param pwm モーターのパワー
  */
-void Motion::setRightPwm(int pwm){
+inline void Motion::setRightPwm(int pwm){
     rightWheel_.setPWM(pwm);
 }
 
@@ -128,7 +128,7 @@ void Motion::setRightPwm(Stopper& stopper, int pwm){
  * @param leftPwm  左モーターのパワー
  * @param rightPwm 右モーターのパワー
  */
-void Motion::setBothPwm(int leftPwm, int lightPwm) {
+inline void Motion::setBothPwm(int leftPwm, int lightPwm) {
     leftWheel_.setPWM(leftPwm);
     rightWheel_.setPWM(lightPwm);
 }
@@ -155,7 +155,7 @@ void Motion::setBothPwm(Stopper& stopper, int leftPwm, int lightPwm) {
  * @param pwm       モーターのパワー
  * @param turnRatio ステアリングの度合い。負で左転回、正で右転回
  */
-void Motion::setSteeringPower(int pwm, int turnRatio){
+inline void Motion::setSteeringPower(int pwm, int turnRatio){
     steering_.setPower (pwm, turnRatio);
 }
 
@@ -174,13 +174,13 @@ void Motion::setSteeringPower(int pwm, int turnRatio){
     stop();
 }
 
-void Motion::onoffSetPwm(Control& control, int pwm) {
+inline void Motion::onoffSetPwm(Control& control, int pwm) {
     if (OnOffControl* onoff = dynamic_cast<OnOffControl*>(&control)) {
         onoff->setPwm(pwm);
     }
 }
 
-void Motion::goStraightHelper(Control& control, int pwm) {
+inline void Motion::goStraightHelper(Control& control, int pwm) {
     float countDiff = leftWheel_.getCount() - rightWheel_.getCount();
     int controlValue = roundInt(control.getControlValue(countDiff));
     if (pwm < 0) { controlValue *= -1; }
@@ -194,7 +194,7 @@ void Motion::goStraightHelper(Control& control, int pwm) {
  * @param control 直進制御用のControlクラス
  * @param pwm     モーターのパワー
  */
-void Motion::goStraight(Control& control, int pwm) {
+inline void Motion::goStraight(Control& control, int pwm) {
     onoffSetPwm(control, pwm);
     control.setTarget(leftWheel_.getCount() - rightWheel_.getCount());
     goStraightHelper(control, pwm);
@@ -217,7 +217,7 @@ void Motion::goStraight(Stopper& stopper, Control& control, int pwm) {
     stop();
 }
 
-void Motion::spinHelper(Control& control, int pwm) {
+inline void Motion::spinHelper(Control& control, int pwm) {
     // ターゲット値よりも大きければ右寄り
     double countDiff = leftWheel_.getCount() + rightWheel_.getCount();
     int controlValue = roundInt(control.getControlValue(countDiff) / 2.0);
@@ -232,7 +232,7 @@ void Motion::spinHelper(Control& control, int pwm) {
  * @param control 回転制御用のControlクラス
  * @param pwm     モーターのパワー
  */
-void Motion::spin(Control& control, int pwm) {
+inline void Motion::spin(Control& control, int pwm) {
     onoffSetPwm(control, pwm);
     control.setTarget(leftWheel_.getCount() + rightWheel_.getCount());
     spinHelper(control, pwm);
@@ -264,7 +264,7 @@ void Motion::spin(Stopper& stopper, Control& control, int pwm) {
     stop();
 }
 
-void Motion::lineTraceHelper(Control& control, int pwm, bool isRightSide) {
+inline void Motion::lineTraceHelper(Control& control, int pwm, bool isRightSide) {
     colorSensor_.getRawColor(rgb_);
     float value = static_cast<float>(rgb_.r + rgb_.g + rgb_.b);
     int controlValue = roundInt(control.getControlValue(value));
@@ -280,7 +280,7 @@ void Motion::lineTraceHelper(Control& control, int pwm, bool isRightSide) {
  * @param pwm         モーターのパワー
  * @param isRightSide ラインの右側走るならtrue、左を走るならfalse
  */
-void Motion::lineTrace(Control& control, int pwm, bool isRightSide) {
+inline void Motion::lineTrace(Control& control, int pwm, bool isRightSide) {
     onoffSetPwm(control, pwm);
     lineTraceHelper(control, pwm, isRightSide);
 }
