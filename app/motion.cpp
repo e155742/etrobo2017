@@ -4,7 +4,6 @@
  *
  * @author Suguru Kouchi
  */
-
 #include "motion.hpp"
 #include "onoff_control.hpp"
 #include "direction_stoper.hpp"
@@ -270,6 +269,27 @@ inline void Motion::lineTraceHelper(Control& control, int pwm, bool isRightSide)
     int controlValue = roundInt(control.getControlValue(value));
     if (!isRightSide) { controlValue *= -1; }
     steering_.setPower(pwm, controlValue);
+}
+
+/**
+ * 指定の座標に移動する。Steeringクラスを使用。
+ *
+ * @param l Localizationクラス
+ * @param control Steering制御用のControlクラス
+ * @param pwm モーターのパワー
+ * @param pointX 目標となるX座標
+ * @param pointY 目標となるY座標
+ */
+void Motion::goPoint(Localization& l, Control& control, int pwm, point_t pointX, point_t pointY) {
+    onoffSetPwm(control, pwm);
+    while(margineForGoPpont <= std::sqrt(std::pow(pointX - l.getPointX(), 2) + std::pow(pointY - l.getPointY(), 2))) {
+        // 正だと左旋回
+        point_t diffRadian = std::atan2(pointX - l.getPointX(), pointY - l.getPointY())
+                   - l.getDirection();
+        int controlValue = roundInt(control.getControlValue(radianNormalize(diffRadian)));
+        steering_.setPower(pwm, -controlValue);
+    }
+    stop();
 }
 
 /**

@@ -9,6 +9,7 @@
 #include <Steering.h>
 #include <ColorSensor.h>
 
+#include "localization.hpp"
 #include "control.hpp"
 #include "stopper.hpp"
 
@@ -39,6 +40,8 @@ public:
     void spin(Control& control, int pwm);
     void spin(Stopper& stopper, Control& control, int pwm);
 
+    void goPoint(Localization& l, Control& control, int pwm, point_t pointX, point_t pointY);
+
     void lineTrace(Control& control, int pwm, bool isRightSide);
     void lineTrace(Stopper& stopper, Control& control, int pwm, bool isRightSide);
 
@@ -50,10 +53,12 @@ private:
     ev3api::Motor arm_;
     ev3api::ColorSensor colorSensor_;
     rgb_raw_t rgb_;
+    const double margineForGoPpont = 15.0;
     void onoffSetPwm(Control& control, int pwm);
     void goStraightHelper(Control& control, int pwm);
     void spinHelper(Control& control, int pwm);
     void lineTraceHelper(Control& control, int pwm, bool isRightSide);
+
 };
 
 }

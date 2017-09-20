@@ -112,27 +112,31 @@ void moveTest() {
     delete stControl;
 }
 
+void hoge(ie::Motion& motion, ie::DirectionStopper& ds, ie::Control& stControl, ie::Control& spControl, ie::point_t pointX, ie::point_t pointY) {
+    int pwm = 20;
+    int spinPwm = 15;
+    ds.setTargetDirection(std::atan2(pointX - localization->getPointX(), pointY - localization->getPointY()));
+    motion.spin(ds, spControl, spinPwm);
+    motion.goPoint(*localization, stControl, pwm, pointX, pointY);
+}
+
 /*
  * ブロック並べフィールドを移動。入口からスタート。
  * 黒マーカーでいうところの以下の番号を通る。
  * 10 -> 5 -> 1 -> 13 -> 2 -> 10
  */
 void goPointTest() {
-    ie::OnOffControl* stControl = new ie::OnOffControl(0, 0, 2, 0);
-    ie::OnOffControl* spControl = new ie::OnOffControl(0, 0, 0.3, 0);
-    ie::Move move;
+    ie::OnOffControl stControl(0, 0, 2, 0);
+    ie::OnOffControl spControl(0, 0, 0.3, 0);
+    ie::Motion motion;
+    ie::DirectionStopper ds(*localization);
 
     localization->setDirection(30 * M_PI/180.0); // 入口のラインの角度が30度
-                                                    // X座標 Y座標 出力 回転出力
-    move.goPoint(*stControl, *spControl, *localization, 225, 389.7, 20, 15);
-    move.goPoint(*stControl, *spControl, *localization, -164.7, 614.7, 20, 15);
-    move.goPoint(*stControl, *spControl, *localization, 839.7, -225, 20, 15);
-    move.goPoint(*stControl, *spControl, *localization, 614.7, 614.7, 20, 15);
-    move.goPoint(*stControl, *spControl, *localization, 0, 0, 20, 15);
-
-    move.stop();
-    delete stControl;
-    delete spControl;
+    hoge(motion, ds, stControl, spControl, 225.0, 389.7);
+    hoge(motion, ds, stControl, spControl, -164.7, 614.7);
+    hoge(motion, ds, stControl, spControl, 839.7, -225.0);
+    hoge(motion, ds, stControl, spControl, 614.7, 614.7);
+    hoge(motion, ds, stControl, spControl, 0.0, 0.0);
 }
 
 void pidTest() {
@@ -153,19 +157,17 @@ void pidTest() {
 }
 
 void motionTest() {
-    ie::OnOffControl spControl(0, 0.3, 0);
+    ie::OnOffControl stControl(0, 0, 2, 0);
+    ie::OnOffControl spControl(0, 0, 0.3, 0);
     ie::Motion motion;
+    ie::DirectionStopper ds(*localization);
 
-    ie::AngleStopper as(645);
-    motion.spin(as, spControl, 20);
-    ie::MileageStopper ms(80);
-    motion.setLeftPwm(ms,10);
-    ms.setTargetMileage(50);
-    motion.setRightPwm(ms,10);
-
-    ie::DirectionStopper ds(*localization, 90.0 * M_PI/180.0);
-    // motion.spin(ds, spControl, 5);
-    motion.setBothPwm(ds, 10, -5);
+    localization->setDirection(30 * M_PI/180.0); // 入口のラインの角度が30度
+    hoge(motion, ds, stControl, spControl, 225.0, 389.7);
+    hoge(motion, ds, stControl, spControl, -164.7, 614.7);
+    hoge(motion, ds, stControl, spControl, 839.7, -225.0);
+    hoge(motion, ds, stControl, spControl, 614.7, 614.7);
+    hoge(motion, ds, stControl, spControl, 0.0, 0.0);
 }
 
 void main_task(intptr_t unused) {
