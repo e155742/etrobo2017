@@ -6,6 +6,7 @@ APPL_CXXOBJS += \
 	decoder.o \
 	file_output.o \
 	hsv_converter.o \
+	color_judge.o \
 	localization.o \
 	motion.o \
 	move.o \

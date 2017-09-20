@@ -9,6 +9,7 @@ move
 角度停止  
 方位停止  
   
+ColorJudge  
 各種control  
 FileOutput  
 Decoder  
@@ -21,6 +22,7 @@ HsvConverter
 
 
 ### 更新履歴
+色判定  
 座標指定移動  
 方位停止  
 角度停止  
