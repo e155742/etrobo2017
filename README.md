@@ -11,6 +11,7 @@ move
 色停止  
 ライン停止  
   
+スターター  
 キャリブレーション  
 ColorJudge  
 各種control  
@@ -25,6 +26,7 @@ HsvConverter
 
 
 ### 更新履歴
+スターター  
 キャリブレーション  
 Sterring独自実装  
 ライン停止  

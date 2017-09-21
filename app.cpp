@@ -10,6 +10,7 @@
 #include "hsv_converter.hpp"
 #include "file_output.hpp"
 #include "calibration.hpp"
+#include "starter.hpp"
 
 #include "control.hpp"
 #include "pid_control.hpp"
@@ -144,9 +145,11 @@ void goPointTest() {
 
 void pidTest() {
     // PIDの各種定数
-    const float kp = 0.15;  // 比例定数
-    const float ki = 0.0;  // 積分定数
+    const float kp = 0.15; // 比例定数
+    const float ki = 0.00; // 積分定数
     const float kd = 0.00; // 微分定数
+
+    const int pwm = 30;
 
     ie::Motion motion;
     motion.raiseArm(15, 5);
@@ -159,10 +162,13 @@ void pidTest() {
     msg_f("Target", 7);
     msg_f(target, 8);
 
-
+    // タッチセンサーを押すとスタート
+    ie::Starter* starter = new ie::Starter();
+    msg_f("PUSH TOUCH SENSOR!", 10);
+    starter->startWait();
+    delete starter;
 
     const float threshold = target * 0.47;
-    const int pwm = 30;
     ie::PIDControl ltControl(threshold, kp, ki, kd);
     // ie::OnOffControl ltControl(threshold, 0, 0, 100);
 

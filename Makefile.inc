@@ -13,6 +13,7 @@ APPL_CXXOBJS += \
 	move.o \
 	onoff_control.o \
 	pid_control.o \
+	starter.o \
 	util.o \
 	var_entering.o \
 	mileage_stopper.o \
