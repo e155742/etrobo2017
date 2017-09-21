@@ -25,6 +25,8 @@
 #include "line_stopper.hpp"
 
 ie::Localization* localization;
+ev3api::Motor left(ie::LEFT_WHEEL_PORT);
+ev3api::Motor right(ie::RIGHT_WHEEL_PORT);
 /**
  * 20ms間隔で呼び出される周期ハンドラ<br>
  * 自己位置推定を行っている
@@ -82,8 +84,6 @@ void moveTest() {
 
     const float threshold = 36.5;
 
-    ev3api::Motor left(ie::LEFT_WHEEL_PORT);
-    ev3api::Motor right(ie::RIGHT_WHEEL_PORT);
     ie::PIDControl* ltControl = new ie::PIDControl(threshold, kp, ki, kd);
     ie::OnOffControl* stControl = new ie::OnOffControl(0, 0, 0.3, 0);
     ie::Move move;
@@ -160,13 +160,22 @@ void pidTest() {
 
 void motionTest() {
     ie::OnOffControl stControl(0, 0, 0.3, 0);
-    // ie::PIDControl ltControl(350.0, 0.15, 0, 0);
+    ie::PIDControl ltControl(350.0, 0.15, 0, 0);
     ie::Motion motion;
 
+    ie::MileageStopper ms(2000);
     ie::LineStopper ls(350.0);
 
-    motion.goStraight(ls, stControl, 30);
-    // motion.lineTrace(ms, ltControl, 15, true);
+    // motion.setBothPwm(ms, 100, 100);
+    // dly_tsk(2000);
+    // ms.setTargetMileage(1000);
+    // motion.setSteeringPower(ms, 100, 0);
+    // motion.goStraight(ms, stControl, 100);
+    motion.goPoint(*localization, stControl, 100, 0.0, 2000.0);
+    msg_f(left.getCount(), 1);
+    msg_f(right.getCount(), 2);
+    // motion.goStraight(ls, stControl, 100);
+    // motion.lineTrace(ms, ltControl, 15, false);
 }
 
 void main_task(intptr_t unused) {

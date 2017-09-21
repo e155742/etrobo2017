@@ -6,7 +6,6 @@
 #define MOTION_HPP
 
 #include <Motor.h>
-#include <Steering.h>
 #include <ColorSensor.h>
 
 #include "localization.hpp"
@@ -48,12 +47,13 @@ public:
 private:
     ev3api::Motor leftWheel_;
     ev3api::Motor rightWheel_;
-    ev3api::Steering steering_;
     ev3api::Motor tail_;
     ev3api::Motor arm_;
     ev3api::ColorSensor colorSensor_;
     rgb_raw_t rgb_;
     const double margineForGoPpont = 15.0;
+    int setSteeringLeftPower(int pwm, double turnRatio);
+    int setSteeringRightPower(int pwm, double turnRatio);
     void onoffSetPwm(Control& control, int pwm);
     void goStraightHelper(Control& control, int pwm);
     void spinHelper(Control& control, int pwm);

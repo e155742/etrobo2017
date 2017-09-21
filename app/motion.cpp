@@ -10,10 +10,12 @@
 #include "robo_meta_datas.hpp"
 #include "util.h"
 
+#include "mileage_stopper.hpp"
+
 namespace ie {
 
 Motion::Motion():
-leftWheel_(LEFT_WHEEL_PORT), rightWheel_(RIGHT_WHEEL_PORT), steering_(leftWheel_, rightWheel_),
+leftWheel_(LEFT_WHEEL_PORT), rightWheel_(RIGHT_WHEEL_PORT),
 tail_(TAIL_MOTOR_PORT), arm_(ARM_MOTOR_PORT), colorSensor_(COLOR_SENSOR_PORT) {
     leftWheel_.reset();
     rightWheel_.reset();
@@ -147,28 +149,46 @@ void Motion::setBothPwm(Stopper& stopper, int leftPwm, int lightPwm) {
     stop();
 }
 
+inline int Motion::setSteeringLeftPower(int pwm, double turnRatio) {
+    if (0 < turnRatio) { return pwm; }
+
+    if (turnRatio < -100) { turnRatio = -100; }
+    return roundInt(pwm * ((100.0 + turnRatio) / 100.0));
+}
+
+inline int Motion::setSteeringRightPower(int pwm, double turnRatio) {
+    if (turnRatio < 0) { return pwm; }
+
+    if (100 < turnRatio) { turnRatio = 100; }
+    return roundInt(pwm * ((100.0 - turnRatio) / 100.0));
+}
+
 /**
  * ステアリング操作を行う<br>
- * Steering.setPower()を呼び出している。
+ * Steering.setPower()を使わない独自実装
  *
  * @param pwm       モーターのパワー
  * @param turnRatio ステアリングの度合い。負で左転回、正で右転回
  */
 inline void Motion::setSteeringPower(int pwm, int turnRatio){
-    steering_.setPower (pwm, turnRatio);
+    int leftPwm = setSteeringLeftPower(pwm, turnRatio);
+    int rightPwm = setSteeringRightPower(pwm, turnRatio);
+    setBothPwm(leftPwm, rightPwm);
 }
 
 /**
  * ステアリング操作を行う<br>
- * Steering.setPower()を呼び出している。
+ * Steering.setPower()を使わない独自実装
  *
  * @param stopper   停止判定用のStopperクラス
  * @param pwm       モーターのパワー
  * @param turnRatio ステアリングの度合い。負で左転回、正で右転回
  */
  void Motion::setSteeringPower(Stopper& stopper, int pwm, int turnRatio){
+    int leftPwm = setSteeringLeftPower(pwm, turnRatio);
+    int rightPwm = setSteeringRightPower(pwm, turnRatio);
     while (!stopper.doStop()) {
-        setSteeringPower(pwm, turnRatio);
+        setBothPwm(leftPwm, rightPwm);
     }
     stop();
 }
@@ -181,9 +201,9 @@ inline void Motion::onoffSetPwm(Control& control, int pwm) {
 
 inline void Motion::goStraightHelper(Control& control, int pwm) {
     float countDiff = leftWheel_.getCount() - rightWheel_.getCount();
-    int controlValue = roundInt(control.getControlValue(countDiff));
-    if (pwm < 0) { controlValue *= -1; }
-    steering_.setPower(pwm, controlValue);
+    double controlValue = control.getControlValue(countDiff);
+    if (0 < pwm) { controlValue *= -1; }
+    setSteeringPower(pwm, controlValue);
 }
 
 /**
@@ -263,14 +283,6 @@ void Motion::spin(Stopper& stopper, Control& control, int pwm) {
     stop();
 }
 
-inline void Motion::lineTraceHelper(Control& control, int pwm, bool isRightSide) {
-    colorSensor_.getRawColor(rgb_);
-    float value = static_cast<float>(rgb_.r + rgb_.g + rgb_.b);
-    int controlValue = roundInt(control.getControlValue(value));
-    if (!isRightSide) { controlValue *= -1; }
-    steering_.setPower(pwm, controlValue);
-}
-
 /**
  * 指定の座標に移動する。Steeringクラスを使用。
  *
@@ -286,10 +298,18 @@ void Motion::goPoint(Localization& l, Control& control, int pwm, point_t pointX,
         // 正だと左旋回
         point_t diffRadian = std::atan2(pointX - l.getPointX(), pointY - l.getPointY())
                    - l.getDirection();
-        int controlValue = roundInt(control.getControlValue(radianNormalize(diffRadian)));
-        steering_.setPower(pwm, -controlValue);
+        double controlValue = control.getControlValue(radianNormalize(diffRadian));
+        setSteeringPower(pwm, controlValue);
     }
     stop();
+}
+
+inline void Motion::lineTraceHelper(Control& control, int pwm, bool isRightSide) {
+    colorSensor_.getRawColor(rgb_);
+    float value = static_cast<float>(rgb_.r + rgb_.g + rgb_.b);
+    double controlValue = control.getControlValue(value);
+    if (isRightSide) { controlValue *= -1; }
+    setSteeringPower(pwm, controlValue);
 }
 
 /**
