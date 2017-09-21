@@ -14,9 +14,8 @@ colorSensor_(COLOR_SENSOR_PORT), colorJudge_(hsvConverter_) {
 }
 
 bool ColorStopper::doStop() {
-    rgb_raw_t rgb;
-    colorSensor_.getRawColor(rgb);
-    colorid_t color = colorJudge_.getColorNumber(rgb.r, rgb.g, rgb.b);
+    colorSensor_.getRawColor(rgb_);
+    colorid_t color = colorJudge_.getColorNumber(rgb_.r, rgb_.g, rgb_.b);
 
     if (color == COLOR_BLACK || color == COLOR_WHITE) {
         return false;

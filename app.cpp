@@ -22,6 +22,7 @@
 #include "angle_stopper.hpp"
 #include "direction_stopper.hpp"
 #include "color_stopper.hpp"
+#include "line_stopper.hpp"
 
 ie::Localization* localization;
 /**
@@ -158,13 +159,14 @@ void pidTest() {
 }
 
 void motionTest() {
-    // ie::OnOffControl stControl(0, 0, 2, 0);
-    ie::PIDControl ltControl(350.0, 0.1, 0, 0);
+    ie::OnOffControl stControl(0, 0, 0.3, 0);
+    // ie::PIDControl ltControl(350.0, 0.15, 0, 0);
     ie::Motion motion;
 
-    ie::ColorStopper cs;
+    ie::LineStopper ls(350.0);
 
-    motion.lineTrace(cs, ltControl, 30, true);
+    motion.goStraight(ls, stControl, 30);
+    // motion.lineTrace(ms, ltControl, 15, true);
 }
 
 void main_task(intptr_t unused) {

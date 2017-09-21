@@ -21,6 +21,7 @@ private:
     ev3api::ColorSensor colorSensor_;
     HsvConverter hsvConverter_;
     ColorJudge colorJudge_;
+    rgb_raw_t rgb_;
 
 };
 
