@@ -1,5 +1,5 @@
 /**
- * @file direction_stoper.hpp
+ * @file direction_stopper.hpp
  * @author Suguru Kouchi
  */
 #ifndef DIRECTION_STOPPER_HPP

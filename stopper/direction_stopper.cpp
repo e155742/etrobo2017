@@ -1,10 +1,10 @@
 /**
- * @file direction_stoper.cpp
+ * @file direction_stopper.cpp
  * @brief 方位で終了判定
  *
  * @author Suguru Kouchi
  */
-#include "direction_stoper.hpp"
+#include "direction_stopper.hpp"
 #include <cmath>
 #include "util.h"
 #include "robo_meta_datas.hpp"

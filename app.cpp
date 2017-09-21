@@ -20,7 +20,8 @@
 
 #include "mileage_stopper.hpp"
 #include "angle_stopper.hpp"
-#include "direction_stoper.hpp"
+#include "direction_stopper.hpp"
+#include "color_stopper.hpp"
 
 ie::Localization* localization;
 /**
@@ -157,17 +158,13 @@ void pidTest() {
 }
 
 void motionTest() {
-    ie::OnOffControl stControl(0, 0, 2, 0);
-    ie::OnOffControl spControl(0, 0, 0.3, 0);
+    // ie::OnOffControl stControl(0, 0, 2, 0);
+    ie::PIDControl ltControl(350.0, 0.1, 0, 0);
     ie::Motion motion;
-    ie::DirectionStopper ds(*localization);
 
-    localization->setDirection(30 * M_PI/180.0); // 入口のラインの角度が30度
-    hoge(motion, ds, stControl, spControl, 225.0, 389.7);
-    hoge(motion, ds, stControl, spControl, -164.7, 614.7);
-    hoge(motion, ds, stControl, spControl, 839.7, -225.0);
-    hoge(motion, ds, stControl, spControl, 614.7, 614.7);
-    hoge(motion, ds, stControl, spControl, 0.0, 0.0);
+    ie::ColorStopper cs;
+
+    motion.lineTrace(cs, ltControl, 30, true);
 }
 
 void main_task(intptr_t unused) {

@@ -16,7 +16,8 @@ APPL_CXXOBJS += \
 	var_entering.o \
 	mileage_stopper.o \
 	angle_stopper.o \
-	direction_stoper.o
+	direction_stopper.o \
+	color_stopper.o
 
 SRCLANG := c++
 

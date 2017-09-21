@@ -6,7 +6,7 @@
  */
 #include "motion.hpp"
 #include "onoff_control.hpp"
-#include "direction_stoper.hpp"
+#include "direction_stopper.hpp"
 #include "robo_meta_datas.hpp"
 #include "util.h"
 
