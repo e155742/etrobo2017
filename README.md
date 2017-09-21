@@ -11,6 +11,7 @@ move
 色停止  
 ライン停止  
   
+キャリブレーション  
 ColorJudge  
 各種control  
 FileOutput  
@@ -24,6 +25,8 @@ HsvConverter
 
 
 ### 更新履歴
+キャリブレーション  
+Sterring独自実装  
 ライン停止  
 色停止  
 色判定  

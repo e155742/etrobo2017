@@ -148,21 +148,23 @@ void pidTest() {
     const float ki = 0.0;  // 積分定数
     const float kd = 0.00; // 微分定数
 
+    ie::Motion motion;
+    motion.raiseArm(15, 5);
+
+    // キャリブレーション
     msg_f("Please waite...", 1);
-    ie::Calibration calibration;
-    float target = calibration.calibrate();
-    // msg_clear();
-    msg_f("Target", 1);
-    msg_f(target, 2);
+    ie::Calibration* calibration = new ie::Calibration();
+    float target = calibration->calibrate();
+    delete calibration;
+    msg_f("Target", 7);
+    msg_f(target, 8);
+
+
 
     const float threshold = target * 0.47;
     const int pwm = 30;
     ie::PIDControl ltControl(threshold, kp, ki, kd);
     // ie::OnOffControl ltControl(threshold, 0, 0, 100);
-    ie::Motion motion;
-
-    motion.raiseArm(15, 5);
-    dly_tsk(2000);
 
     ie::MileageStopper ms(2000);
     motion.lineTrace(ms, ltControl, pwm, true);

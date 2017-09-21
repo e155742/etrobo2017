@@ -6,6 +6,7 @@
 #define CALIBRATION_HPP
 
 #include <ColorSensor.h>
+#include <TouchSensor.h>
 
 namespace ie {
 
@@ -17,7 +18,10 @@ public:
 
 private:
     ev3api::ColorSensor colorSensor_;
-    int pushCenterButton();
+    ev3api::TouchSensor touchSensor_;
+    int pushCenterButton(int line);
+    int pushTouchButton(int line);
+
 };
 
 }
