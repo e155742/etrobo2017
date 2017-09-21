@@ -9,6 +9,7 @@
 #include "decoder.hpp"
 #include "hsv_converter.hpp"
 #include "file_output.hpp"
+#include "calibration.hpp"
 
 #include "control.hpp"
 #include "pid_control.hpp"
@@ -122,13 +123,13 @@ void hoge(ie::Motion& motion, ie::DirectionStopper& ds, ie::Control& stControl, 
     motion.goPoint(*localization, stControl, pwm, pointX, pointY);
 }
 
-/*
+/**
  * ブロック並べフィールドを移動。入口からスタート。
  * 黒マーカーでいうところの以下の番号を通る。
  * 10 -> 5 -> 1 -> 13 -> 2 -> 10
  */
 void goPointTest() {
-    ie::OnOffControl stControl(0, 0, 2, 0);
+    ie::OnOffControl stControl(0, 0, 0.3, 0);
     ie::OnOffControl spControl(0, 0, 0.3, 0);
     ie::Motion motion;
     ie::DirectionStopper ds(*localization);
@@ -143,10 +144,19 @@ void goPointTest() {
 
 void pidTest() {
     // PIDの各種定数
-    const float kp = 3.0;  // 比例定数
+    const float kp = 0.15;  // 比例定数
     const float ki = 0.0;  // 積分定数
     const float kd = 0.00; // 微分定数
-    const float threshold = (30 + 708) * 0.47;
+
+    msg_f("Please waite...", 1);
+    ie::Calibration calibration;
+    float target = calibration.calibrate();
+    // msg_clear();
+    msg_f("Target", 1);
+    msg_f(target, 2);
+
+    const float threshold = target * 0.47;
+    const int pwm = 30;
     ie::PIDControl ltControl(threshold, kp, ki, kd);
     // ie::OnOffControl ltControl(threshold, 0, 0, 100);
     ie::Motion motion;
@@ -155,7 +165,7 @@ void pidTest() {
     dly_tsk(2000);
 
     ie::MileageStopper ms(2000);
-    motion.lineTrace(ms, ltControl, 100, true);
+    motion.lineTrace(ms, ltControl, pwm, true);
 }
 
 void motionTest() {
@@ -186,7 +196,8 @@ void main_task(intptr_t unused) {
     ev3_sta_cyc(SUB_CYC);
     // moveTest();
     // goPointTest();
-    motionTest();
+    // motionTest();
+    pidTest();
     ev3_stp_cyc(SUB_CYC);
     delete localization;
 }

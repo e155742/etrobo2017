@@ -3,6 +3,7 @@ mkfile_path := $(dir $(lastword $(MAKEFILE_LIST)))
 APPL_COBJS +=
 
 APPL_CXXOBJS += \
+	calibration.o \
 	decoder.o \
 	file_output.o \
 	hsv_converter.o \
