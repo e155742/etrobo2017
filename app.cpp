@@ -27,6 +27,8 @@
 #include "line_stopper.hpp"
 #include "gray_stopper.hpp"
 
+#include "left_course.cpp"
+
 ie::Localization* localization;
 ev3api::Motor left(ie::LEFT_WHEEL_PORT);
 ev3api::Motor right(ie::RIGHT_WHEEL_PORT);
@@ -47,7 +49,7 @@ void sub_cyc(intptr_t exinf) {
 
 /**
  * スタート前に呼び出す関数。
- * アームの初期化とキャリブレーション
+ * アームの初期化とキャリブレーションと自己位置推定開始
  */
 void init(ie::Motion& motion, float& threshold) {
     motion.raiseArm(15, 5);
@@ -55,7 +57,7 @@ void init(ie::Motion& motion, float& threshold) {
     // キャリブレーション
     msg_f("Please waite...", 1);
     ie::Calibration* calibration = new ie::Calibration();
-    threshold = calibration->calibrate() * 0.47;;
+    threshold = calibration->calibrate() * 0.47; // 普通のライントレース
     delete calibration;
     msg_f("Threshold", 7);
     msg_f(threshold, 8);
@@ -64,38 +66,40 @@ void init(ie::Motion& motion, float& threshold) {
     ie::Starter* starter = new ie::Starter();
     msg_f("PUSH TOUCH SENSOR!", 10);
     starter->startWait();
+    msg_f("START!", 10);
     delete starter;
+    ev3_sta_cyc(SUB_CYC);
 }
 
 /**
- * 入出力のテスト<br>
- * RGB-HSV変換とブロック並べのデコード<br>
- * for文によるファイル出力テスト
+ * 終了時に呼び出す関数。
  */
-void ioTest() {
-    std::vector<ie::rgb_t> rgb = {0, 0, 0};
-    inputInt(rgb, "Enter RGB");
+void del(ie::Motion& motion) {
+    motion.stop(); // 念のため
+    ev3_stp_cyc(SUB_CYC);
+    delete localization;
+    msg_f("END...", 10);
+}
+
+/**
+ * ブロック並べの初期位置コードを解読
+ */
+void initCodeDecode() {
     msg_clear();
-    ie::HsvConverter hsv(rgb[0], rgb[1], rgb[2]);
-    msg_f("HSV color", 1);
+    std::vector<int> initCodeVector = {0, 0, 0, 0, 0};
+    inputInt(initCodeVector, "INPUT INIT CODE");
+    int initCode = initCodeVector[0] * 10000;
+    initCode += initCodeVector[1] * 1000;
+    initCode += initCodeVector[2] * 100;
+    initCode += initCodeVector[3] * 10;
+    initCode += initCodeVector[4];
+    msg_clear();
+    msg_f(initCode ,2);
+    ie::Decoder d(initCode);
+    msg_f("Black, Red, Yellow, Blue", 4);
     char str[64];
-    sprintf(str, "Hue        %f", hsv.getHue());
-    msg_f(str, 3);
-    sprintf(str, "Saturation %f", hsv.getSaturation());
-    msg_f(str, 4);
-    sprintf(str, "Value      %f", hsv.getLightness());
-    msg_f(str, 5);
-
-    ie::Decoder d(12008);
-    msg_f("Black, Red, Yellow, Blue", 7);
     sprintf(str, "%d,    %d,   %d,      %d", d.getBlackPosition(), d.getRedPosition(), d.getYellowPosition(), d.getBluePosition());
-    msg_f(str, 8);
-
-    ie::FileOutput fo("test.txt");
-    for (double i = 10.12345678900; i < 10.12345678915; i+=0.00000000001) {
-        fo.fileWrite(i, "%2.13f");
-    }
-    fo.close();
+    msg_f(str, 5);
 }
 
 /**
@@ -177,28 +181,13 @@ void pidTest() {
     const int pwm = 100;
 
     ie::Motion motion;
-    motion.raiseArm(15, 5);
+    float threshold;
+    init(motion, threshold);
 
-    // キャリブレーション
-    msg_f("Please waite...", 1);
-    ie::Calibration* calibration = new ie::Calibration();
-    float target = calibration->calibrate();
-    delete calibration;
-    msg_f("Target", 7);
-    msg_f(target, 8);
-
-    // タッチセンサーを押すとスタート
-    ie::Starter* starter = new ie::Starter();
-    msg_f("PUSH TOUCH SENSOR!", 10);
-    starter->startWait();
-    delete starter;
-
-    const float threshold = target * 0.47;
     ie::PIDControl ltControl(threshold, kp, ki, kd);
-    // ie::OnOffControl ltControl(threshold, 0, 0, 100);
 
-    ie::MileageStopper ms(2000);
-    motion.lineTrace(ms, ltControl, pwm, true);
+    ie::MileageStopper stopper(2000);
+    motion.lineTrace(stopper, ltControl, pwm, true);
 }
 
 void motionTest() {
@@ -207,23 +196,21 @@ void motionTest() {
 
     init(motion, target);
 
-    ie::PIDControl ltControl(target, 0.15, 0, 0);
-    ie::OnOffControl stControl(0, 0.3, 0);
-
-    ie::LineStopper ls(80);
-    motion.spin(ls, stControl, 15); // ライントレースをするためにラインを検知するまで回転
+    LCourseParking(motion, target);
 }
 
 void main_task(intptr_t unused) {
-    // ioTest();
+    // initCodeDecode();
     // dly_tsk(3 * 1000);
     // msg_clear();
 
-    ev3_sta_cyc(SUB_CYC);
-    // moveTest();
-    goPointTest();
+    // goPointTest();
     // motionTest();
+    ie::Motion motion;
+    float target;
+    init(motion, target);
+    // LCourseIdaten(motion);
+    LCourseParking(motion, target);
     // pidTest();
-    ev3_stp_cyc(SUB_CYC);
-    delete localization;
+    del(motion);
 }
