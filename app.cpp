@@ -25,6 +25,7 @@
 #include "direction_stopper.hpp"
 #include "color_stopper.hpp"
 #include "line_stopper.hpp"
+#include "gray_stopper.hpp"
 
 ie::Localization* localization;
 ev3api::Motor left(ie::LEFT_WHEEL_PORT);
@@ -177,19 +178,29 @@ void pidTest() {
 }
 
 void motionTest() {
-    ie::OnOffControl stControl(0, 0, 0.3, 0);
-    ie::PIDControl ltControl(350.0, 0.15, 0, 0);
     ie::Motion motion;
+    motion.raiseArm(15, 5);
 
-    ie::MileageStopper ms(2000);
-    ie::LineStopper ls(350.0);
+    // キャリブレーション
+    msg_f("Please waite...", 1);
+    ie::Calibration* calibration = new ie::Calibration();
+    float target = calibration->calibrate() * 0.47;
+    delete calibration;
+    msg_f("Target", 7);
+    msg_f(target, 8);
 
-    // motion.setBothPwm(ms, 100, 100);
-    // dly_tsk(2000);
-    // ms.setTargetMileage(1000);
-    // motion.setSteeringPower(ms, 100, 0);
-    // motion.goStraight(ms, stControl, 100);
-    motion.goPoint(*localization, stControl, 100, 0.0, 2000.0);
+    ie::PIDControl ltControl(target, 0.15, 0, 0);
+
+    // タッチセンサーを押すとスタート
+    ie::Starter* starter = new ie::Starter();
+    msg_f("PUSH TOUCH SENSOR!", 10);
+    starter->startWait();
+    delete starter;
+
+    ie::MileageStopper ms(250);
+    motion.lineTrace(ms, ltControl, 20, true);;
+    ie::GrayStopper gs(500);
+    motion.lineTrace(gs, ltControl, 20, true);
     msg_f(left.getCount(), 1);
     msg_f(right.getCount(), 2);
     // motion.goStraight(ls, stControl, 100);
@@ -204,8 +215,8 @@ void main_task(intptr_t unused) {
     ev3_sta_cyc(SUB_CYC);
     // moveTest();
     // goPointTest();
-    // motionTest();
-    pidTest();
+    motionTest();
+    // pidTest();
     ev3_stp_cyc(SUB_CYC);
     delete localization;
 }
