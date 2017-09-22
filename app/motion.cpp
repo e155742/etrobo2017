@@ -291,17 +291,21 @@ void Motion::spin(Stopper& stopper, Control& control, int pwm) {
 }
 
 /**
- * 指定の座標に移動する。Steeringクラスを使用。
+ * 指定の座標に移動する。Steeringクラスを使用。<br>
+ * Controlクラスのtargetは自動で指定される。(0)<br>
+ * pwmが大きいとmarginも大きくする必要がある。
  *
  * @param l Localizationクラス
  * @param control Steering制御用のControlクラス
  * @param pwm モーターのパワー
- * @param pointX 目標となるX座標
- * @param pointY 目標となるY座標
+ * @param pointX 目標となるX座標(mm)
+ * @param pointY 目標となるY座標(mm)
+ * @param margin 目標からどれだけ手前で止まるか(mm)
  */
-void Motion::goPoint(Localization& l, Control& control, int pwm, point_t pointX, point_t pointY) {
+void Motion::goPoint(Localization& l, Control& control, int pwm, point_t pointX, point_t pointY, int margen) {
     onoffSetPwm(control, pwm);
-    while(margineForGoPpont <= std::sqrt(std::pow(pointX - l.getPointX(), 2) + std::pow(pointY - l.getPointY(), 2))) {
+    control.setTarget(0);
+    while(margen <= std::sqrt(std::pow(pointX - l.getPointX(), 2) + std::pow(pointY - l.getPointY(), 2))) {
         // 正だと左旋回
         point_t diffRadian = std::atan2(pointX - l.getPointX(), pointY - l.getPointY())
                    - l.getDirection();

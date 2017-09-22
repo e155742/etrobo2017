@@ -75,6 +75,8 @@ void Localization::updatePoint() {
     msg_f(distance_,  8);
     msg_f("direction_", 9);
     msg_f(direction_, 10);
+    msg_f("direction_(Degree)", 11);
+    msg_f(direction_ * 180.0 / M_PI, 12);
     #endif
 
     #ifdef OUTPUT_LOCALIZATION

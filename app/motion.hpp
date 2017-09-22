@@ -40,7 +40,7 @@ public:
     void spin(Control& control, int pwm);
     void spin(Stopper& stopper, Control& control, int pwm);
 
-    void goPoint(Localization& l, Control& control, int pwm, point_t pointX, point_t pointY);
+    void goPoint(Localization& l, Control& control, int pwm, point_t pointX, point_t pointY, int margin);
 
     void lineTrace(Control& control, int pwm, bool isRightSide);
     void lineTrace(Stopper& stopper, Control& control, int pwm, bool isRightSide);
@@ -52,7 +52,6 @@ private:
     ev3api::Motor arm_;
     ev3api::ColorSensor colorSensor_;
     rgb_raw_t rgb_;
-    const double margineForGoPpont = 15.0;
     int setSteeringLeftPower(int pwm, double turnRatio);
     int setSteeringRightPower(int pwm, double turnRatio);
     void onoffSetPwm(Control& control, int pwm);

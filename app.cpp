@@ -78,7 +78,9 @@ void del(ie::Motion& motion) {
     motion.stop(); // 念のため
     ev3_stp_cyc(SUB_CYC);
     delete localization;
+    #ifndef PRINT_LOCALIZATION
     msg_f("END...", 10);
+    #endif
 }
 
 /**
@@ -149,7 +151,7 @@ void hoge(ie::Motion& motion, ie::DirectionStopper& ds, ie::Control& stControl, 
     ds.setTargetDirection(std::atan2(pointX - localization->getPointX(), pointY - localization->getPointY()));
     motion.spin(ds, spControl, spinPwm);
     motion.wait(200);
-    motion.goPoint(*localization, stControl, pwm, pointX, pointY);
+    motion.goPoint(*localization, stControl, pwm, pointX, pointY, 15);
     motion.wait(200);
 }
 
@@ -158,10 +160,10 @@ void hoge(ie::Motion& motion, ie::DirectionStopper& ds, ie::Control& stControl, 
  * 黒マーカーでいうところの以下の番号を通る。
  * 10 -> 5 -> 1 -> 13 -> 2 -> 10
  */
-void goPointTest() {
+void goPointTest(ie::Motion& motion) {
     ie::OnOffControl stControl(0, 0, 0.3, 0);
     ie::OnOffControl spControl(0, 0, 0.3, 0);
-    ie::Motion motion;
+    dly_tsk(1); // これがないとフリーズする。
     ie::DirectionStopper ds(*localization);
 
     localization->setDirection(30 * M_PI/180.0); // 入口のラインの角度が30度
@@ -190,13 +192,10 @@ void pidTest() {
     motion.lineTrace(stopper, ltControl, pwm, true);
 }
 
-void motionTest() {
-    ie::Motion motion;
-    float target;
-
-    init(motion, target);
-
-    LCourseParking(motion, target);
+void motionTest(ie::Motion& motion) {
+    ie::OnOffControl stControl(0, 0, 0.0, 100);
+    dly_tsk(1);
+    motion.goPoint(*localization, stControl, 10, 30, 1000, 15);
 }
 
 void main_task(intptr_t unused) {
@@ -204,14 +203,16 @@ void main_task(intptr_t unused) {
     // dly_tsk(3 * 1000);
     // msg_clear();
 
-    // goPointTest();
-    // motionTest();
     ie::Motion motion;
     float target;
     init(motion, target);
+
+    // goPointTest(motion);
+    // motionTest(motion);
+    // pidTest();
+
     LCourseIdaten(motion);
     // LCourseParking(motion, target);
-    // pidTest();
 
     del(motion);
 }
