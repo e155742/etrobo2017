@@ -80,6 +80,8 @@ void Motion::stop() {
 
 /**
  * 両方の車輪を指定時間停止させる。
+ *
+ * @param time 停止する時間(ms)
  */
  void Motion::wait(uint32_t time) {
     leftWheel_.stop();

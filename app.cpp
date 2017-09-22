@@ -209,8 +209,9 @@ void main_task(intptr_t unused) {
     ie::Motion motion;
     float target;
     init(motion, target);
-    // LCourseIdaten(motion);
-    LCourseParking(motion, target);
+    LCourseIdaten(motion);
+    // LCourseParking(motion, target);
     // pidTest();
+
     del(motion);
 }

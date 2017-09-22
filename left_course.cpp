@@ -1,3 +1,5 @@
+#include "left_course.hpp"
+
 #include "pid_control.hpp"
 #include "onoff_control.hpp"
 
@@ -6,12 +8,42 @@
 #include "line_stopper.hpp"
 #include "gray_stopper.hpp"
 
+extern ie::Localization* localization;
+
 /**
  * 韋駄天
  */
 void LCourseIdaten(ie::Motion& motion) {
-}
+    ie::AngleStopper as(90);
+    motion.setSteeringPower(as, -100, -50); // 第2ゲートへ向けて右旋回(バック)
 
+    // ie::MileageStopper ms(-500);
+    ie::OnOffControl stControl(0, 0.3, 0);
+    // motion.goStraight(ms, stControl, -100); // 第2ゲートを通過(バック)
+
+    as.setAngle(-90);
+    motion.setSteeringPower(as, -100, 53); // 第1ゲートへ向けて左旋回(バック)
+
+    ie::MileageStopper ms(-1460);
+    motion.goStraight(ms, stControl, -100); // 第1ゲートを通過(バック)
+
+    ms.setTargetMileage(500);
+    motion.goStraight(ms, stControl, 100); // バックストレート前のコーナまで前進
+
+    as.setAngle(-90);
+    motion.setSteeringPower(as, 100, -50); // バックストレート前のコーナを通過
+
+    stControl.setCoefficient(0, 0.4, 0);
+    ms.setTargetMileage(2500);
+    motion.goStraight(ms, stControl, 100); // バックストレートからゴールへ
+
+    msg_f("RETURN", 10);
+    motion.wait(2000);
+    ie::DirectionStopper ds(*localization);
+    ds.setTargetDirection(std::atan2(0.0 - localization->getPointX(), 0.0 - localization->getPointY()));
+    motion.spin(ds, stControl, 15);
+    motion.goPoint(*localization, stControl, 30, 0.0, 0.0);
+}
 
 /**
  * 縦列駐車
