@@ -308,13 +308,27 @@ inline void Motion::lineTraceHelper(Control& control, int pwm, bool isRightSide)
     colorSensor_.getRawColor(rgb_);
     float value = static_cast<float>(rgb_.r + rgb_.g + rgb_.b);
     double controlValue = control.getControlValue(value);
-    if (isRightSide) { controlValue *= -1; }
-    setSteeringPower(pwm, controlValue);
+    // if (isRightSide) { controlValue *= -1; }
+    // setSteeringPower(pwm, controlValue);
+
+    if (!isRightSide) { controlValue *= -1;}
+    if (controlValue < -pwm) {controlValue = -pwm;}
+    if (pwm < controlValue) {controlValue = pwm;}
+
+    if (controlValue < 0) {
+        // 右旋回
+        setBothPwm(pwm, pwm + controlValue);
+    } else {
+        // 左旋回
+        setBothPwm(pwm - controlValue, pwm);
+    }
+    #ifdef OUTPUT_LINETRACE
+    fo_.fileWrite(controlValue);
+    #endif
 }
 
 /**
  * 指定したパワーでライントレースする。<br>
- * Steeringクラスを使用した実装。
  *
  * @param control     ライントレース制御用のControlクラス
  * @param pwm         モーターのパワー
@@ -327,7 +341,6 @@ inline void Motion::lineTrace(Control& control, int pwm, bool isRightSide) {
 
 /**
  * 指定したパワーでライントレースする。<br>
- * Steeringクラスを使用した実装。
  *
  * @param stopper 停止判定用のStopperクラス
  * @param control     ライントレース制御用のControlクラス

@@ -145,11 +145,11 @@ void goPointTest() {
 
 void pidTest() {
     // PIDの各種定数
-    const float kp = 0.15; // 比例定数
+    const float kp = 0.107; // 比例定数
     const float ki = 0.00; // 積分定数
-    const float kd = 0.00; // 微分定数
+    const float kd = 0.05; // 微分定数
 
-    const int pwm = 30;
+    const int pwm = 100;
 
     ie::Motion motion;
     motion.raiseArm(15, 5);
