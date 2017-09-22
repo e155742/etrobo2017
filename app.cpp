@@ -86,7 +86,7 @@ void del(ie::Motion& motion) {
 /**
  * ブロック並べの初期位置コードを解読
  */
-void initCodeDecode() {
+void initCodeDecode(ie::Decoder d) {
     msg_clear();
     std::vector<int> initCodeVector = {0, 0, 0, 0, 0};
     inputInt(initCodeVector, "INPUT INIT CODE");
@@ -97,7 +97,7 @@ void initCodeDecode() {
     initCode += initCodeVector[4];
     msg_clear();
     msg_f(initCode ,2);
-    ie::Decoder d(initCode);
+    d.setPositionFromCode(initCode);
     msg_f("Black, Red, Yellow, Blue", 4);
     char str[64];
     sprintf(str, "%d,    %d,   %d,      %d", d.getBlackPosition(), d.getRedPosition(), d.getYellowPosition(), d.getBluePosition());
@@ -198,21 +198,38 @@ void motionTest(ie::Motion& motion) {
     motion.goPoint(*localization, stControl, 10, 30, 1000, 15);
 }
 
+void leftCourse() {
+    int greenPosition = 0;
+
+    ie::Decoder decoder;
+    initCodeDecode(decoder);
+    ie::Motion motion;
+    float target;
+    msg_clear();
+    init(motion, target);
+
+    // LCourseIdaten(motion);
+    LCourseBlock(motion, target, decoder, greenPosition);
+    // LCourseParking(motion, target);
+
+    del(motion);
+}
+
 void main_task(intptr_t unused) {
-    // initCodeDecode();
+    // ie::Decoder decoder;
+    // initCodeDecode(decoder);
     // dly_tsk(3 * 1000);
     // msg_clear();
 
-    ie::Motion motion;
-    float target;
-    init(motion, target);
+    // ie::Motion motion;
+    // float target;
+    // init(motion, target);
 
     // goPointTest(motion);
     // motionTest(motion);
     // pidTest();
 
-    LCourseIdaten(motion);
-    // LCourseParking(motion, target);
+    // del(motion);
 
-    del(motion);
+    leftCourse();
 }

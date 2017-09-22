@@ -21,7 +21,8 @@ APPL_CXXOBJS += \
 	direction_stopper.o \
 	color_stopper.o \
 	line_stopper.o \
-	gray_stopper.o
+	gray_stopper.o \
+	marker.o
 
 SRCLANG := c++
 
@@ -37,13 +38,15 @@ APPL_DIR += \
 	$(mkfile_path)unit \
 	$(mkfile_path)util \
 	$(mkfile_path)control \
-	$(mkfile_path)stopper
+	$(mkfile_path)stopper \
+	$(mkfile_path)block
 
 INCLUDES += \
 	-I$(mkfile_path)app \
 	-I$(mkfile_path)unit \
 	-I$(mkfile_path)util \
 	-I$(mkfile_path)control \
-	-I$(mkfile_path)stopper
+	-I$(mkfile_path)stopper \
+	-I$(mkfile_path)block
 
 COPTS += -fno-use-cxa-atexit
