@@ -20,6 +20,7 @@ public:
     void rotateTail(int degree, int pwm);
     void raiseArm(int degree, int pwm);
     void stop();
+    void wait(uint32_t time);
 
     void setLeftPwm(int pwm);
     void setLeftPwm(Stopper& stopper, int pwm);

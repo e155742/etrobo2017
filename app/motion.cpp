@@ -79,12 +79,22 @@ void Motion::stop() {
 }
 
 /**
+ * 両方の車輪を指定時間停止させる。
+ */
+ void Motion::wait(uint32_t time) {
+    leftWheel_.stop();
+    rightWheel_.stop();
+    dly_tsk(time);
+}
+
+/**
  * 指定したパワーで左ホイールを動かす。
  *
  * @param pwm モーターのパワー
  */
 inline void Motion::setLeftPwm(int pwm){
     leftWheel_.setPWM(pwm);
+    rightWheel_.stop();
 }
 
 /**
@@ -97,7 +107,6 @@ void Motion::setLeftPwm(Stopper& stopper, int pwm){
     while (!stopper.doStop()) {
         setLeftPwm(pwm);
     }
-    leftWheel_.stop();
 }
 
 /**
@@ -106,6 +115,7 @@ void Motion::setLeftPwm(Stopper& stopper, int pwm){
  * @param pwm モーターのパワー
  */
 inline void Motion::setRightPwm(int pwm){
+    leftWheel_.stop();
     rightWheel_.setPWM(pwm);
 }
 
@@ -119,7 +129,6 @@ void Motion::setRightPwm(Stopper& stopper, int pwm){
     while (!stopper.doStop()) {
         setRightPwm(pwm);
     }
-    rightWheel_.stop();
 }
 
 /**
@@ -146,7 +155,6 @@ void Motion::setBothPwm(Stopper& stopper, int leftPwm, int lightPwm) {
     while (!stopper.doStop()) {
         setBothPwm(leftPwm, lightPwm);
     }
-    stop();
 }
 
 inline int Motion::setSteeringLeftPower(int pwm, double turnRatio) {
@@ -190,7 +198,6 @@ inline void Motion::setSteeringPower(int pwm, int turnRatio){
     while (!stopper.doStop()) {
         setBothPwm(leftPwm, rightPwm);
     }
-    stop();
 }
 
 inline void Motion::onoffSetPwm(Control& control, int pwm) {
@@ -233,7 +240,6 @@ void Motion::goStraight(Stopper& stopper, Control& control, int pwm) {
     while (!stopper.doStop()) {
         goStraightHelper(control, pwm);
     }
-    stop();
 }
 
 inline void Motion::spinHelper(Control& control, int pwm) {
@@ -280,7 +286,6 @@ void Motion::spin(Stopper& stopper, Control& control, int pwm) {
     while (!stopper.doStop()) {
         spinHelper(control, pwm);
     }
-    stop();
 }
 
 /**
@@ -301,7 +306,6 @@ void Motion::goPoint(Localization& l, Control& control, int pwm, point_t pointX,
         double controlValue = control.getControlValue(radianNormalize(diffRadian));
         setSteeringPower(pwm, controlValue);
     }
-    stop();
 }
 
 inline void Motion::lineTraceHelper(Control& control, int pwm, bool isRightSide) {
@@ -352,7 +356,6 @@ void Motion::lineTrace(Stopper& stopper, Control& control, int pwm, bool isRight
     while (!stopper.doStop()) {
         lineTraceHelper(control, pwm, isRightSide);
     }
-    stop();
 }
 
 }

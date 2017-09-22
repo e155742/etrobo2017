@@ -46,6 +46,28 @@ void sub_cyc(intptr_t exinf) {
 }
 
 /**
+ * スタート前に呼び出す関数。
+ * アームの初期化とキャリブレーション
+ */
+void init(ie::Motion& motion, float& threshold) {
+    motion.raiseArm(15, 5);
+
+    // キャリブレーション
+    msg_f("Please waite...", 1);
+    ie::Calibration* calibration = new ie::Calibration();
+    threshold = calibration->calibrate() * 0.47;;
+    delete calibration;
+    msg_f("Threshold", 7);
+    msg_f(threshold, 8);
+
+    // タッチセンサーを押すとスタート
+    ie::Starter* starter = new ie::Starter();
+    msg_f("PUSH TOUCH SENSOR!", 10);
+    starter->startWait();
+    delete starter;
+}
+
+/**
  * 入出力のテスト<br>
  * RGB-HSV変換とブロック並べのデコード<br>
  * for文によるファイル出力テスト
@@ -122,7 +144,9 @@ void hoge(ie::Motion& motion, ie::DirectionStopper& ds, ie::Control& stControl, 
     int spinPwm = 15;
     ds.setTargetDirection(std::atan2(pointX - localization->getPointX(), pointY - localization->getPointY()));
     motion.spin(ds, spControl, spinPwm);
+    motion.wait(200);
     motion.goPoint(*localization, stControl, pwm, pointX, pointY);
+    motion.wait(200);
 }
 
 /**
@@ -179,32 +203,15 @@ void pidTest() {
 
 void motionTest() {
     ie::Motion motion;
-    motion.raiseArm(15, 5);
+    float target;
 
-    // キャリブレーション
-    msg_f("Please waite...", 1);
-    ie::Calibration* calibration = new ie::Calibration();
-    float target = calibration->calibrate() * 0.47;
-    delete calibration;
-    msg_f("Target", 7);
-    msg_f(target, 8);
+    init(motion, target);
 
     ie::PIDControl ltControl(target, 0.15, 0, 0);
+    ie::OnOffControl stControl(0, 0.3, 0);
 
-    // タッチセンサーを押すとスタート
-    ie::Starter* starter = new ie::Starter();
-    msg_f("PUSH TOUCH SENSOR!", 10);
-    starter->startWait();
-    delete starter;
-
-    ie::MileageStopper ms(250);
-    motion.lineTrace(ms, ltControl, 20, true);;
-    ie::GrayStopper gs(500);
-    motion.lineTrace(gs, ltControl, 20, true);
-    msg_f(left.getCount(), 1);
-    msg_f(right.getCount(), 2);
-    // motion.goStraight(ls, stControl, 100);
-    // motion.lineTrace(ms, ltControl, 15, false);
+    ie::LineStopper ls(80);
+    motion.spin(ls, stControl, 15); // ライントレースをするためにラインを検知するまで回転
 }
 
 void main_task(intptr_t unused) {
@@ -214,8 +221,8 @@ void main_task(intptr_t unused) {
 
     ev3_sta_cyc(SUB_CYC);
     // moveTest();
-    // goPointTest();
-    motionTest();
+    goPointTest();
+    // motionTest();
     // pidTest();
     ev3_stp_cyc(SUB_CYC);
     delete localization;
