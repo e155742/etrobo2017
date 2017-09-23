@@ -58,7 +58,7 @@ void init(ie::Motion& motion, float& threshold) {
     // キャリブレーション
     msg_f("Please waite...", 1);
     ie::Calibration* calibration = new ie::Calibration();
-    threshold = calibration->calibrate * 0.48; // 普通のライントレース
+    threshold = calibration->calibrate() * 0.40; // 普通のライントレース
     delete calibration;
     msg_f("Threshold", 7);
     msg_f(threshold, 8);
@@ -84,7 +84,7 @@ void del(ie::Motion& motion) {
     #endif
 }
 
-void pidTest(ie::Motion& motion, float target) {
+void pidCurve(ie::Motion& motion, float target, int mile) {
     // PIDの各種定数
 	
 	/*
@@ -96,9 +96,9 @@ void pidTest(ie::Motion& motion, float target) {
 
 	// ゆるい曲線用
 	
-    const float kp = 0.033; // 比例定数
+    const float kp = 0.040; // 比例定数
     const float ki = 0.00; // 積分定数
-    const float kd = 0.002; // 微分定数
+    const float kd = 0.004; // 微分定数
 	
 
 	// きつい曲線用
@@ -118,7 +118,34 @@ void pidTest(ie::Motion& motion, float target) {
     const int pwm = 70;
 
     ie::PIDControl ltControl(target, kp, ki, kd);
-    ie::MileageStopper stopper(2000);
+    ie::MileageStopper stopper(mile);
+    motion.lineTrace(stopper, ltControl, pwm, false);
+}
+
+void pidStraight(ie::Motion& motion, float target, int mile) {
+    // PIDの各種定数
+	
+	// 直線用ベストパラメータ
+	/*
+    const float kp = 0.003; // 比例定数
+    const float ki = 0.00; // 積分定数
+    const float kd = 0.001; // 微分定数
+	*/
+
+	// 直線用
+    float kp = 0.027; // 比例定数
+    const float ki = 0.00; // 積分定数
+    const float kd = 0.003; // 微分定数
+
+    // ボタン入力
+    // inputFloat(kp, 100, "kp X.*");
+    // inputFloat(kp, "kp X.X*");
+    // inputFloat(kp, 1000, "kp X.XX*");
+
+    const int pwm = 100;
+
+    ie::PIDControl ltControl(target, kp, ki, kd);
+    ie::MileageStopper stopper(mile);
     motion.lineTrace(stopper, ltControl, pwm, false);
 }
 
@@ -126,8 +153,12 @@ void main_task(intptr_t unused) {
     ie::Motion motion;
     float target;
     init(motion, target);
+	int mile = 0;
 
-    pidTest(motion, target);
+	mile = 2200;
+    pidStraight(motion, target, mile);
+	mile = 4000;
+    pidCurve(motion, target, mile);
 
     del(motion);
 }

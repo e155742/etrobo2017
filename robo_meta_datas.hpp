@@ -32,7 +32,8 @@ static constexpr double RED_COEFFICIENT   = 255.0 / 377.0;
 static constexpr double GREEN_COEFFICIENT = 255.0 / 368.0;
 static constexpr double BLUE_COEFFICIENT  = 255.0 / 225.0;
 
-static constexpr double DELTA_T = 0.00078064012;// 0.004;
+//static constexpr double DELTA_T = 0.00078064012;// 0.004;
+static constexpr double DELTA_T = 0.004;
 
 }
 
