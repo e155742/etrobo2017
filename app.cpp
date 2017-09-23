@@ -32,6 +32,7 @@
 ie::Localization* localization;
 ev3api::Motor left(ie::LEFT_WHEEL_PORT);
 ev3api::Motor right(ie::RIGHT_WHEEL_PORT);
+
 /**
  * 20ms間隔で呼び出される周期ハンドラ<br>
  * 自己位置推定を行っている
@@ -83,153 +84,30 @@ void del(ie::Motion& motion) {
     #endif
 }
 
-/**
- * ブロック並べの初期位置コードを解読
- */
-void initCodeDecode(ie::Decoder d) {
-    msg_clear();
-    std::vector<int> initCodeVector = {0, 0, 0, 0, 0};
-    inputInt(initCodeVector, "INPUT INIT CODE");
-    int initCode = initCodeVector[0] * 10000;
-    initCode += initCodeVector[1] * 1000;
-    initCode += initCodeVector[2] * 100;
-    initCode += initCodeVector[3] * 10;
-    initCode += initCodeVector[4];
-    msg_clear();
-    msg_f(initCode ,2);
-    d.setPositionFromCode(initCode);
-    msg_f("Black, Red, Yellow, Blue", 4);
-    char str[64];
-    sprintf(str, "%d,    %d,   %d,      %d", d.getBlackPosition(), d.getRedPosition(), d.getYellowPosition(), d.getBluePosition());
-    msg_f(str, 5);
-}
-
-/**
- * 実際に動かして見る
- */
-void moveTest() {
-    // PIDの各種定数
-    const float kp = 3.0; // 比例定数
-    const float ki = 0.0; // 積分定数
-    const float kd = 0.0; // 微分定数
-
-    const float threshold = 36.5;
-
-    ie::PIDControl* ltControl = new ie::PIDControl(threshold, kp, ki, kd);
-    ie::OnOffControl* stControl = new ie::OnOffControl(0, 0, 0.3, 0);
-    ie::Move move;
-
-    move.raiseArm(60, 10);
-    move.raiseArm(15, 5);
-    move.rotateTail(360, 10);
-    move.goStraight(*stControl, 15 * 10, 10);
-    move.spin(*stControl, -360, 15);
-
-    // move.goStraight(*stPid, -15 * 10, 20) と同じ
-    ie::PIDControl* stPid = new ie::PIDControl(left.getCount() - right.getCount(), 2, 0, 0);
-    int begin = move.getMileage();
-    while (true) {
-        if (15 * 10 < std::abs(move.getMileage() - begin)) {
-            delete stPid;
-            break;
-        }
-        move.goStraight(*stPid, -20);
-    }
-
-    while (move.getMileage() < 3.5 * 1000) {
-        move.lineTrace(*ltControl, 30, true);
-    }
-
-    move.stop();
-    delete ltControl;
-    delete stControl;
-}
-
-void hoge(ie::Motion& motion, ie::DirectionStopper& ds, ie::Control& stControl, ie::Control& spControl, ie::point_t pointX, ie::point_t pointY) {
-    int pwm = 20;
-    int spinPwm = 15;
-    ds.setTargetDirection(std::atan2(pointX - localization->getPointX(), pointY - localization->getPointY()));
-    motion.spin(ds, spControl, spinPwm);
-    motion.wait(200);
-    motion.goPoint(*localization, stControl, pwm, pointX, pointY, 15);
-    motion.wait(200);
-}
-
-/**
- * ブロック並べフィールドを移動。入口からスタート。
- * 黒マーカーでいうところの以下の番号を通る。
- * 10 -> 5 -> 1 -> 13 -> 2 -> 10
- */
-void goPointTest(ie::Motion& motion) {
-    ie::OnOffControl stControl(0, 0, 0.3, 0);
-    ie::OnOffControl spControl(0, 0, 0.3, 0);
-    dly_tsk(1); // これがないとフリーズする。
-    ie::DirectionStopper ds(*localization);
-
-    localization->setDirection(30 * M_PI/180.0); // 入口のラインの角度が30度
-    hoge(motion, ds, stControl, spControl, 225.0, 389.7);
-    hoge(motion, ds, stControl, spControl, -164.7, 614.7);
-    hoge(motion, ds, stControl, spControl, 839.7, -225.0);
-    hoge(motion, ds, stControl, spControl, 614.7, 614.7);
-    hoge(motion, ds, stControl, spControl, 0.0, 0.0);
-}
-
-void pidTest() {
+void pidTest(ie::Motion& motion, float target) {
     // PIDの各種定数
     const float kp = 0.107; // 比例定数
     const float ki = 0.00; // 積分定数
-    const float kd = 0.05; // 微分定数
+    const float kd = 0.00; // 微分定数
+
+    // ボタン入力
+    // inputFloat(kp, 10, "kp X.*");
+    // inputFloat(kp, "kp X.X*");
+    // inputFloat(kp, 1000, "kp X.XX*");
 
     const int pwm = 100;
 
-    ie::Motion motion;
-    float threshold;
-    init(motion, threshold);
-
-    ie::PIDControl ltControl(threshold, kp, ki, kd);
-
+    ie::PIDControl ltControl(target, kp, ki, kd);
     ie::MileageStopper stopper(2000);
     motion.lineTrace(stopper, ltControl, pwm, true);
 }
 
-void motionTest(ie::Motion& motion) {
-    ie::OnOffControl stControl(0, 0, 0.0, 100);
-    dly_tsk(1);
-    motion.goPoint(*localization, stControl, 10, 30, 1000, 15);
-}
-
-void leftCourse() {
-    int greenPosition = 0;
-
-    ie::Decoder decoder;
-    initCodeDecode(decoder);
+void main_task(intptr_t unused) {
     ie::Motion motion;
     float target;
-    msg_clear();
     init(motion, target);
 
-    // LCourseIdaten(motion);
-    LCourseBlock(motion, target, decoder, greenPosition);
-    // LCourseParking(motion, target);
+    pidTest(motion, target);
 
     del(motion);
-}
-
-void main_task(intptr_t unused) {
-    // ie::Decoder decoder;
-    // initCodeDecode(decoder);
-    // dly_tsk(3 * 1000);
-    // msg_clear();
-
-    // ie::Motion motion;
-    // float target;
-    // init(motion, target);
-
-    // goPointTest(motion);
-    // motionTest(motion);
-    // pidTest();
-
-    // del(motion);
-
-    leftCourse();
 }

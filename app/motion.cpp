@@ -16,12 +16,26 @@ namespace ie {
 
 Motion::Motion():
 leftWheel_(LEFT_WHEEL_PORT), rightWheel_(RIGHT_WHEEL_PORT),
-tail_(TAIL_MOTOR_PORT), arm_(ARM_MOTOR_PORT), colorSensor_(COLOR_SENSOR_PORT) {
+tail_(TAIL_MOTOR_PORT), arm_(ARM_MOTOR_PORT), colorSensor_(COLOR_SENSOR_PORT)
+#ifdef OUTPUT_LINETRACE
+, fo_("PID_control_value.txt")
+#endif
+{
     leftWheel_.reset();
     rightWheel_.reset();
     tail_.reset();
     arm_.reset();
 }
+
+#ifdef OUTPUT_LINETRACE
+Motion::~Motion() {
+    close();
+}
+
+void Motion::close() {
+    fo_.close();
+}
+#endif
 
 /**
  * 尻尾を指定した角度だけ回転させる。<br>
