@@ -21,7 +21,8 @@ APPL_CXXOBJS += \
 	direction_stopper.o \
 	color_stopper.o \
 	line_stopper.o \
-	gray_stopper.o
+	gray_stopper.o \
+	prize.o
 
 SRCLANG := c++
 
