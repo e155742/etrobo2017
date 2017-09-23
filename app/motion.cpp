@@ -222,7 +222,7 @@ inline void Motion::goStraightHelper(Control& control, int pwm) {
  * @param control 直進制御用のControlクラス
  * @param pwm     モーターのパワー
  */
-inline void Motion::goStraight(Control& control, int pwm) {
+void Motion::goStraight(Control& control, int pwm) {
     onoffSetPwm(control, pwm);
     control.setTarget(leftWheel_.getCount() - rightWheel_.getCount());
     goStraightHelper(control, pwm);

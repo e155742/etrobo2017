@@ -1,77 +1,89 @@
-#include "prize.h"
-#include "Clock.h"
-#include "Motor.h"
+/**
+ * @file prize.cpp
+ * @brief 検証運び
+ *
+ * @author Akari Minowa
+ */
+#include "prize.hpp"
+#include <Motor.h>
 
-#include "control.hpp"
-#include "pid_control.hpp"
 #include "onoff_control.hpp"
+#include "mileage_stopper.hpp"
+#include "angle_stopper.hpp"
 
-//変数の初期設定スペース
+namespace ie {
 
-ev3api::Motor Left(ie::LEFT_WHEEL_PORT);
-ev3api::Motor Right(ie::RIGHT_WHEEL_PORT);
+Prize::Prize(Motion& motion):
+leftWheel_(LEFT_WHEEL_PORT), rightWheel_(RIGHT_WHEEL_PORT),
+sonarSensor_(SONAR_SENSOR_PORT), motion_(motion) {}
 
-#define dist 3 //懸賞前で止まるための距離
-#define dist2 35 //電車を避ける距離
+void Prize::prizeCourse() {
+    // int16_t distance = 0; //距離格納用変数
+    ie::OnOffControl stControl(0, 0.3, 0);
 
+    MileageStopper ms(150);
+    motion_.goStraight(ms, stControl, 20);
 
-void prize::PrizeCourse() {
-  
-  //センサー等の初期設定
-  SonarSensor sonarSensor(PORT_2);
-  Clock clock;
+    AngleStopper as(-90);
+    motion_.spin(as, stControl, -15);
+    motion_.stop();
 
-  int16_t distance = sonarSensor.getDistance(); //距離格納用変数
-  int roop = 0;
-  int flag = 0;
-
-  Motor leftWheel(PORT_C);
-  Motor rightWheel(PORT_B);
-  ie::Move move;
-  ie::Motion motion;
-  ie::OnOffControl* stControl = new ie::OnOffControl(0,0,0.3,0);
-  ie::PIDControl* stPid = new ie::PIDControl(Left.getCount() - Right.getCount(), 2, 0, 0);
-
-  move.goStraight(*stControl, 10 * 15, 20);
-  move.spin(*stControl, -90, 100/6);
-
-  leftWheel.setPWM(20);
-  rightWheel.setPWM(20);
-
-
-  //----懸賞に向かって直進
-  while(1){
-    distance = sonarSensor.getDistance();  //距離を格納している
-    if(distance == dist && distance != 0){
-      move.stop();
-      break;
+    // 懸賞に向かって直進
+    while(distOnPrize_ < sonarSensor_.getDistance() || sonarSensor_.getDistance() == 0){
+        motion_.goStraight(stControl, 20);
     }
-  }
-  
-  //---懸賞getし後退.そして回転
-  move.raiseArm(75, 5);  //懸賞を持つ
-  move.goStraight(*stControl, 10 * -20, 20); //(int 距離, int PWM) ※距離は単位がミリなので10かける
-  move.spin(*stControl, -90, 100/6);
+    motion_.stop();
 
-  //---電車が通過するのを確認するまで待つ
-  while(1){
-    distance = sonarSensor.getDistance();
-    if(distance <= dist2 && distance != 0){
-      break;
+    // 懸賞getし後退.そして回転
+    motion_.raiseArm(75, 5);  //懸賞を持つ
+
+    // 懸賞を持って後進
+    ms.setTargetMileage(-200);
+    motion_.goStraight(ms, stControl, -20);
+    motion_.stop();
+
+    // 回転
+    as.setAngle(-90);
+    motion_.spin(as, stControl, -15);
+    motion_.stop();
+
+    // 電車が通過するのを確認するまで待つ
+    while(distOnTrain_ < sonarSensor_.getDistance() || sonarSensor_.getDistance() == 0){
+        // 待機
     }
-  }
 
-  //---回転して交代のままレールの上を通過．懸賞置き場へ置く
-  move.spin(*stControl, -180, 100/6);
-  move.goStraight(*stControl, 10 * -50, 20);
-  move.spin(*stControl, -90, 100/6);
-  move.goStraight(*stControl, 10 * 10, 10);
-  move.raiseArm(7, 10);
-  move.goStraight(*stControl, 10 * -15, 10);
+    // 回転して交代のままレールの上を通過．懸賞置き場へ置く
+    as.setAngle(-180);
+    motion_.spin(as, stControl, -15);
 
-  //バックで駐車
-  move.spin(*stControl, 90, 10);
-  move.goStraight(*stControl, 10 * -35, 10);
-  move.spin(*stControl, 90, 10);
-  move.goStraight(*stControl, 10 * -40, 10);
+    ms.setTargetMileage(-500);
+    motion_.goStraight(ms, stControl, -20);
+
+    as.setAngle(-90);
+    motion_.spin(as, stControl, -15);
+
+    ms.setTargetMileage(100);
+    motion_.goStraight(ms, stControl, 10);
+
+    motion_.raiseArm(7, 10);
+
+    ms.setTargetMileage(-150);
+    motion_.goStraight(ms, stControl, -10);
+
+
+    // バックで駐車
+    as.setAngle(90);
+    motion_.spin(as, stControl, 10);
+
+    ms.setTargetMileage(-350);
+    motion_.goStraight(ms, stControl, -10);
+
+    as.setAngle(90);
+    motion_.spin(as, stControl, 10);
+
+    ms.setTargetMileage(-400);
+    motion_.goStraight(ms, stControl, -10);
+    motion_.stop();
+}
+
 }
