@@ -199,7 +199,7 @@ void motionTest(ie::Motion& motion) {
 }
 
 void leftCourse() {
-    int greenPosition = 0;
+    int greenPosition = 12;
 
     ie::Decoder decoder;
     initCodeDecode(decoder);
@@ -210,6 +210,7 @@ void leftCourse() {
 
     // LCourseIdaten(motion);
     LCourseBlock(motion, target, decoder, greenPosition);
+    dly_tsk(5000);
     // LCourseParking(motion, target);
 
     del(motion);

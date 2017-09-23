@@ -22,7 +22,8 @@ APPL_CXXOBJS += \
 	color_stopper.o \
 	line_stopper.o \
 	gray_stopper.o \
-	marker.o
+	marker.o \
+	block_field.o
 
 SRCLANG := c++
 

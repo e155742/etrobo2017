@@ -9,7 +9,7 @@
 #ifndef LOCALIZATION_HPP
 #define LOCALIZATION_HPP
 
-// #define PRINT_LOCALIZATION  // 座標と方位と移動距離を画面出力
+#define PRINT_LOCALIZATION  // 座標と方位と移動距離を画面出力
 // #define OUTPUT_LOCALIZATION // 座標の変位をファイル出力
 
 namespace ie {

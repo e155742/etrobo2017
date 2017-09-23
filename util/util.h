@@ -103,4 +103,36 @@ inline extern void plusMinusNormalize(X& value, Y& subValue) {
   }
 }
 
+/**
+ * 度数法を弧度法(ラジアン)に変換
+ *
+ * @param degree 度数法での角度
+ * @return       弧度法での角度
+ */
+inline extern double degToRad(double degree) {
+  return degree * (M_PI / 180.0);
+}
+
+/**
+ * 極座標から直交座標のX座標を求める
+ *
+ * @param r     中心と座標の距離
+ * @param theta 中心と座標の偏角
+ * @return      X座標
+ */
+inline extern double polarToRectX(double r, double theta) {
+  return r * std::cos(theta);
+}
+
+/**
+ * 極座標から直交座標のY座標を求める
+ *
+ * @param r     中心と座標の距離
+ * @param theta 中心と座標の偏角
+ * @return      Y座標
+ */
+inline extern double polarToRectY(double r, double theta) {
+  return r * std::sin(theta);
+}
+
 #endif  // MY_UNTL_H_
