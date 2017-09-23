@@ -12,6 +12,8 @@
 
 #include "mileage_stopper.hpp"
 
+// #define STERRING_LINETRACE // ライントレースの実装をステアリングに
+
 namespace ie {
 
 Motion::Motion():
@@ -332,9 +334,13 @@ inline void Motion::lineTraceHelper(Control& control, int pwm, bool isRightSide)
     colorSensor_.getRawColor(rgb_);
     float value = static_cast<float>(rgb_.r + rgb_.g + rgb_.b);
     double controlValue = control.getControlValue(value);
-    // if (isRightSide) { controlValue *= -1; }
-    // setSteeringPower(pwm, controlValue);
 
+    #ifdef STERRING_LINETRACE
+    // ステアリングによる実装
+    if (isRightSide) { controlValue *= -1; }
+    setSteeringPower(pwm, controlValue);
+    #else
+    // 一般的な実装
     if (!isRightSide) { controlValue *= -1;}
     if (controlValue < -pwm) {controlValue = -pwm;}
     if (pwm < controlValue) {controlValue = pwm;}
@@ -346,6 +352,8 @@ inline void Motion::lineTraceHelper(Control& control, int pwm, bool isRightSide)
         // 左旋回
         setBothPwm(pwm - controlValue, pwm);
     }
+    #endif
+
     #ifdef OUTPUT_LINETRACE
     fo_.fileWrite(controlValue);
     #endif
