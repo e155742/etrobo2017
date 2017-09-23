@@ -6,7 +6,7 @@
  */
 #include "color_stopper.hpp"
 #include "robo_meta_datas.hpp"
-
+#include "util.h"
 namespace ie {
 
 ColorStopper::ColorStopper():
@@ -17,7 +17,7 @@ bool ColorStopper::doStop() {
     colorSensor_.getRawColor(rgb_);
     colorid_t color = colorJudge_.getColorNumber(rgb_.r, rgb_.g, rgb_.b);
 
-    if (color == COLOR_BLACK || color == COLOR_WHITE) {
+    if (color == COLOR_BLACK || color == COLOR_WHITE || color == COLOR_NONE) {
         return false;
     }
     return true;

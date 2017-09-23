@@ -52,6 +52,7 @@ void sub_cyc(intptr_t exinf) {
  * アームの初期化とキャリブレーションと自己位置推定開始
  */
 void init(ie::Motion& motion, float& threshold) {
+    motion.raiseArm(60, 15); // 動いていることがわかりやすいように
     motion.raiseArm(15, 5);
 
     // キャリブレーション
@@ -104,47 +105,6 @@ void initCodeDecode(ie::Decoder d) {
     msg_f(str, 5);
 }
 
-/**
- * 実際に動かして見る
- */
-void moveTest() {
-    // PIDの各種定数
-    const float kp = 3.0; // 比例定数
-    const float ki = 0.0; // 積分定数
-    const float kd = 0.0; // 微分定数
-
-    const float threshold = 36.5;
-
-    ie::PIDControl* ltControl = new ie::PIDControl(threshold, kp, ki, kd);
-    ie::OnOffControl* stControl = new ie::OnOffControl(0, 0, 0.3, 0);
-    ie::Move move;
-
-    move.raiseArm(60, 10);
-    move.raiseArm(15, 5);
-    move.rotateTail(360, 10);
-    move.goStraight(*stControl, 15 * 10, 10);
-    move.spin(*stControl, -360, 15);
-
-    // move.goStraight(*stPid, -15 * 10, 20) と同じ
-    ie::PIDControl* stPid = new ie::PIDControl(left.getCount() - right.getCount(), 2, 0, 0);
-    int begin = move.getMileage();
-    while (true) {
-        if (15 * 10 < std::abs(move.getMileage() - begin)) {
-            delete stPid;
-            break;
-        }
-        move.goStraight(*stPid, -20);
-    }
-
-    while (move.getMileage() < 3.5 * 1000) {
-        move.lineTrace(*ltControl, 30, true);
-    }
-
-    move.stop();
-    delete ltControl;
-    delete stControl;
-}
-
 void hoge(ie::Motion& motion, ie::DirectionStopper& ds, ie::Control& stControl, ie::Control& spControl, ie::point_t pointX, ie::point_t pointY) {
     int pwm = 20;
     int spinPwm = 15;
@@ -193,16 +153,21 @@ void pidTest() {
 }
 
 void motionTest(ie::Motion& motion) {
-    ie::OnOffControl stControl(0, 0, 0.0, 100);
-    dly_tsk(1);
-    motion.goPoint(*localization, stControl, 10, 30, 1000, 15);
+    ie::OnOffControl onoff(0, 0.3, 0);
+    ie::MileageStopper ms(1500);
+    motion.goStraight(ms, onoff, 30);
+    motion.stop();
+
+    msg_clear();
+    msg_f(left.getCount(), 2);
+    msg_f(left.getCount(), 3);
 }
 
 void leftCourse() {
-    int greenPosition = 12;
+    int greenPosition = 14; // ブロック並べはやらないためダミー
 
     ie::Decoder decoder;
-    initCodeDecode(decoder);
+    // initCodeDecode(decoder);
     ie::Motion motion;
     float target;
     msg_clear();
@@ -210,7 +175,6 @@ void leftCourse() {
 
     // LCourseIdaten(motion);
     LCourseBlock(motion, target, decoder, greenPosition);
-    dly_tsk(5000);
     // LCourseParking(motion, target);
 
     del(motion);

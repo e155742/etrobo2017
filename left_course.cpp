@@ -11,6 +11,7 @@
 #include "line_stopper.hpp"
 #include "gray_stopper.hpp"
 #include "direction_stopper.hpp"
+#include "color_stopper.hpp"
 
 #include "decoder.hpp"
 #include "block_field.hpp"
@@ -44,7 +45,7 @@ void LCourseIdaten(ie::Motion& motion) {
     ms.setTargetMileage(500);
     motion.goStraight(ms, stControl, 100);
     // バックストレート前のコーナを通過
-    ds.setTargetDirection(-90.0 * M_PI / 180.0);
+    ds.setTargetDirection(-75.0 * M_PI / 180.0);
     motion.setSteeringPower(ds, 100, -50);
     // バックストレートからゴールへ
     // stControl.setCoefficient(0, 0.3, 0);
@@ -52,6 +53,7 @@ void LCourseIdaten(ie::Motion& motion) {
     // motion.goPoint(*localization, stControl, 50, localization->getPointX() - 3500, localization->getPointY() - 300, 1000);
     motion.goStraight(ms, stControl, 100);
 
+    // 帰還
     msg_f("RETURN", 10);
     motion.wait(2000);
     ds.setTargetDirection(0.0);
@@ -63,14 +65,76 @@ void LCourseIdaten(ie::Motion& motion) {
     motion.goPoint(*localization, stControl, 60, 0.0, 0.0, 15);
 }
 
+/**
+ * ブロック並べ
+ * 無視して駐車場まで移動する
+ */
 void LCourseBlock(ie::Motion& motion, float target, ie::Decoder& decoder, int greenPosition) {
     dly_tsk(1); // 念のため
     ie::BlockField bf(*localization, decoder, greenPosition);
-    int targetMarker = bf.getTargetMarker();
-    msg_clear();
-    msg_f(targetMarker, 1);
+    // 以下の変数はブロック並べを行わないため使用しない。
+    // int targetMarker = bf.getTargetMarker();
 
-    bf.revisionBotPoint(9, 30);
+    // ライントレースに移るために旋回
+    ie::OnOffControl stControl(0, 0.3, 0);
+    ie::LineStopper ls(80);
+    motion.spin(ls, stControl, -15);
+
+    // バックストレートで自機方位修正
+    // ブロック置き場での修正は誤差が出る可能性が高い
+    ie::MileageStopper ms(150);
+    ie::PIDControl ltControl(target, 0.08, 0, 0.0001);
+    motion.lineTrace(ms, ltControl, 10, true);
+    localization->setDirection(degToRad(-90));
+
+    // ブロック置き場までライントレース
+    ms.setTargetMileage(700);
+    motion.lineTrace(ms, ltControl, 20, true);
+    ie::ColorStopper cs;
+    motion.lineTrace(cs, ltControl, 20, true);
+    motion.wait(100);
+
+    // // 自己位置推定の座標を修正
+    // bf.revisionBotPoint(9, 30);
+
+    // バックして白色地帯に乗せる
+    ms.setTargetMileage(-320);
+    motion.goStraight(ms, stControl, -15);
+    motion.wait(100);
+
+    // ブロック並べフィールドの右端を向く
+    ie::DirectionStopper ds(*localization, degToRad(87.5));
+    motion.spin(ds, stControl, 15);
+    motion.wait(100);
+
+    // 裏ストレートを直進
+    ms.setTargetMileage(1850);
+    motion.goStraight(ms, stControl, 30);
+    motion.stop();
+
+    // 島を避ける
+    ds.setTargetDirection(degToRad(60));
+    motion.setRightPwm(ds, 30);
+    ms.setTargetMileage(450);
+    motion.goStraight(ms, stControl, 30);
+    ds.setTargetDirection(degToRad(87));
+    motion.setLeftPwm(ds, 30);
+
+    // 駐車場ラインに乗せる
+    ms.setTargetMileage(250);
+    motion.goStraight(ms, stControl, 30);
+    ds.setTargetDirection(degToRad(0));
+    motion.spin(ds, stControl, 20);
+
+    // 帰還
+    // msg_f("RETURN", 10);
+    // motion.wait(2000);
+    // ds.setTargetDirection(degToRad(87));
+    // motion.setRightPwm(ds, -30);
+    // ms.setTargetMileage(-1800);
+    // motion.goStraight(ms, stControl, -30);
+    motion.stop();
+
 }
 
 /**
@@ -106,4 +170,5 @@ void LCourseParking(ie::Motion& motion, float target) {
     // 右旋回で車庫と水平にする
     as.setAngle(50);
     motion.setLeftPwm(as, 20);
+    motion.stop();
 }
