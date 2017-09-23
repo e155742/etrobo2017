@@ -12,16 +12,32 @@
 
 #include "mileage_stopper.hpp"
 
+//#define STERRING_LINETRACE // ライントレースの実装をステアリングに
+
 namespace ie {
 
 Motion::Motion():
 leftWheel_(LEFT_WHEEL_PORT), rightWheel_(RIGHT_WHEEL_PORT),
-tail_(TAIL_MOTOR_PORT), arm_(ARM_MOTOR_PORT), colorSensor_(COLOR_SENSOR_PORT) {
+tail_(TAIL_MOTOR_PORT), arm_(ARM_MOTOR_PORT), colorSensor_(COLOR_SENSOR_PORT)
+#ifdef OUTPUT_LINETRACE
+, fo_("PID_control_value.txt")
+#endif
+{
     leftWheel_.reset();
     rightWheel_.reset();
     tail_.reset();
     arm_.reset();
 }
+
+#ifdef OUTPUT_LINETRACE
+Motion::~Motion() {
+    close();
+}
+
+void Motion::close() {
+    fo_.close();
+}
+#endif
 
 /**
  * 尻尾を指定した角度だけ回転させる。<br>
@@ -318,20 +334,23 @@ inline void Motion::lineTraceHelper(Control& control, int pwm, bool isRightSide)
     colorSensor_.getRawColor(rgb_);
     float value = static_cast<float>(rgb_.r + rgb_.g + rgb_.b);
     double controlValue = control.getControlValue(value);
-    // if (isRightSide) { controlValue *= -1; }
-    // setSteeringPower(pwm, controlValue);
 
+    #ifdef STERRING_LINETRACE
+    // ステアリングによる実装
+    if (isRightSide) { controlValue *= -1; }
+    setSteeringPower(pwm, controlValue);
+    #else
+    // 一般的な実装
     if (!isRightSide) { controlValue *= -1;}
     if (controlValue < -pwm) {controlValue = -pwm;}
     if (pwm < controlValue) {controlValue = pwm;}
 
-    if (controlValue < 0) {
-        // 右旋回
-        setBothPwm(pwm, pwm + controlValue);
-    } else {
-        // 左旋回
-        setBothPwm(pwm - controlValue, pwm);
-    }
+    controlValue *= 0.02;
+	int pwm_L = static_cast<int>(static_cast<double>(pwm) * (1.0 - controlValue));
+	int pwm_R = static_cast<int>(static_cast<double>(pwm) * (1.0 + controlValue));
+    setBothPwm(pwm_L, pwm_R);
+    #endif
+
     #ifdef OUTPUT_LINETRACE
     fo_.fileWrite(controlValue);
     #endif
