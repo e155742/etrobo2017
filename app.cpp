@@ -28,6 +28,7 @@
 #include "gray_stopper.hpp"
 
 #include "left_course.cpp"
+#include "prize.h"
 
 ie::Localization* localization;
 ev3api::Motor left(ie::LEFT_WHEEL_PORT);
@@ -205,6 +206,9 @@ void main_task(intptr_t unused) {
 
     ie::Motion motion;
     float target;
+    
+    prize Prize;
+    Prize.PrizeCourse();
     init(motion, target);
 
     // goPointTest(motion);
