@@ -1,33 +1,26 @@
 #include <vector>
-#include <cmath>
+#include <Motor.h>
 #include "app.h"
-#include "util.h"
 
-#include <ColorSensor.h>
-#include "robo_meta_datas.hpp"
+#include "motion.hpp"
+#include "localization.hpp"
 
-#include "decoder.hpp"
-#include "hsv_converter.hpp"
+#include "pid_control.hpp"
+#include "onoff_control.hpp"
+
+#include "mileage_stopper.hpp"
+#include "direction_stopper.hpp"
+
 #include "file_output.hpp"
 #include "calibration.hpp"
 #include "starter.hpp"
 
-#include "control.hpp"
-#include "pid_control.hpp"
-#include "onoff_control.hpp"
+#include "left_idaten.hpp"
+#include "left_block.hpp"
+#include "left_parking.hpp"
 
-#include "localization.hpp"
-#include "move.hpp"
-#include "motion.hpp"
-
-#include "mileage_stopper.hpp"
-#include "angle_stopper.hpp"
-#include "direction_stopper.hpp"
-#include "color_stopper.hpp"
-#include "line_stopper.hpp"
-#include "gray_stopper.hpp"
-
-#include "left_course.cpp"
+#include "robo_meta_datas.hpp"
+#include "util.h"
 
 ie::Localization* localization;
 ev3api::Motor left(ie::LEFT_WHEEL_PORT);
@@ -163,11 +156,13 @@ void motionTest(ie::Motion& motion) {
     msg_f(left.getCount(), 3);
 }
 
+/**
+ * Lコース
+ */
 void leftCourse() {
     int greenPosition = 14; // ブロック並べはやらないためダミー
 
     ie::Decoder decoder;
-    // initCodeDecode(decoder);
     ie::Motion motion;
     float target;
     msg_clear();
@@ -175,17 +170,12 @@ void leftCourse() {
 
     // LCourseIdaten(motion);
     LCourseBlock(motion, target, decoder, greenPosition);
-    // LCourseParking(motion, target);
+    LCourseParking(motion, target);
 
     del(motion);
 }
 
 void main_task(intptr_t unused) {
-    // ie::Decoder decoder;
-    // initCodeDecode(decoder);
-    // dly_tsk(3 * 1000);
-    // msg_clear();
-
     // ie::Motion motion;
     // float target;
     // init(motion, target);

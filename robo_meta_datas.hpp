@@ -4,6 +4,7 @@
  *
  * @see https://redmine.ie.u-ryukyu.ac.jp/projects/etrobo2017-teamtwd/wiki/Port
  * @see https://redmine.ie.u-ryukyu.ac.jp/projects/etrobo2017-teamtwd/wiki/Spec
+ * @see https://redmine.ie.u-ryukyu.ac.jp/projects/etrobo2017-teamtwd/wiki/Color
  * @author Suguru Kouchi
  */
 #ifndef ROBO_META_DATAS_HPP
@@ -32,7 +33,6 @@ static constexpr double ANGLE_COEFFICIENT = 1.050;//1.043        // 角度係数
 
 static constexpr double OFF_SET           = 34.0;         // カラーセンサーから車体中心までの距離(mm)
 
-// see https://redmine.ie.u-ryukyu.ac.jp/projects/etrobo2017-teamtwd/wiki/Color
 #ifndef TWO_UNIT
 // 一号機
 static constexpr double RED_COEFFICIENT   = 255.0 / 377.0;
