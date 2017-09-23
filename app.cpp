@@ -58,9 +58,7 @@ void init(ie::Motion& motion, float& threshold) {
     // キャリブレーション
     msg_f("Please waite...", 1);
     ie::Calibration* calibration = new ie::Calibration();
-	int black = calibration->calibrate();
-	int white = calibration->calibrate();
-    threshold = (black + white) * 0.47; // 普通のライントレース
+    threshold = calibration->calibrate * 0.48; // 普通のライントレース
     delete calibration;
     msg_f("Threshold", 7);
     msg_f(threshold, 8);
