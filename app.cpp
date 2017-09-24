@@ -167,6 +167,7 @@ void motionTest(ie::Motion& motion) {
 void leftCourse(ie::Motion& motion, float target) {
     ie::Decoder decoder;
     int greenPosition = 14; // LCourseBlock()のためのダミー ブロック並べはやらないから使わない
+
     LCourseIdaten(motion);
     LCourseBlock(motion, target, decoder, greenPosition);
     LCourseParking(motion, target);
