@@ -1,4 +1,4 @@
-#include "left_idaten.hpp"
+#include "right_idaten.hpp"
 #include "localization.hpp"
 
 #include "onoff_control.hpp"
@@ -11,28 +11,40 @@
 
 extern ie::Localization* localization;
 
+void rtb(ie::Motion& motion) {
+    motion.wait(3000);
+    ie::OnOffControl stControl(0, 0.3, 0);
+    msg_f("RETURN", 10);
+    motion.wait(2000);
+    ie::DirectionStopper ds(*localization);
+    ds.setTargetDirection(std::atan2(0.0 - localization->getPointX(), 0.0 - localization->getPointY()));
+    motion.spin(ds, stControl, 15);
+    motion.goPoint(*localization, stControl, 30, 0.0, 0.0, 15);
+    motion.wait(100000);
+}
+
 /**
  * 韋駄天
  */
-void LCourseIdaten(ie::Motion& motion) {
+void RCourseIdaten(ie::Motion& motion) {
     dly_tsk(1); // これがないとフリーズする。
     ie::DirectionStopper ds(*localization);
     ie::MileageStopper ms;
+    ie::OnOffControl stControl(0, 0.3, 0);
 
     // 第2ゲートへ向けて右旋回(バック)
-    ds.setTargetDirection(degToRad(58));
-    motion.setSteeringPower(ds, -100, -55);
+    ds.setTargetDirection(degToRad(40));
+    motion.setRightPwm(ds, -100);
     // 第2ゲートを通過(バック)
-    ms.setTargetMileage(-780);
-    ie::OnOffControl stControl(0, 0.3, 0);
+    ms.setTargetMileage(-1360);
     motion.goStraight(ms, stControl, -100);
 
     // 第1ゲートへ向けて左旋回(バック)
     ds.setTargetDirection(degToRad(0));
-    motion.setSteeringPower(ds, -100, 59);
+    motion.setSteeringPower(ds, -100, 65);
 
-    int margenOne = -100;
     // 第1ゲートを通過(バック)
+    int margenOne = -60;
     ms.setTargetMileage(-1400 + margenOne); // 1400 // ********** 用調整 **********
     motion.goStraight(ms, stControl, -100);
     ms.setTargetMileage(-20);
@@ -57,17 +69,18 @@ void LCourseIdaten(ie::Motion& motion) {
     ms.setTargetMileage(2610);     // ********** 用調整 **********
     // motion.goPoint(*localization, stControl, 50, localization->getPointX() - 3500, localization->getPointY() - 250, 1000);
     motion.goStraight(ms, stControl, 100);
+    rtb(motion);
 
-    // 終了
-    motion.wait(100);
-    motion.raiseArm(15, 5);
-    // ブロック並べのためにLコースのラインに乗せる
-    ds.setTargetDirection(0);
-    motion.spin(ds, stControl, 20);
-    ie::LineStopper ls(80);
-    motion.goStraight(ls, stControl, 25);
-    ms.setTargetMileage(ie::OFF_SET + 10);
-    motion.goStraight(ms, stControl, 20);
-    motion.stop();
+    // // 終了
+    // motion.wait(100);
+    // motion.raiseArm(15, 5);
+    // // ブロック並べのためにLコースのラインに乗せる
+    // ds.setTargetDirection(0);
+    // motion.spin(ds, stControl, 20);
+    // ie::LineStopper ls(80);
+    // motion.goStraight(ls, stControl, 25);
+    // ms.setTargetMileage(ie::OFF_SET + 10);
+    // motion.goStraight(ms, stControl, 20);
+    // motion.stop();
 
 }

@@ -21,11 +21,13 @@
 #include "left_block.hpp"
 #include "left_parking.hpp"
 
+#include "right_idaten.hpp"
 #include "right_prize.hpp"
 
 #include "robo_meta_datas.hpp"
 #include "util.h"
 
+// #define LEFT_COURSE
 
 ie::Localization* localization;
 ev3api::Motor left(ie::LEFT_WHEEL_PORT);
@@ -62,7 +64,8 @@ void init(ie::Motion& motion, float& threshold) {
     msg_f("Threshold", 7);
     msg_f(threshold, 8);
 
-    motion.raiseArm(0, 15);
+    motion.wait(1000);
+    motion.raiseArm(0, 15); // フロントサスペンション
 
     // タッチセンサーを押すとスタート
     ie::Starter* starter = new ie::Starter();
@@ -147,15 +150,17 @@ void leftCourse(ie::Motion& motion, float target) {
  * Rコース
  */
 void rightCourse(ie::Motion& motion, float target) {
-    ev3api::SonarSensor sonarSensor(ie::SONAR_SENSOR_PORT);
-    // RCourseIdaten(motion);
-    RCoursePrize(motion, sonarSensor);
+    RCourseIdaten(motion);
+    // RCoursePrize(motion, sonarSensor);
     // ie::Prize prize(motion);
     // prize.prizeCourse();
 }
 
 void main_task(intptr_t unused) {
     ie::Motion motion;
+    #ifndef LEFT_COURSE
+    ev3api::SonarSensor sonarSensor(ie::SONAR_SENSOR_PORT);
+    #endif
     msg_clear();
     float target;
 
@@ -165,8 +170,11 @@ void main_task(intptr_t unused) {
     // motionTest(motion);
     // pidTest();
 
+    #ifdef LEFT_COURSE
     leftCourse(motion, target);
-    // rightCourse(motion, target);
+    #else
+    rightCourse(motion, target);
+    #endif
 
     del(motion);
 }
