@@ -10,6 +10,7 @@
 
 #include "mileage_stopper.hpp"
 #include "direction_stopper.hpp"
+#include "angle_stopper.hpp"
 
 #include "file_output.hpp"
 #include "calibration.hpp"
@@ -146,45 +147,46 @@ void pidTest() {
 }
 
 void motionTest(ie::Motion& motion) {
-    ie::OnOffControl onoff(0, 0.3, 0);
-    ie::MileageStopper ms(1500);
-    motion.goStraight(ms, onoff, 30);
+    ie::AngleStopper as(360);
+    ie::MileageStopper ms(400);
+    ie::OnOffControl onoff(0, 0, 0.3, 0);
+    // motion.spin(as, onoff, 15);
+    motion.goStraight(ms, onoff, 15);
     motion.stop();
-
     msg_clear();
-    msg_f(left.getCount(), 2);
     msg_f(left.getCount(), 3);
+    msg_f(right.getCount(), 4);
 }
 
 /**
  * Lコース
  */
-void leftCourse() {
-    int greenPosition = 14; // ブロック並べはやらないためダミー
-
+void leftCourse(ie::Motion& motion, float target) {
     ie::Decoder decoder;
-    ie::Motion motion;
-    float target;
-    msg_clear();
-    init(motion, target);
-
-    // LCourseIdaten(motion);
+    int greenPosition = 14; // LCourseBlock()のためのダミー ブロック並べはやらないから使わない
+    LCourseIdaten(motion);
     LCourseBlock(motion, target, decoder, greenPosition);
     LCourseParking(motion, target);
+}
 
-    del(motion);
+/**
+ * Lコース
+ */
+void rightCourse(ie::Motion& motion, float target) {
+    // RCourseIdaten(motion);
 }
 
 void main_task(intptr_t unused) {
-    // ie::Motion motion;
-    // float target;
-    // init(motion, target);
+    ie::Motion motion;
+    msg_clear();
+    float target;
+    init(motion, target);
 
     // goPointTest(motion);
     // motionTest(motion);
     // pidTest();
 
-    // del(motion);
+    leftCourse(motion, target);
 
-    leftCourse();
+    del(motion);
 }

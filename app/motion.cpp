@@ -35,7 +35,7 @@ tail_(TAIL_MOTOR_PORT), arm_(ARM_MOTOR_PORT), colorSensor_(COLOR_SENSOR_PORT) {
     tail_.reset();
     plusMinusNormalize(degree, pwm);
     tail_.setPWM(pwm);
-    while (std::abs(tail_.getCount() < degree)) {}
+    while (std::abs(tail_.getCount()) < degree) {}
     tail_.stop();
 }
 

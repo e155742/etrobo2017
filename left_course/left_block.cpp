@@ -27,7 +27,7 @@ void LCourseBlock(ie::Motion& motion, float target, ie::Decoder& decoder, int gr
 
     // ライントレースに移るために旋回
     ie::OnOffControl stControl(0, 0.3, 0);
-    ie::LineStopper ls(80);
+    ie::LineStopper ls(400);
     motion.spin(ls, stControl, -15);
 
     // バックストレートで自機方位修正
@@ -53,7 +53,7 @@ void LCourseBlock(ie::Motion& motion, float target, ie::Decoder& decoder, int gr
     motion.wait(100);
 
     // ブロック並べフィールドの右端を向く
-    ie::DirectionStopper ds(*localization, degToRad(87.5));
+    ie::DirectionStopper ds(*localization, degToRad(90));
     motion.spin(ds, stControl, 15);
     motion.wait(100);
 
@@ -65,7 +65,7 @@ void LCourseBlock(ie::Motion& motion, float target, ie::Decoder& decoder, int gr
     // 島を避ける
     ds.setTargetDirection(degToRad(60));
     motion.setRightPwm(ds, 30);
-    ms.setTargetMileage(450);
+    ms.setTargetMileage(470);
     motion.goStraight(ms, stControl, 30);
     ds.setTargetDirection(degToRad(87));
     motion.setLeftPwm(ds, 30);
