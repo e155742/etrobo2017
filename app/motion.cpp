@@ -12,7 +12,7 @@
 
 #include "mileage_stopper.hpp"
 
-#define ISHIZUKA_LINETRACE // KaitoIshizukaによるライントレース実装
+// #define ISHIZUKA_LINETRACE // KaitoIshizukaによるライントレース実装
 
 namespace ie {
 

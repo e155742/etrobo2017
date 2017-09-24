@@ -1,5 +1,6 @@
 #include <vector>
 #include <Motor.h>
+#include <SonarSensor.h>
 #include "app.h"
 
 #include "motion.hpp"
@@ -20,7 +21,7 @@
 #include "left_block.hpp"
 #include "left_parking.hpp"
 
-#include "prize.hpp"
+#include "right_prize.hpp"
 
 #include "robo_meta_datas.hpp"
 #include "util.h"
@@ -61,6 +62,8 @@ void init(ie::Motion& motion, float& threshold) {
     msg_f("Threshold", 7);
     msg_f(threshold, 8);
 
+    motion.raiseArm(0, 15);
+
     // タッチセンサーを押すとスタート
     ie::Starter* starter = new ie::Starter();
     msg_f("PUSH TOUCH SENSOR!", 10);
@@ -79,6 +82,9 @@ void del(ie::Motion& motion) {
     delete localization;
     #ifndef PRINT_LOCALIZATION
     msg_f("END...", 10);
+    char str[64];
+    sprintf(str, "%d mV", ev3_battery_voltage_mV());
+    msg_f(str, 11);
     #endif
 }
 
@@ -138,10 +144,14 @@ void leftCourse(ie::Motion& motion, float target) {
 }
 
 /**
- * Lコース
+ * Rコース
  */
 void rightCourse(ie::Motion& motion, float target) {
+    ev3api::SonarSensor sonarSensor(ie::SONAR_SENSOR_PORT);
     // RCourseIdaten(motion);
+    RCoursePrize(motion, sonarSensor);
+    // ie::Prize prize(motion);
+    // prize.prizeCourse();
 }
 
 void main_task(intptr_t unused) {
@@ -151,14 +161,12 @@ void main_task(intptr_t unused) {
 
     init(motion, target);
 
-    ie::Prize prize(motion);
-    prize.prizeCourse();
-
     // goPointTest(motion);
     // motionTest(motion);
     // pidTest();
 
-    // leftCourse(motion, target);
+    leftCourse(motion, target);
+    // rightCourse(motion, target);
 
     del(motion);
 }
