@@ -12,7 +12,7 @@
 
 #include "mileage_stopper.hpp"
 
-// #define STERRING_LINETRACE // ライントレースの実装をステアリングに
+#define ISHIZUKA_LINETRACE // KaitoIshizukaによるライントレース実装
 
 namespace ie {
 
@@ -335,16 +335,18 @@ inline void Motion::lineTraceHelper(Control& control, int pwm, bool isRightSide)
     float value = static_cast<float>(rgb_.r + rgb_.g + rgb_.b);
     double controlValue = control.getControlValue(value);
 
-    #ifdef STERRING_LINETRACE
-    // ステアリングによる実装
-    if (isRightSide) { controlValue *= -1; }
-    setSteeringPower(pwm, controlValue);
-    #else
-    // 一般的な実装
     if (!isRightSide) { controlValue *= -1;}
     if (controlValue < -pwm) {controlValue = -pwm;}
     if (pwm < controlValue) {controlValue = pwm;}
 
+    #ifdef ISHIZUKA_LINETRACE
+    // KaitoIshizukaによる謎実装
+    controlValue *= 0.02; // 謎の値
+	int pwm_L = roundInt(pwm * (1.0 - controlValue));
+	int pwm_R = roundInt(pwm * (1.0 + controlValue));
+    setBothPwm(pwm_L, pwm_R);
+    #else
+    // 一般的なの実装
     if (controlValue < 0) {
         // 右旋回
         setBothPwm(pwm, pwm + controlValue);

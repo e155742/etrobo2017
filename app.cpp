@@ -52,13 +52,13 @@ void sub_cyc(intptr_t exinf) {
  * スタート前に呼び出す関数。
  * アームの初期化とキャリブレーションと自己位置推定開始
  */
-void init(ie::Motion& motion, float& threshold) {
+void init(ie::Motion& motion, float& threshold, float targetGain) {
     motion.raiseArm(15, 5);
 
     // キャリブレーション
     msg_f("Please waite...", 1);
     ie::Calibration* calibration = new ie::Calibration();
-    threshold = calibration->calibrate() * 0.47; // 普通のライントレース
+    threshold = calibration->calibrate() * targetGain; // 普通のライントレースBest0.43
     delete calibration;
     msg_f("Threshold", 7);
     msg_f(threshold, 8);
@@ -84,30 +84,93 @@ void del(ie::Motion& motion) {
     #endif
 }
 
-void pidTest(ie::Motion& motion, float target) {
+void pid(ie::Motion& motion, float target, int mile, int pwm, float kp, float ki, float kd, bool isRight) {
     // PIDの各種定数
-    const float kp = 0.107; // 比例定数
+
+	/*
+	// 直線用
+    const float kp = 0.003; // 比例定数
     const float ki = 0.00; // 積分定数
-    const float kd = 0.00; // 微分定数
+    const float kd = 0.001; // 微分定数
+	*/
+
+	// ゆるい曲線用
+
+	// きつい曲線用
+	/*
+    const float kp = 0.003; // 比例定数
+    const float ki = 0.00; // 積分定数
+    const float kd = 0.001; // 微分定数
+	*/
+
+
 
     // ボタン入力
     // inputFloat(kp, 10, "kp X.*");
     // inputFloat(kp, "kp X.X*");
     // inputFloat(kp, 1000, "kp X.XX*");
 
-    const int pwm = 100;
 
     ie::PIDControl ltControl(target, kp, ki, kd);
-    ie::MileageStopper stopper(2000);
-    motion.lineTrace(stopper, ltControl, pwm, true);
+    ie::MileageStopper stopper(mile);
+    motion.lineTrace(stopper, ltControl, pwm, false);
+}
+
+void beep(){
+  ev3_speaker_set_volume(100);
+  ev3_speaker_play_tone(NOTE_B5, 40);
 }
 
 void main_task(intptr_t unused) {
     ie::Motion motion;
     float target;
-    init(motion, target);
+    float targetGain = 0.43;//暫定Best 0.43
+    init(motion, target, targetGain);
+	int mile = 0;
 
-    pidTest(motion, target);
+	//↓ Rコース
+	mile = 2200;
+	//pid(motion, 閾値, 距離, 速度,  kp, ki, kd,   isRight);
+    pid(motion, target, mile, 100, 0.02, 0.0, 0.02, false);//直線
+	beep();
+
+	mile = 3200;
+    pid(motion, target, mile, 80, 0.040, 0.0001, 0.025, false);//弱カーブ
+	beep();
+
+	mile = 3400;
+    pid(motion, target, mile, 70, 0.06, 0.001, 0.05, false);//強カーブ
+	beep();
+
+	mile = 1600;
+    pid(motion, target, mile, 100, 0.02, 0.000, 0.02, false);//直線
+	beep();
+	//↑ Rコース
+
+	/*
+	//↓ Lコース
+	mile = 2200;
+    pid(motion, target, mile, 100, 0.02, 0.0, 0.02, false);//直線
+	beep();
+
+	mile = 2100;
+    pid(motion, target, mile, 70, 0.06, 0.0001, 0.05, false);//強カーブ
+	beep();
+
+
+	mile = 2200;
+    pid(motion, target, mile, 80, 0.040, 0.0001, 0.04, false);//弱カーブ
+	beep();
+
+	mile = 2000;
+    pid(motion, target, mile, 70, 0.06, 0.001, 0.05, false);//強カーブ
+	beep();
+
+	mile = 1600;
+    pid(motion, target, mile, 100, 0.02, 0.000, 0.02, false);//直線;
+	beep();
+	//↑ Lコース
+	*/
 
     del(motion);
 }
