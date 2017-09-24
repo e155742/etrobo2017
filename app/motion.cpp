@@ -12,16 +12,32 @@
 
 #include "mileage_stopper.hpp"
 
+#define ISHIZUKA_LINETRACE // KaitoIshizukaによるライントレース実装
+
 namespace ie {
 
 Motion::Motion():
 leftWheel_(LEFT_WHEEL_PORT), rightWheel_(RIGHT_WHEEL_PORT),
-tail_(TAIL_MOTOR_PORT), arm_(ARM_MOTOR_PORT), colorSensor_(COLOR_SENSOR_PORT) {
+tail_(TAIL_MOTOR_PORT), arm_(ARM_MOTOR_PORT), colorSensor_(COLOR_SENSOR_PORT)
+#ifdef OUTPUT_LINETRACE
+, fo_("PID_control_value.txt")
+#endif
+{
     leftWheel_.reset();
     rightWheel_.reset();
     tail_.reset();
     arm_.reset();
 }
+
+#ifdef OUTPUT_LINETRACE
+Motion::~Motion() {
+    close();
+}
+
+void Motion::close() {
+    fo_.close();
+}
+#endif
 
 /**
  * 尻尾を指定した角度だけ回転させる。<br>
@@ -318,13 +334,19 @@ inline void Motion::lineTraceHelper(Control& control, int pwm, bool isRightSide)
     colorSensor_.getRawColor(rgb_);
     float value = static_cast<float>(rgb_.r + rgb_.g + rgb_.b);
     double controlValue = control.getControlValue(value);
-    // if (isRightSide) { controlValue *= -1; }
-    // setSteeringPower(pwm, controlValue);
 
     if (!isRightSide) { controlValue *= -1;}
     if (controlValue < -pwm) {controlValue = -pwm;}
     if (pwm < controlValue) {controlValue = pwm;}
 
+    #ifdef ISHIZUKA_LINETRACE
+    // KaitoIshizukaによる謎実装
+    controlValue *= 0.02; // 謎の値
+	int pwm_L = roundInt(pwm * (1.0 - controlValue));
+	int pwm_R = roundInt(pwm * (1.0 + controlValue));
+    setBothPwm(pwm_L, pwm_R);
+    #else
+    // 一般的なの実装
     if (controlValue < 0) {
         // 右旋回
         setBothPwm(pwm, pwm + controlValue);
@@ -332,6 +354,8 @@ inline void Motion::lineTraceHelper(Control& control, int pwm, bool isRightSide)
         // 左旋回
         setBothPwm(pwm - controlValue, pwm);
     }
+    #endif
+
     #ifdef OUTPUT_LINETRACE
     fo_.fileWrite(controlValue);
     #endif

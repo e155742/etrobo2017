@@ -5,6 +5,8 @@
 #ifndef MOTION_HPP
 #define MOTION_HPP
 
+#define OUTPUT_LINETRACE // ライントレースの制御量をファイル出力
+
 #include <Motor.h>
 #include <ColorSensor.h>
 
@@ -17,6 +19,11 @@ namespace ie {
 class Motion {
 public:
     Motion();
+    #ifdef OUTPUT_LINETRACE
+    ~Motion();
+    void close();
+    #endif
+
     void rotateTail(int degree, int pwm);
     void raiseArm(int degree, int pwm);
     void stop();
@@ -51,6 +58,9 @@ private:
     ev3api::Motor tail_;
     ev3api::Motor arm_;
     ev3api::ColorSensor colorSensor_;
+    #ifdef OUTPUT_LINETRACE
+    FileOutput fo_;
+    #endif
     rgb_raw_t rgb_;
     int setSteeringLeftPower(int pwm, double turnRatio);
     int setSteeringRightPower(int pwm, double turnRatio);

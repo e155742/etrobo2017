@@ -29,6 +29,7 @@
 ie::Localization* localization;
 ev3api::Motor left(ie::LEFT_WHEEL_PORT);
 ev3api::Motor right(ie::RIGHT_WHEEL_PORT);
+
 /**
  * 20ms間隔で呼び出される周期ハンドラ<br>
  * 自己位置推定を行っている
@@ -55,7 +56,7 @@ void init(ie::Motion& motion, float& threshold) {
     // キャリブレーション
     msg_f("Please waite...", 1);
     ie::Calibration* calibration = new ie::Calibration();
-    threshold = calibration->calibrate() * 0.47; // 普通のライントレース
+    threshold = calibration->calibrate() * 0.47; // 普通のライントレースBest0.43
     delete calibration;
     msg_f("Threshold", 7);
     msg_f(threshold, 8);
@@ -110,43 +111,6 @@ void hoge(ie::Motion& motion, ie::DirectionStopper& ds, ie::Control& stControl, 
     motion.wait(200);
     motion.goPoint(*localization, stControl, pwm, pointX, pointY, 15);
     motion.wait(200);
-}
-
-/**
- * ブロック並べフィールドを移動。入口からスタート。
- * 黒マーカーでいうところの以下の番号を通る。
- * 10 -> 5 -> 1 -> 13 -> 2 -> 10
- */
-void goPointTest(ie::Motion& motion) {
-    ie::OnOffControl stControl(0, 0, 0.3, 0);
-    ie::OnOffControl spControl(0, 0, 0.3, 0);
-    dly_tsk(1); // これがないとフリーズする。
-    ie::DirectionStopper ds(*localization);
-
-    localization->setDirection(30 * M_PI/180.0); // 入口のラインの角度が30度
-    hoge(motion, ds, stControl, spControl, 225.0, 389.7);
-    hoge(motion, ds, stControl, spControl, -164.7, 614.7);
-    hoge(motion, ds, stControl, spControl, 839.7, -225.0);
-    hoge(motion, ds, stControl, spControl, 614.7, 614.7);
-    hoge(motion, ds, stControl, spControl, 0.0, 0.0);
-}
-
-void pidTest() {
-    // PIDの各種定数
-    const float kp = 0.107; // 比例定数
-    const float ki = 0.00; // 積分定数
-    const float kd = 0.05; // 微分定数
-
-    const int pwm = 100;
-
-    ie::Motion motion;
-    float threshold;
-    init(motion, threshold);
-
-    ie::PIDControl ltControl(threshold, kp, ki, kd);
-
-    ie::MileageStopper stopper(2000);
-    motion.lineTrace(stopper, ltControl, pwm, true);
 }
 
 void motionTest(ie::Motion& motion) {
