@@ -26,7 +26,8 @@ APPL_CXXOBJS += \
 	block_field.o \
 	left_idaten.o \
 	left_block.o \
-	left_parking.o
+	left_parking.o \
+	prize.o
 
 SRCLANG := c++
 

@@ -20,8 +20,11 @@
 #include "left_block.hpp"
 #include "left_parking.hpp"
 
+#include "prize.hpp"
+
 #include "robo_meta_datas.hpp"
 #include "util.h"
+
 
 ie::Localization* localization;
 ev3api::Motor left(ie::LEFT_WHEEL_PORT);
@@ -180,13 +183,17 @@ void main_task(intptr_t unused) {
     ie::Motion motion;
     msg_clear();
     float target;
+
     init(motion, target);
+
+    ie::Prize prize(motion);
+    prize.prizeCourse();
 
     // goPointTest(motion);
     // motionTest(motion);
     // pidTest();
 
-    leftCourse(motion, target);
+    // leftCourse(motion, target);
 
     del(motion);
 }
