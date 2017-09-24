@@ -121,7 +121,6 @@ void beep(){
   ev3_speaker_play_tone(NOTE_B5, 40);
 }
 
-
 void main_task(intptr_t unused) {
     ie::Motion motion;
     float target;
@@ -131,6 +130,7 @@ void main_task(intptr_t unused) {
 
 	//↓ Rコース
 	mile = 2200;
+	//pid(motion, 閾値, 距離, 速度,  kp, ki, kd,   isRight);
     pid(motion, target, mile, 100, 0.02, 0.0, 0.02, false);//直線
 	beep();
 
