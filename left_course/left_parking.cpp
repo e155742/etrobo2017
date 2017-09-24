@@ -21,13 +21,13 @@ void LCourseParking(ie::Motion& motion, float target) {
     // 最終ラインを検知するまで前進。右側から侵入
     ie::LineStopper ls(80);
     motion.goStraight(ls, stControl, 30);
-    // 車体がラインを跨ぐように少しだけ全身
-    ie::MileageStopper ms(80);
+    // 車体がラインを跨ぐように少しだけ前進
+    ie::MileageStopper ms(ie::OFF_SET + 10);
     motion.goStraight(ms, stControl, 30);
 
     // ライントレースをするためにラインを検知するまで回転
     ls.setTaigetThreshold(80);
-    motion.spin(ls, stControl, 15);
+    motion.spin(ls, stControl, 20);
     // 車体とラインをまっすぐにするためにライントレース
     ms.setTargetMileage(250);
     motion.lineTrace(ms, ltControl, 15, false);
@@ -45,4 +45,12 @@ void LCourseParking(ie::Motion& motion, float target) {
     as.setAngle(50);
     motion.setLeftPwm(as, 20);
     motion.stop();
+
+    // 尻尾フリフリ
+    motion.wait(700);
+    motion.rotateTail(60, 40);
+    motion.rotateTail(-120, 40);
+    motion.rotateTail(120, 40);
+    motion.rotateTail(-120, 40);
+    motion.rotateTail(60, 40);
 }
