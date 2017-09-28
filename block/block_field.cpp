@@ -102,4 +102,3 @@ int BlockField::getTargetMarker() const {
 }
 
 }
-
