@@ -13,6 +13,7 @@
 #include "mileage_stopper.hpp"
 #include "direction_stopper.hpp"
 #include "angle_stopper.hpp"
+#include "line_stopper.hpp"
 
 #include "file_output.hpp"
 #include "calibration.hpp"
@@ -114,18 +115,21 @@ void initCodeDecode(ie::Decoder d) {
     msg_f(str, 5);
 }
 
-void motionTest(ie::Motion& motion) {
-    ev3api::SonarSensor sonarSensor(ie::SONAR_SENSOR_PORT);
-    ev3api::Clock clock;
-    msg_clear();
-    int lastdistance = sonarSensor.getDistance();
-    while (true) {
-        int distance = sonarSensor.getDistance();
-        if (lastdistance != distance) {
-            msg_f(distance, 8);
-        }
-        lastdistance = distance;
-    }
+void motionTest(ie::Motion& motion, float target) {
+    // ev3api::SonarSensor sonarSensor(ie::SONAR_SENSOR_PORT);
+    // ev3api::Clock clock;
+    // msg_clear();
+    // int lastdistance = sonarSensor.getDistance();
+    // while (true) {
+    //     int distance = sonarSensor.getDistance();
+    //     if (lastdistance != distance) {
+    //         msg_f(distance, 8);
+    //     }
+    //     lastdistance = distance;
+    // }
+    ie::LineStopper ls(80);
+    ie::PIDControl ltControl(target, 0.15, 0, 0);
+    motion.lineTrace(ls, ltControl, 30, false);
 }
 
 /**
@@ -147,7 +151,7 @@ void leftCourse(ie::Motion& motion, float target) {
  */
 void rightCourse(ie::Motion& motion, float target, ev3api::SonarSensor sonarSensor) {
     // RCourseIdaten(motion);
-    RCourseSumo(motion, sonarSensor);
+    RCourseSumo(motion, target, sonarSensor);
     // RCoursePrize(motion, sonarSensor);
     // ie::Prize prize(motion);
     // prize.prizeCourse();
@@ -175,7 +179,7 @@ void main_task(intptr_t unused) {
     init(motion, target); // キャリブレーションとスタート待機
 
     #ifdef TEST_MODE
-    motionTest(motion);
+    motionTest(motion, target);
     #else
 
     #ifdef LEFT_COURSE
