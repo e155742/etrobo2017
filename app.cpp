@@ -1,6 +1,7 @@
 #include <vector>
 #include <Motor.h>
 #include <SonarSensor.h>
+#include <ColorSensor.h>
 #include <Clock.h>
 #include "app.h"
 
@@ -149,9 +150,9 @@ void leftCourse(ie::Motion& motion, float target) {
  * Rコース
  * ET相撲のほう
  */
-void rightCourse(ie::Motion& motion, float target, ev3api::SonarSensor sonarSensor) {
+void rightCourse(ie::Motion& motion, float target, ev3api::SonarSensor& sonarSensor, ev3api::ColorSensor& colorSensor) {
     // RCourseIdaten(motion);
-    RCourseSumo(motion, target, sonarSensor);
+    RCourseSumo(motion, target, sonarSensor, colorSensor);
     // RCoursePrize(motion, sonarSensor);
     // ie::Prize prize(motion);
     // prize.prizeCourse();
@@ -167,6 +168,7 @@ void main_task(intptr_t unused) {
     ie::Motion motion;
     #ifndef LEFT_COURSE
     ev3api::SonarSensor sonarSensor(ie::SONAR_SENSOR_PORT);
+    ev3api::ColorSensor colorSensor(ie::COLOR_SENSOR_PORT);
     #endif
 
     msg_clear();
@@ -185,7 +187,7 @@ void main_task(intptr_t unused) {
     #ifdef LEFT_COURSE
     leftCourse(motion, target);
     #else
-    rightCourse(motion, target, sonarSensor);
+    rightCourse(motion, target, sonarSensor, colorSensor);
     #endif
 
     #endif

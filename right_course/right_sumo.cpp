@@ -15,8 +15,8 @@
 
 extern ie::Localization* localization;
 
-void RCourseSumo(ie::Motion& motion, float target, ev3api::SonarSensor& sonarSensor) {
-    ie::Sumo sumo(sonarSensor, target);
+void RCourseSumo(ie::Motion& motion, float target, ev3api::SonarSensor& sonarSensor, ev3api::ColorSensor& colorSensor) {
+    ie::Sumo sumo(sonarSensor, colorSensor, target);
     ie::OnOffControl stControl(0, 0.3, 0);
     ie::PIDControl ltControl(target, 0.15, 0, 0);
     ie::MileageStopper ms;
@@ -37,18 +37,22 @@ void RCourseSumo(ie::Motion& motion, float target, ev3api::SonarSensor& sonarSen
     motion.spin(as, stControl, -30);
     motion.spin(ls, stControl, 15);
 
-    sumo.moveTocross(motion, 110);
+    dly_tsk(1);
+    sumo.moveTocross(motion, localization, 110);
 
     // 前半の土俵の中心まで戻る
     ms.setTargetMileage(-150);
     motion.goStraight(ms, ltControl, -15);
     motion.wait(200); // 念のため停止
 
+    motion.raiseArm(85, 15);
+
     // 最初のブロック
-    // ds.setTargetDirection(std::atan2(230, 300));
-    // motion.spin(as, stControl, 20);
-    // motion.stop();
-    // ms.setTargetMileage(150);
-    // motion.goStraight(ms, ltControl, 15);
-    // motion.stop();
+    dly_tsk(1);
+    sumo.turnFirstBlock(motion, localization);
+    ms.setTargetMileage(138);
+    motion.goStraight(ms, ltControl, 15);
+    motion.stop();
+    sumo.moveBlock(motion, 0);
+
 }

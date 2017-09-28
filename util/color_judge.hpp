@@ -1,5 +1,5 @@
 /**
- * @color_judge.hpp
+ * @file color_judge.hpp
  * @author Suguru Kouchi
  */
 #ifndef COLOR_JUDGE_HPP

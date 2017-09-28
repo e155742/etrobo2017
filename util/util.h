@@ -114,6 +114,16 @@ inline extern double degToRad(double degree) {
 }
 
 /**
+ * 弧度法(ラジアン)を度数法に変換
+ *
+ * @param radian 弧度法での角度
+ * @return       度数法での角度
+ */
+inline extern double RadToDeg(double radian) {
+  return radian * (180.0 / M_PI);
+}
+
+/**
  * 極座標から直交座標のX座標を求める
  *
  * @param r     中心と座標の距離
