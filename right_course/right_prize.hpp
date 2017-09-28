@@ -2,8 +2,8 @@
  * @file right_prize.hpp
  * @author Akari Minowa
  */
-#ifndef PRIZE_HPP
-#define PRIZE_HPP
+#ifndef RIGHT_PRIZE_HPP
+#define RIGHT_PRIZE_HPP
 
 #include <SonarSensor.h>
 #include "motion.hpp"

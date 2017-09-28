@@ -1,6 +1,7 @@
 #include <vector>
 #include <Motor.h>
 #include <SonarSensor.h>
+#include <Clock.h>
 #include "app.h"
 
 #include "motion.hpp"
@@ -22,12 +23,14 @@
 #include "left_parking.hpp"
 
 #include "right_idaten.hpp"
+#include "right_sumo.hpp"
 #include "right_prize.hpp"
 
 #include "robo_meta_datas.hpp"
 #include "util.h"
 
-// #define LEFT_COURSE
+// #define TEST_MODE
+// #define LEFT_COURSE // ブロック並べの方
 
 ie::Localization* localization;
 ev3api::Motor left(ie::LEFT_WHEEL_PORT);
@@ -57,7 +60,6 @@ void init(ie::Motion& motion, float& threshold) {
     motion.raiseArm(15, 5);
 
     // キャリブレーション
-    msg_f("Please waite...", 1);
     ie::Calibration* calibration = new ie::Calibration();
     threshold = calibration->calibrate() * 0.47; // 普通のライントレースBest0.43
     delete calibration;
@@ -84,10 +86,10 @@ void del(ie::Motion& motion) {
     ev3_stp_cyc(SUB_CYC);
     delete localization;
     #ifndef PRINT_LOCALIZATION
-    msg_f("END...", 10);
-    char str[64];
-    sprintf(str, "%d mV", ev3_battery_voltage_mV());
-    msg_f(str, 11);
+    // msg_f("END...", 10);
+    // char str[64];
+    // sprintf(str, "%d mV", ev3_battery_voltage_mV());
+    // msg_f(str, 11);
     #endif
 }
 
@@ -112,30 +114,23 @@ void initCodeDecode(ie::Decoder d) {
     msg_f(str, 5);
 }
 
-void hoge(ie::Motion& motion, ie::DirectionStopper& ds, ie::Control& stControl, ie::Control& spControl, ie::point_t pointX, ie::point_t pointY) {
-    int pwm = 20;
-    int spinPwm = 15;
-    ds.setTargetDirection(std::atan2(pointX - localization->getPointX(), pointY - localization->getPointY()));
-    motion.spin(ds, spControl, spinPwm);
-    motion.wait(200);
-    motion.goPoint(*localization, stControl, pwm, pointX, pointY, 15);
-    motion.wait(200);
-}
-
 void motionTest(ie::Motion& motion) {
-    ie::AngleStopper as(360);
-    ie::MileageStopper ms(400);
-    ie::OnOffControl onoff(0, 0, 0.3, 0);
-    // motion.spin(as, onoff, 15);
-    motion.goStraight(ms, onoff, 15);
-    motion.stop();
+    ev3api::SonarSensor sonarSensor(ie::SONAR_SENSOR_PORT);
+    ev3api::Clock clock;
     msg_clear();
-    msg_f(left.getCount(), 3);
-    msg_f(right.getCount(), 4);
+    int lastdistance = sonarSensor.getDistance();
+    while (true) {
+        int distance = sonarSensor.getDistance();
+        if (lastdistance != distance) {
+            msg_f(distance, 8);
+        }
+        lastdistance = distance;
+    }
 }
 
 /**
  * Lコース
+ * ブロック並べのほう
  */
 void leftCourse(ie::Motion& motion, float target) {
     ie::Decoder decoder;
@@ -148,33 +143,48 @@ void leftCourse(ie::Motion& motion, float target) {
 
 /**
  * Rコース
+ * ET相撲のほう
  */
-void rightCourse(ie::Motion& motion, float target) {
-    RCourseIdaten(motion);
+void rightCourse(ie::Motion& motion, float target, ev3api::SonarSensor sonarSensor) {
+    // RCourseIdaten(motion);
+    RCourseSumo(motion, sonarSensor);
     // RCoursePrize(motion, sonarSensor);
     // ie::Prize prize(motion);
     // prize.prizeCourse();
 }
 
 void main_task(intptr_t unused) {
+    msg_f("Please waite...", 1);
+    // バッテリー残量
+    char str[64];
+    sprintf(str, "%d mV", ev3_battery_voltage_mV());
+    msg_f(str, 11);
+
     ie::Motion motion;
     #ifndef LEFT_COURSE
     ev3api::SonarSensor sonarSensor(ie::SONAR_SENSOR_PORT);
     #endif
+
     msg_clear();
+    // バッテリー残量
+    sprintf(str, "%d mV", ev3_battery_voltage_mV());
+    msg_f(str, 11);
+
     float target;
 
-    init(motion, target);
+    init(motion, target); // キャリブレーションとスタート待機
 
-    // goPointTest(motion);
-    // motionTest(motion);
-    // pidTest();
+    #ifdef TEST_MODE
+    motionTest(motion);
+    #else
 
     #ifdef LEFT_COURSE
     leftCourse(motion, target);
     #else
-    rightCourse(motion, target);
+    rightCourse(motion, target, sonarSensor);
     #endif
 
+    #endif
     del(motion);
 }
+

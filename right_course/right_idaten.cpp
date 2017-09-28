@@ -19,7 +19,7 @@ void rtb(ie::Motion& motion) {
     ie::DirectionStopper ds(*localization);
     ds.setTargetDirection(std::atan2(0.0 - localization->getPointX(), 0.0 - localization->getPointY()));
     motion.spin(ds, stControl, 15);
-    motion.goPoint(*localization, stControl, 30, 0.0, 0.0, 15);
+    motion.goPoint(*localization, stControl, 50, 0.0, 0.0, 30);
     motion.wait(100000);
 }
 
@@ -30,13 +30,14 @@ void RCourseIdaten(ie::Motion& motion) {
     dly_tsk(1); // これがないとフリーズする。
     ie::DirectionStopper ds(*localization);
     ie::MileageStopper ms;
+    ie::LineStopper ls(80);
     ie::OnOffControl stControl(0, 0.3, 0);
 
     // 第2ゲートへ向けて右旋回(バック)
-    ds.setTargetDirection(degToRad(40));
+    ds.setTargetDirection(degToRad(45));
     motion.setRightPwm(ds, -100);
     // 第2ゲートを通過(バック)
-    ms.setTargetMileage(-1360);
+    ms.setTargetMileage(-1350);
     motion.goStraight(ms, stControl, -100);
 
     // 第1ゲートへ向けて左旋回(バック)
@@ -59,18 +60,20 @@ void RCourseIdaten(ie::Motion& motion) {
     // motion.goStraight(ms, stControl, -100);
 
     // バックストレート前のコーナまで前進
-    ms.setTargetMileage(500 - margenOne); // 600
+    ms.setTargetMileage(450 - margenOne); // 600
     motion.goStraight(ms, stControl, 100);
     // 最終を通過してストレートに向ける
     ds.setTargetDirection(degToRad(-90));  // ********** 用調整 **********
-    motion.setSteeringPower(ds, 100, -60);
+    motion.setSteeringPower(ds, 100, -67); // 60
     // バックストレートからゴールへ
     stControl.setCoefficient(0, 0.4, 0);
-    ms.setTargetMileage(2610);     // ********** 用調整 **********
+    ms.setTargetMileage(2500);     // ********** 用調整 **********
     // motion.goPoint(*localization, stControl, 50, localization->getPointX() - 3500, localization->getPointY() - 250, 1000);
     motion.goStraight(ms, stControl, 100);
-    rtb(motion);
+    // rtb(motion);
 
+
+    motion.goStraight(ls, stControl, 30);
     // // 終了
     // motion.wait(100);
     // motion.raiseArm(15, 5);
