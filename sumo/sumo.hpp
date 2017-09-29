@@ -29,6 +29,7 @@ private:
     static constexpr double TRAIN_WAIT_TIME = 1000; // 目の前を電車が通った時に停止しておく時間(ms)
     static constexpr double KIRI_DISTANCE   = 75.0; // 押し切りの距離(mm)
     static constexpr double DASHI_DISTANCE  = 115.0; // 押し出しの距離(mm)
+    void soundBeep();
 };
 
 }

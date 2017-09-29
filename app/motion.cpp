@@ -292,7 +292,7 @@ inline void Motion::spin(Control& control, int pwm) {
 void Motion::spin(Stopper& stopper, Control& control, int pwm) {
     // 方位停止の場合、pwmの正負を無視して近い方を回転方向とする。
     if (DirectionStopper* ds = dynamic_cast<DirectionStopper*>(&stopper)) {
-        point_t diffDirection = ds->getTargetDirection() - ds->getDirection();
+        point_t diffDirection = radianNormalize(ds->getTargetDirection() - ds->getDirection());
         if (0 < diffDirection) {
             pwm = std::abs(pwm);
         } else {

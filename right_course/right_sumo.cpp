@@ -59,7 +59,7 @@ void RCourseSumo(ie::Motion& motion, float target, float target2, ev3api::SonarS
     motion.stop();
     motion.raiseArm(15, 15);
 
-    // ライントレース準備
+    // ライントレース準備の回転
     as.setAngle(-30);
     motion.spin(as, stControl, -30);
     motion.spin(ls, stControl, 10);
@@ -73,6 +73,7 @@ void RCourseSumo(ie::Motion& motion, float target, float target2, ev3api::SonarS
     motion.goStraight(ms, stControl, -15);
     motion.wait(200); // 念のため停止
 
+    // 色検知のためアームをあげる
     motion.raiseArm(85, 15);
 
     // (0)のブロック
@@ -111,15 +112,55 @@ void RCourseSumo(ie::Motion& motion, float target, float target2, ev3api::SonarS
     ms.setTargetMileage(10);
     motion.lineTrace(ms, ltControl, 15, false);  // ギリギリまでライントレース
     motion.stop();
-    motion.raiseArm(45, 15);                     // 念のため引っかからないようにアームを上げておく
+
+    // 2枚目の土俵に移動
+    sumo.trainWait(motion, 2);
+    ms.setTargetMileage(400);
+    motion.goStraight(ms, stControl, 50);
+    motion.stop();
+    motion.raiseArm(15, 15);
+    motion.stop();
+
+    // ライントレース準備の回転
+    as.setAngle(-30);
+    motion.spin(as, stControl, -30);
+    motion.spin(ls, stControl, 10);
+
+    // 手前から4番目の直角まで移動
+    dly_tsk(1);
+    sumo.moveTocross(motion, localization, crossTarget);
+
+    // 後半の土俵の中心まで戻る
+    ms.setTargetMileage(-150);
+    motion.goStraight(ms, stControl, -15);
+    motion.wait(200); // 念のため停止
+
+    // 色検知のためアームをあげる
+    motion.raiseArm(85, 15);
 
     // (4)のブロック
+    dly_tsk(1);
+    sumo.turnToBlock(motion, localization, 0);
+    sumo.moveBlock(motion, 4, 138);
 
     // (5)のブロック
+    dly_tsk(1);
+    sumo.turnToBlock(motion, localization, 1);
+    sumo.moveBlock(motion, 5, 138);
 
     // (6)のブロック
+    dly_tsk(1);
+    sumo.turnToBlock(motion, localization, 2);
+    sumo.moveBlock(motion, 6, 118);
 
     // (7)のブロック
+    dly_tsk(1);
+    sumo.turnToBlock(motion, localization, 3);
+    sumo.moveBlock(motion, 7, 118);
 
+    // 懸賞を向く
+    motion.raiseArm(15, 15);
+    ds.setTargetDirection(degToRad(90));
+    motion.spin(ds, stControl, 10);
 
 }

@@ -156,7 +156,7 @@ void leftCourse(ie::Motion& motion, float target) {
 void rightCourse(ie::Motion& motion, float target, float target2, ev3api::SonarSensor& sonarSensor, ev3api::ColorSensor& colorSensor) {
     // RCourseIdaten(motion);
     RCourseSumo(motion, target, target2, sonarSensor, colorSensor);
-    // RCoursePrize(motion, sonarSensor);
+    RCoursePrize(motion, sonarSensor);
     // ie::Prize prize(motion);
     // prize.prizeCourse();
 }
