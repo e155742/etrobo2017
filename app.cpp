@@ -57,13 +57,16 @@ void sub_cyc(intptr_t exinf) {
  * スタート前に呼び出す関数。
  * アームの初期化とキャリブレーションと自己位置推定開始
  */
-void init(ie::Motion& motion, float& threshold) {
+void init(ie::Motion& motion, float& threshold, float& threshold2) {
     motion.raiseArm(60, 15); // 動いていることがわかりやすいように
     motion.raiseArm(15, 5);
 
     // キャリブレーション
     ie::Calibration* calibration = new ie::Calibration();
     threshold = calibration->calibrate() * 0.47; // 普通のライントレースBest0.43
+    #ifndef LEFT_COURSE
+    threshold2 = calibration->calibrate() * 0.47; // 普通のライントレースBest0.43
+    #endif
     delete calibration;
     msg_f("Threshold", 7);
     msg_f(threshold, 8);
@@ -150,9 +153,9 @@ void leftCourse(ie::Motion& motion, float target) {
  * Rコース
  * ET相撲のほう
  */
-void rightCourse(ie::Motion& motion, float target, ev3api::SonarSensor& sonarSensor, ev3api::ColorSensor& colorSensor) {
+void rightCourse(ie::Motion& motion, float target, float target2, ev3api::SonarSensor& sonarSensor, ev3api::ColorSensor& colorSensor) {
     // RCourseIdaten(motion);
-    RCourseSumo(motion, target, sonarSensor, colorSensor);
+    RCourseSumo(motion, target, target2, sonarSensor, colorSensor);
     // RCoursePrize(motion, sonarSensor);
     // ie::Prize prize(motion);
     // prize.prizeCourse();
@@ -177,8 +180,9 @@ void main_task(intptr_t unused) {
     msg_f(str, 11);
 
     float target;
+    float target2; // 土俵用
 
-    init(motion, target); // キャリブレーションとスタート待機
+    init(motion, target, target2); // キャリブレーションとスタート待機
 
     #ifdef TEST_MODE
     motionTest(motion, target);
@@ -187,7 +191,7 @@ void main_task(intptr_t unused) {
     #ifdef LEFT_COURSE
     leftCourse(motion, target);
     #else
-    rightCourse(motion, target, sonarSensor, colorSensor);
+    rightCourse(motion, target, target2, sonarSensor, colorSensor);
     #endif
 
     #endif

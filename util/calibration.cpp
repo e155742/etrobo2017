@@ -24,12 +24,12 @@ Calibration::Calibration():colorSensor_(COLOR_SENSOR_PORT), touchSensor_(TOUCH_S
  * @return 2回の測定値の反射光の合計
  */
 int Calibration::calibrate() {
+    dly_tsk(300); // 少し止めないとちょん押しで次のやつまで入力される
     msg_f("First brightness", 1);
     int firstBrightness = pushTouchButton(2);
     msg_f(firstBrightness, 2);
 
-    dly_tsk(300); // 少し止めないとちょん押しで次のやつまで入力される
-
+    dly_tsk(300);
     msg_f("Second brightness", 4);
     int secondBrightness = pushTouchButton(5);
     msg_f(secondBrightness, 5);

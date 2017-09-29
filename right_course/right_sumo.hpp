@@ -4,6 +4,6 @@
 #include <SonarSensor.h>
 #include "motion.hpp"
 
-extern void RCourseSumo(ie::Motion& motion, float target, ev3api::SonarSensor& sonarSensor, ev3api::ColorSensor& colorSensor);
+extern void RCourseSumo(ie::Motion& motion, float target, float target2, ev3api::SonarSensor& sonarSensor, ev3api::ColorSensor& colorSensor);
 
 #endif

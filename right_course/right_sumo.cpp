@@ -15,15 +15,15 @@
 
 extern ie::Localization* localization;
 
-void RCourseSumo(ie::Motion& motion, float target, ev3api::SonarSensor& sonarSensor, ev3api::ColorSensor& colorSensor) {
+void RCourseSumo(ie::Motion& motion, float target, float target2, ev3api::SonarSensor& sonarSensor, ev3api::ColorSensor& colorSensor) {
     const int crossTarget = 110;
 
-    ie::Sumo sumo(sonarSensor, colorSensor, target);
+    ie::Sumo sumo(sonarSensor, colorSensor, target2);
     ie::OnOffControl stControl(0, 0.3, 0);
-    ie::PIDControl ltControl(target, 0.15, 0, 0);
+    ie::PIDControl ltControl(target2, 0.15, 0, 0);
     ie::MileageStopper ms;
     ie::AngleStopper as;
-    ie::LineStopper ls(target);
+    ie::LineStopper ls(target2);
     ie::DirectionStopper ds(*localization);
 
     sumo.trainWait(motion, 3);
