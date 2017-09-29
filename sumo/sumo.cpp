@@ -25,13 +25,13 @@ namespace ie {
 
 
 // ブロックの並びは手前の土俵から時計回りの順番で
-// (8)---(5)
+// (7)---(4)
 //     |
-// (7)---(6)
+// (6)---(5)
 //     |
-// (4)---(1)
+// (3)---(0)
 //     |
-// (3)---(2)
+// (2)---(1)
 
 Sumo::Sumo(ev3api::SonarSensor& sonarSensor, ev3api::ColorSensor& colorSensor, float target):
 sonarSensor_(sonarSensor), colorSensor_(colorSensor), target_(target) {
@@ -86,32 +86,36 @@ void Sumo::moveTocross(Motion& motion, Localization* localization, double lineTh
 
     ms.setTargetMileage(50);
     motion.lineTrace(ms, ltControl, 15, false);  // 車体をまっすぐにする
-    motion.lineTrace(ls, ltControl, 25, false);  // 直角までライントレース 少し早いくらいが車体がブレない
+    motion.lineTrace(ls, ltControl, 20, false);  // 直角までライントレース 少し早いくらいが車体がブレない
     ms.setTargetMileage(ie::OFF_SET + 10);
     localization->setDirection(0.0);             // 方位を0に
     motion.goStraight(ms, stControl, 10);        // トレッド軸にラインが来るように移動
     motion.wait(200); // 念のため停止
 }
 
-void Sumo::turnFirstBlock(Motion& motion, Localization* localization) {
+void Sumo::turnToBlock(Motion& motion, Localization* localization, int markerNum) {
     ie::DirectionStopper ds(*localization);
     ie::OnOffControl stControl(0, 0.3, 0);
 
-    ds.setTargetDirection(std::atan2(230, 150));
+    ds.setTargetDirection(std::atan2(markerX_[markerNum], markerY_[markerNum]));
     motion.spin(ds, stControl, 20);
     motion.stop();
 }
 
-void Sumo::moveBlock(Motion& motion, int markerNum) {
+void Sumo::moveBlock(Motion& motion, int markerNum, double distane) {
     ie::OnOffControl stControl(0, 0.3, 0);
     ie::MileageStopper ms;
     HsvConverter hsvConverter;
     ColorJudge colorJudge(hsvConverter);
     rgb_raw_t rgb;
 
-    colorSensor_.getRawColor(rgb);
+    // マーカー前まで移動
+    ms.setTargetMileage(distane);
+    motion.goStraight(ms, stControl, 15);
+    motion.stop();
 
     int pwm = 15;
+    colorSensor_.getRawColor(rgb);
     if (markers_[markerNum] == colorJudge.getColorNumber(rgb.r, rgb.g, rgb.b)) {
         // 寄り切り
         ms.setTargetMileage(KIRI_DISTANCE);
@@ -119,7 +123,6 @@ void Sumo::moveBlock(Motion& motion, int markerNum) {
         motion.wait(200);
         ms.setTargetMileage(-KIRI_DISTANCE);
         motion.goStraight(ms, stControl, -pwm);
-        motion.stop();
     } else {
         // 押し出し
         ms.setTargetMileage(DASHI_DISTANCE);
@@ -127,8 +130,11 @@ void Sumo::moveBlock(Motion& motion, int markerNum) {
         motion.wait(200);
         ms.setTargetMileage(-DASHI_DISTANCE);
         motion.goStraight(ms, stControl, -pwm);
-        motion.stop();
     }
+
+    // 中心まで戻る
+    ms.setTargetMileage(-distane);
+    motion.goStraight(ms, stControl, -15);
 }
 
 }
