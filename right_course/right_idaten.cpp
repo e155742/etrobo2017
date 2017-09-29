@@ -10,7 +10,7 @@
 #include "util.h"
 
 extern ie::Localization* localization;
-
+/*
 void rtb(ie::Motion& motion) {
     motion.wait(3000);
     ie::OnOffControl stControl(0, 0.3, 0);
@@ -22,15 +22,15 @@ void rtb(ie::Motion& motion) {
     motion.goPoint(*localization, stControl, 50, 0.0, 0.0, 30);
     motion.wait(100000);
 }
-
+*/
 /**
  * 韋駄天
  */
-void RCourseIdaten(ie::Motion& motion) {
+void RCourseIdaten(ie::Motion& motion, float target) {
     dly_tsk(1); // これがないとフリーズする。
     ie::DirectionStopper ds(*localization);
     ie::MileageStopper ms;
-    ie::LineStopper ls(80);
+    ie::LineStopper ls(target); // 80
     ie::OnOffControl stControl(0, 0.3, 0);
 
     // 第2ゲートへ向けて右旋回(バック)
@@ -71,19 +71,13 @@ void RCourseIdaten(ie::Motion& motion) {
     // motion.goPoint(*localization, stControl, 50, localization->getPointX() - 3500, localization->getPointY() - 250, 1000);
     motion.goStraight(ms, stControl, 100);
     // rtb(motion);
+    // 終了
 
-
-    motion.goStraight(ls, stControl, 30);
-    // // 終了
-    // motion.wait(100);
-    // motion.raiseArm(15, 5);
-    // // ブロック並べのためにLコースのラインに乗せる
-    // ds.setTargetDirection(0);
-    // motion.spin(ds, stControl, 20);
-    // ie::LineStopper ls(80);
-    // motion.goStraight(ls, stControl, 25);
-    // ms.setTargetMileage(ie::OFF_SET + 10);
-    // motion.goStraight(ms, stControl, 20);
-    // motion.stop();
+    // プライマリーのラインに乗せる
+    motion.goStraight(ls, stControl, 50);
+    ms.setTargetMileage(ie::OFF_SET + 10);
+    motion.goStraight(ms, stControl, 30);
+    motion.spin(ls, stControl, 10);
+    motion.stop();
 
 }

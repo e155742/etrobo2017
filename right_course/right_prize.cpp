@@ -12,29 +12,34 @@
 #include "angle_stopper.hpp"
 
 void RCoursePrize(ie::Motion& motion, ev3api::SonarSensor& sonarSensor) {
-    const int distOnPrize = 3;  //懸賞前で止まるための距離
+    // const int distOnPrize = 3;  //懸賞前で止まるための距離
     const int distOnTrain = 35; //電車を避ける距離
 
     ie::OnOffControl stControl(0, 0.3, 0);
+    ie::MileageStopper ms;
+    ie::AngleStopper as;
 
-    ie::MileageStopper ms(150);
-    motion.goStraight(ms, stControl, 20);
+    // ie::MileageStopper ms(150);
+    // motion.goStraight(ms, stControl, 20);
 
-    ie::AngleStopper as(-90);
-    motion.spin(as, stControl, -15);
-    motion.stop();
+    // ie::AngleStopper as(-90);
+    // motion.spin(as, stControl, -15);
+    // motion.stop();
 
     // 懸賞に向かって直進
-    while(distOnPrize < sonarSensor.getDistance() || sonarSensor.getDistance() == 0){
-        motion.goStraight(stControl, 20);
-    }
+    int prizeDistance = 240;
+    ms.setTargetMileage(prizeDistance);
+    motion.goStraight(ms, stControl, 20);
+    // while(distOnPrize < sonarSensor.getDistance() || sonarSensor.getDistance() == 0){
+    //     motion.goStraight(stControl, 20);
+    // }
     motion.stop();
 
     // 懸賞getし後退.そして回転
-    motion.raiseArm(75, 5);  //懸賞を持つ
+    motion.raiseArm(85, 15);  //懸賞を持つ
 
     // 懸賞を持って後進
-    ms.setTargetMileage(-200);
+    ms.setTargetMileage(-prizeDistance);
     motion.goStraight(ms, stControl, -20);
     motion.stop();
 

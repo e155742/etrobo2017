@@ -3,6 +3,6 @@
 
 #include "motion.hpp"
 
-extern void RCourseIdaten(ie::Motion& motion);
+extern void RCourseIdaten(ie::Motion& motion, float target);
 
 #endif

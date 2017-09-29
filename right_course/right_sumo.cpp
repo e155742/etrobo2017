@@ -17,18 +17,19 @@
 extern ie::Localization* localization;
 
 void RCourseSumo(ie::Motion& motion, float target, float target2, ev3api::SonarSensor& sonarSensor, ev3api::ColorSensor& colorSensor) {
-    const int crossTarget = 110;
+    const int crossTarget = 110 - 10;
 
     ie::Sumo sumo(sonarSensor, colorSensor, target2);
     ie::OnOffControl stControl(0, 0.3, 0);
-    ie::PIDControl ltControl(target, 0.15, 0, 0);
+    ie::PIDControl ltControl(target, 0.1, 0, 0.001);
     ie::MileageStopper ms;
     ie::AngleStopper as;
     ie::GrayStopper gs(550);
-    ie::LineStopper ls(250);
+    ie::LineStopper ls;
     ie::DirectionStopper ds(*localization);
 
     motion.raiseArm(15, 5);
+
     // Lコースをライントレース
     ms.setTargetMileage(200);
     motion.lineTrace(ms, ltControl, 20, true);
@@ -39,6 +40,7 @@ void RCourseSumo(ie::Motion& motion, float target, float target2, ev3api::SonarS
     motion.stop();
 
     // Rコースをライントレース
+    ls.setTaigetThreshold(target);
     motion.goStraight(ls, stControl, 20);  // Rコースまで移動
     ms.setTargetMileage(ie::OFF_SET + 10);
     motion.goStraight(ms, stControl, 20);
@@ -48,9 +50,8 @@ void RCourseSumo(ie::Motion& motion, float target, float target2, ev3api::SonarS
     motion.lineTrace(ms, ltControl, 20, false);
     motion.stop();
 
-
+    // 1枚目の土俵
     sumo.trainWait(motion, 3);
-    ls.setTaigetThreshold(target2);
     ltControl.setTarget(target2); // ライントレースの閾値を土俵用に
 
     // 土俵の上に移動
@@ -62,6 +63,7 @@ void RCourseSumo(ie::Motion& motion, float target, float target2, ev3api::SonarS
     // ライントレース準備の回転
     as.setAngle(-30);
     motion.spin(as, stControl, -30);
+    ls.setTaigetThreshold(target2);
     motion.spin(ls, stControl, 10);
 
     // 手前から2番目の直角まで移動
@@ -97,25 +99,23 @@ void RCourseSumo(ie::Motion& motion, float target, float target2, ev3api::SonarS
     sumo.moveBlock(motion, 3, 118);
 
     // 真正面を向く
-    // ds.setTargetDirection(0.0);
-    // motion.spin(ds, stControl, 15);
     motion.raiseArm(15, 15);
+    ls.setTaigetThreshold(target2);
     motion.spin(ls, stControl, 10);
 
     // 電車手前まで移動
-    ms.setTargetMileage(30);
+    ms.setTargetMileage(40);
     motion.lineTrace(ms, ltControl, 15, false);
     ls.setTaigetThreshold(crossTarget);
     motion.lineTrace(ls, ltControl, 15, false);  // 直角までライントレース
-    ms.setTargetMileage(25);
+    ms.setTargetMileage(ie::OFF_SET + 10);
     motion.goStraight(ms, stControl, 15);        // 直角は直進
-    ms.setTargetMileage(10);
-    motion.lineTrace(ms, ltControl, 15, false);  // ギリギリまでライントレース
     motion.stop();
+
 
     // 2枚目の土俵に移動
     sumo.trainWait(motion, 2);
-    ms.setTargetMileage(400);
+    ms.setTargetMileage(380);
     motion.goStraight(ms, stControl, 50);
     motion.stop();
     motion.raiseArm(15, 15);
@@ -124,6 +124,7 @@ void RCourseSumo(ie::Motion& motion, float target, float target2, ev3api::SonarS
     // ライントレース準備の回転
     as.setAngle(-30);
     motion.spin(as, stControl, -30);
+    ls.setTaigetThreshold(target2);
     motion.spin(ls, stControl, 10);
 
     // 手前から4番目の直角まで移動
@@ -158,9 +159,25 @@ void RCourseSumo(ie::Motion& motion, float target, float target2, ev3api::SonarS
     sumo.turnToBlock(motion, localization, 3);
     sumo.moveBlock(motion, 7, 118);
 
-    // 懸賞を向く
+    // 正面を向く
     motion.raiseArm(15, 15);
-    ds.setTargetDirection(degToRad(90));
-    motion.spin(ds, stControl, 10);
+    ls.setTaigetThreshold(target2);
+    motion.spin(ls, stControl, 10);
+
+    // 電車手前まで移動
+    ms.setTargetMileage(30);
+    motion.lineTrace(ms, ltControl, 15, false);
+    ls.setTaigetThreshold(crossTarget);
+    motion.lineTrace(ls, ltControl, 15, false);  // 直角までライントレース
+    ms.setTargetMileage(ie::OFF_SET + 10);
+    motion.goStraight(ms, stControl, 15);        // 直角は直進
+    motion.stop();
+
+
+    // 土俵から降りる
+    sumo.trainWait(motion, 1);
+    ms.setTargetMileage(400);
+    motion.lineTrace(ms, ltControl, 15, false);
+    motion.stop();
 
 }

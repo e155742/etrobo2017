@@ -84,7 +84,8 @@ void Sumo::trainWait(Motion& motion, int n) {
  */
 void Sumo::moveTocross(Motion& motion, Localization* localization, double lineThreshold) {
     ie::OnOffControl stControl(0, 0.3, 0);
-    ie::PIDControl ltControl(target_, 0.15, 0, 0);
+    ie::PIDControl ltControl(target_, 0.10, 0, 0.001);
+    // ie::PIDControl ltControl(target_, 0.15, 0, 0);
 
     ie::LineStopper ls(lineThreshold);
     ie::AngleStopper as;
@@ -92,6 +93,7 @@ void Sumo::moveTocross(Motion& motion, Localization* localization, double lineTh
 
     ms.setTargetMileage(50);
     motion.lineTrace(ms, ltControl, 15, false);  // 車体をまっすぐにする
+    // localization->setDirection(0.0);             // 方位を0に
     motion.lineTrace(ls, ltControl, 20, false);  // 直角までライントレース 少し早いくらいが車体がブレない
     ms.setTargetMileage(ie::OFF_SET + 10);
     localization->setDirection(0.0);             // 方位を0に

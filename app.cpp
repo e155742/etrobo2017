@@ -91,10 +91,10 @@ void del(ie::Motion& motion) {
     ev3_stp_cyc(SUB_CYC);
     delete localization;
     #ifndef PRINT_LOCALIZATION
-    // msg_f("END...", 10);
-    // char str[64];
-    // sprintf(str, "%d mV", ev3_battery_voltage_mV());
-    // msg_f(str, 11);
+    msg_f("END...", 10);
+    char str[64];
+    sprintf(str, "%d mV", ev3_battery_voltage_mV());
+    msg_f(str, 11);
     #endif
 }
 
@@ -154,9 +154,9 @@ void leftCourse(ie::Motion& motion, float target) {
  * ET相撲のほう
  */
 void rightCourse(ie::Motion& motion, float target, float target2, ev3api::SonarSensor& sonarSensor, ev3api::ColorSensor& colorSensor) {
-    // RCourseIdaten(motion);
+    // RCourseIdaten(motion, target);
     RCourseSumo(motion, target, target2, sonarSensor, colorSensor);
-    RCoursePrize(motion, sonarSensor);
+    // RCoursePrize(motion, sonarSensor);
     // ie::Prize prize(motion);
     // prize.prizeCourse();
 }
