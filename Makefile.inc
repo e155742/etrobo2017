@@ -30,6 +30,7 @@ APPL_CXXOBJS += \
 	left_parking.o \
 	right_idaten.o \
 	right_sumo.o \
+	right_parking.o \
 	right_prize.o
 
 SRCLANG := c++

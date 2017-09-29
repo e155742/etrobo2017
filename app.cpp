@@ -26,6 +26,7 @@
 
 #include "right_idaten.hpp"
 #include "right_sumo.hpp"
+#include "right_parking.hpp"
 #include "right_prize.hpp"
 
 #include "robo_meta_datas.hpp"
@@ -157,6 +158,7 @@ void rightCourse(ie::Motion& motion, float target, float target2, ev3api::SonarS
     // RCourseIdaten(motion, target);
     RCourseSumo(motion, target, target2, sonarSensor, colorSensor);
     // RCoursePrize(motion, sonarSensor);
+    RCourseParking(motion, target);
     // ie::Prize prize(motion);
     // prize.prizeCourse();
 }

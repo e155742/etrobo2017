@@ -27,8 +27,10 @@ Rコースは8vくらいで調整してしまった。
 
 - right_idaten.cpp - 韋駄天
  - ショートカットによる韋駄天を狙う
-- right_parking.cpp - ET相撲Neo
+- right_sumo.cpp - ET相撲Neo
  - 普通に相撲をする。懸賞はしない
+- right_parking.cpp - 直角駐車
+ - 普通に駐車する。最後はライントレースではなく直進。
 - right_prize.cpp - 懸賞
  - 懸賞から駐車まで。*残念ながら見送り*
 
