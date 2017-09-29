@@ -6,6 +6,7 @@
 #include "mileage_stopper.hpp"
 #include "angle_stopper.hpp"
 #include "line_stopper.hpp"
+#include "gray_stopper.hpp"
 #include "direction_stopper.hpp"
 
 #include "sumo.hpp"
@@ -20,13 +21,37 @@ void RCourseSumo(ie::Motion& motion, float target, float target2, ev3api::SonarS
 
     ie::Sumo sumo(sonarSensor, colorSensor, target2);
     ie::OnOffControl stControl(0, 0.3, 0);
-    ie::PIDControl ltControl(target2, 0.15, 0, 0);
+    ie::PIDControl ltControl(target, 0.15, 0, 0);
     ie::MileageStopper ms;
     ie::AngleStopper as;
-    ie::LineStopper ls(target2);
+    ie::GrayStopper gs(550);
+    ie::LineStopper ls(250);
     ie::DirectionStopper ds(*localization);
 
+    motion.raiseArm(15, 5);
+    // Lコースをライントレース
+    ms.setTargetMileage(200);
+    motion.lineTrace(ms, ltControl, 20, true);
+    motion.lineTrace(gs, ltControl, 20, true); // 灰色までLコースをライントレース
+    motion.stop();
+    as.setAngle(-90);
+    motion.spin(as, stControl, -20);       // 車体をRコースに向ける
+    motion.stop();
+
+    // Rコースをライントレース
+    motion.goStraight(ls, stControl, 20);  // Rコースまで移動
+    ms.setTargetMileage(ie::OFF_SET + 10);
+    motion.goStraight(ms, stControl, 20);
+    ltControl.setTarget(target);
+    motion.spin(ls, stControl, 20);        // ライントレースのために回転
+    ms.setTargetMileage(740);              // 線路の直前まで移動
+    motion.lineTrace(ms, ltControl, 20, false);
+    motion.stop();
+
+
     sumo.trainWait(motion, 3);
+    ls.setTaigetThreshold(target2);
+    ltControl.setTarget(target2); // ライントレースの閾値を土俵用に
 
     // 土俵の上に移動
     ms.setTargetMileage(400);
