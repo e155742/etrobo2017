@@ -68,6 +68,6 @@ void LCourseIdaten(ie::Motion& motion) {
     motion.goStraight(ls, stControl, 25);
     ms.setTargetMileage(ie::OFF_SET + 10);
     motion.goStraight(ms, stControl, 20);
+    motion.spin(ls, stControl, -15);
     motion.stop();
-
 }

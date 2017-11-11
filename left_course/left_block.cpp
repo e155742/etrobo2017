@@ -93,26 +93,10 @@ void LCourseBlock(ie::Motion& motion, float target, ie::Decoder& decoder, int gr
 
     // // ライントレースに移るために旋回
     ie::OnOffControl stControl(0, 0.3, 0);
-    ie::LineStopper ls(400);
-    ie::MileageStopper ms;
-    // motion.spin(ls, stControl, -15);
-
-    // ゴール後の灰色まで直進
     ie::PIDControl ltControl(target, 0.08, 0, 0.0001);
     ie::GrayStopper gs(550);
-    motion.lineTrace(gs, ltControl, 80, false);
-
-    // 灰色分を直進
-    ms.setTargetMileage(180);
-    motion.goStraight(ms, stControl, 50);
-    motion.stop();
-
-    // 左エッジから右エッジに切り替え
-    ie::AngleStopper as(90);
-    motion.spin(as, stControl, 10);
-    ms.setTargetMileage(20);
-    motion.goStraight(ms, stControl, 5);
-    motion.spin(ls, stControl, -10);
+    ie::LineStopper ls(400);
+    ie::MileageStopper ms;
 
     // バックストレートで自機方位修正
     // ブロック置き場での修正は誤差が出る可能性が高い
@@ -132,7 +116,7 @@ void LCourseBlock(ie::Motion& motion, float target, ie::Decoder& decoder, int gr
     // bf.revisionBotPoint(9, 30);
 
     // バックして白色地帯に乗せる
-    ms.setTargetMileage(-320);
+    ms.setTargetMileage(-350); // 320
     motion.goStraight(ms, stControl, -15);
     motion.wait(100);
 

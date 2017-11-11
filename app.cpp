@@ -15,6 +15,7 @@
 #include "direction_stopper.hpp"
 #include "angle_stopper.hpp"
 #include "line_stopper.hpp"
+#include "gray_stopper.hpp"
 
 #include "file_output.hpp"
 #include "calibration.hpp"
@@ -33,8 +34,8 @@
 #include "util.h"
 
 // #define TEST_MODE
-// #define LEFT_COURSE // ブロック並べの方
-#define IDATEN // 韋駄天
+#define LEFT_COURSE // ブロック並べの方
+// #define IDATEN // 韋駄天
 
 ie::Localization* localization;
 
@@ -237,7 +238,6 @@ void pidRun_R(ie::Motion& motion, float target){
     beep();
 }
 
-
 void pidRun_L(ie::Motion& motion, float target){
     //↓ Lコース
     int mile = 40;
@@ -294,6 +294,26 @@ void pidRun_L(ie::Motion& motion, float target){
     straightPid(motion, target, mile, 100);//直線
     beep();
     //↑ Lコース
+
+    ie::OnOffControl stControl(0, 0.3, 0);
+    ie::PIDControl ltControl(target, 0.08, 0, 0.0001);
+    ie::MileageStopper ms;
+    ie::GrayStopper gs(550);
+    ie::LineStopper ls(400);
+    // ゴール後の灰色まで直進
+    motion.lineTrace(gs, ltControl, 80, false);
+
+    // 灰色分を直進
+    ms.setTargetMileage(180);
+    motion.goStraight(ms, stControl, 50);
+    motion.stop();
+
+    // 左エッジから右エッジに切り替え
+    ie::AngleStopper as(90);
+    motion.spin(as, stControl, 10);
+    ms.setTargetMileage(20);
+    motion.goStraight(ms, stControl, 5);
+    motion.spin(ls, stControl, -10);
 }
 
 /**************************************************
