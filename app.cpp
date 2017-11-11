@@ -34,7 +34,7 @@
 
 // #define TEST_MODE
 // #define LEFT_COURSE // ブロック並べの方
-// #define IDATEN // 韋駄天
+#define IDATEN // 韋駄天
 
 ie::Localization* localization;
 
@@ -325,7 +325,7 @@ void rightCourse(ie::Motion& motion, float target, float target2, ev3api::SonarS
     #ifdef IDATEN
     RCourseIdaten(motion, target);
     #else
-    pidRun_R(motion, target);
+    // pidRun_R(motion, target);
     #endif
     RCourseSumo(motion, target, target2, sonarSensor, colorSensor);
     // RCoursePrize(motion, sonarSensor);

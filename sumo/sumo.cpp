@@ -91,7 +91,7 @@ void Sumo::moveTocross(Motion& motion, Localization* localization, double lineTh
     ie::AngleStopper as;
     ie::MileageStopper ms;
 
-    ms.setTargetMileage(50);
+    ms.setTargetMileage(75); // 50
     motion.lineTrace(ms, ltControl, 15, false);  // 車体をまっすぐにする
     // localization->setDirection(0.0);             // 方位を0に
     motion.lineTrace(ls, ltControl, 20, false);  // 直角までライントレース 少し早いくらいが車体がブレない
