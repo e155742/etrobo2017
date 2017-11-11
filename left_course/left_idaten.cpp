@@ -23,7 +23,7 @@ void LCourseIdaten(ie::Motion& motion) {
     ds.setTargetDirection(degToRad(58));
     motion.setSteeringPower(ds, -100, -55);
     // 第2ゲートを通過(バック)
-    ms.setTargetMileage(-780);
+    ms.setTargetMileage(-780); // 780
     ie::OnOffControl stControl(0, 0.3, 0);
     motion.goStraight(ms, stControl, -100);
 
@@ -54,7 +54,7 @@ void LCourseIdaten(ie::Motion& motion) {
     motion.setSteeringPower(ds, 100, -60);
     // バックストレートからゴールへ
     stControl.setCoefficient(0, 0.4, 0);
-    ms.setTargetMileage(2610);     // ********** 用調整 **********
+    ms.setTargetMileage(2570);     // ********** 用調整 ********** //2610
     // motion.goPoint(*localization, stControl, 50, localization->getPointX() - 3500, localization->getPointY() - 250, 1000);
     motion.goStraight(ms, stControl, 100);
 

@@ -27,8 +27,8 @@ private:
     point_t markerX_[4] = {230, 230, -210, -210};
     point_t markerY_[4] = {150, -150, -150, 150};
     static constexpr double TRAIN_WAIT_TIME = 1000; // 目の前を電車が通った時に停止しておく時間(ms)
-    static constexpr double KIRI_DISTANCE   = 75.0; // 押し切りの距離(mm)
-    static constexpr double DASHI_DISTANCE  = 115.0; // 押し出しの距離(mm)
+    static constexpr double KIRI_DISTANCE   = 80.0; // 押し切りの距離(mm) 75.0
+    static constexpr double DASHI_DISTANCE  = 125.0; // 押し出しの距離(mm) 115.0
     void soundBeep();
 };
 

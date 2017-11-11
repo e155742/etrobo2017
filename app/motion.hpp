@@ -51,6 +51,7 @@ public:
 
     void lineTrace(Control& control, int pwm, bool isRightSide);
     void lineTrace(Stopper& stopper, Control& control, int pwm, bool isRightSide);
+    void lineTraceK(Stopper& stopper, Control& control, int pwm, bool isRightSide);
 
 private:
     ev3api::Motor leftWheel_;
@@ -68,6 +69,7 @@ private:
     void goStraightHelper(Control& control, int pwm);
     void spinHelper(Control& control, int pwm);
     void lineTraceHelper(Control& control, int pwm, bool isRightSide);
+    void lineTraceHelperK(Control& control, int pwm, bool isRightSide);
 
 };
 

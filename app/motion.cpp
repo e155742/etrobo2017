@@ -361,6 +361,32 @@ inline void Motion::lineTraceHelper(Control& control, int pwm, bool isRightSide)
     #endif
 }
 
+inline void Motion::lineTraceHelperK(Control& control, int pwm, bool isRightSide) {
+    colorSensor_.getRawColor(rgb_);
+    float value = static_cast<float>(rgb_.r + rgb_.g + rgb_.b);
+    double controlValue = control.getControlValue(value);
+
+//    #ifdef STERRING_LINETRACE
+    // ステアリングによる実装
+//   if (isRightSide) { controlValue *= -1; }
+//    setSteeringPower(pwm, controlValue);
+//   #else
+    // 一般的な実装
+    if (!isRightSide) { controlValue *= -1;}
+    if (controlValue < -pwm) {controlValue = -pwm;}
+    if (pwm < controlValue) {controlValue = pwm;}
+
+    controlValue *= 0.02;
+	int pwm_L = static_cast<int>((static_cast<double>(pwm) * (static_cast<double>(1.0) - controlValue)));
+	int pwm_R = static_cast<int>((static_cast<double>(pwm) * (static_cast<double>(1.0) + controlValue)));
+    setBothPwm(pwm_L, pwm_R);
+//    #endif
+
+    #ifdef OUTPUT_LINETRACE
+    fo_.fileWrite(controlValue);
+    #endif
+}
+
 /**
  * 指定したパワーでライントレースする。<br>
  *
@@ -385,6 +411,13 @@ void Motion::lineTrace(Stopper& stopper, Control& control, int pwm, bool isRight
     onoffSetPwm(control, pwm);
     while (!stopper.doStop()) {
         lineTraceHelper(control, pwm, isRightSide);
+    }
+}
+
+void Motion::lineTraceK(Stopper& stopper, Control& control, int pwm, bool isRightSide) {
+    onoffSetPwm(control, pwm);
+    while (!stopper.doStop()) {
+        lineTraceHelperK(control, pwm, isRightSide);
     }
 }
 

@@ -23,6 +23,7 @@ void rtb(ie::Motion& motion) {
     motion.wait(100000);
 }
 */
+
 /**
  * 韋駄天
  */
@@ -34,7 +35,7 @@ void RCourseIdaten(ie::Motion& motion, float target) {
     ie::OnOffControl stControl(0, 0.3, 0);
 
     // 第2ゲートへ向けて右旋回(バック)
-    ds.setTargetDirection(degToRad(45));
+    ds.setTargetDirection(degToRad(54));
     motion.setRightPwm(ds, -100);
     // 第2ゲートを通過(バック)
     ms.setTargetMileage(-1350);
@@ -67,7 +68,7 @@ void RCourseIdaten(ie::Motion& motion, float target) {
     motion.setSteeringPower(ds, 100, -67); // 60
     // バックストレートからゴールへ
     stControl.setCoefficient(0, 0.4, 0);
-    ms.setTargetMileage(2500);     // ********** 用調整 **********
+    ms.setTargetMileage(2450);     // ********** 用調整 ********** // 2500
     // motion.goPoint(*localization, stControl, 50, localization->getPointX() - 3500, localization->getPointY() - 250, 1000);
     motion.goStraight(ms, stControl, 100);
     // rtb(motion);
@@ -77,7 +78,7 @@ void RCourseIdaten(ie::Motion& motion, float target) {
     motion.goStraight(ls, stControl, 50);
     ms.setTargetMileage(ie::OFF_SET + 10);
     motion.goStraight(ms, stControl, 30);
-    motion.spin(ls, stControl, 10);
+    motion.spin(ls, stControl, -10);
     motion.stop();
 
 }

@@ -34,10 +34,15 @@
 
 // #define TEST_MODE
 // #define LEFT_COURSE // ブロック並べの方
+// #define IDATEN // 韋駄天
 
 ie::Localization* localization;
+
+#ifdef TEST_MODE
 ev3api::Motor left(ie::LEFT_WHEEL_PORT);
 ev3api::Motor right(ie::RIGHT_WHEEL_PORT);
+ev3api::Motor tail(ie::TAIL_MOTOR_PORT);
+#endif
 
 /**
  * 20ms間隔で呼び出される周期ハンドラ<br>
@@ -50,7 +55,6 @@ void sub_cyc(intptr_t exinf) {
         localization = new ie::Localization();
         f = false;
     }
-
     localization->updatePoint();
 }
 
@@ -60,7 +64,11 @@ void sub_cyc(intptr_t exinf) {
  */
 void init(ie::Motion& motion, float& threshold, float& threshold2) {
     motion.raiseArm(60, 15); // 動いていることがわかりやすいように
+    #ifdef IDATEN
     motion.raiseArm(15, 5);
+    # else
+    motion.raiseArm(5, 5);
+    # endif
 
     // キャリブレーション
     ie::Calibration* calibration = new ie::Calibration();
@@ -73,7 +81,9 @@ void init(ie::Motion& motion, float& threshold, float& threshold2) {
     msg_f(threshold, 8);
 
     motion.wait(1000);
+    #ifdef IDATEN
     motion.raiseArm(0, 15); // フロントサスペンション
+    #endif
 
     // タッチセンサーを押すとスタート
     ie::Starter* starter = new ie::Starter();
@@ -121,21 +131,174 @@ void initCodeDecode(ie::Decoder d) {
 }
 
 void motionTest(ie::Motion& motion, float target) {
-    // ev3api::SonarSensor sonarSensor(ie::SONAR_SENSOR_PORT);
-    // ev3api::Clock clock;
-    // msg_clear();
-    // int lastdistance = sonarSensor.getDistance();
-    // while (true) {
-    //     int distance = sonarSensor.getDistance();
-    //     if (lastdistance != distance) {
-    //         msg_f(distance, 8);
-    //     }
-    //     lastdistance = distance;
-    // }
     ie::LineStopper ls(80);
     ie::PIDControl ltControl(target, 0.15, 0, 0);
     motion.lineTrace(ls, ltControl, 30, false);
 }
+
+/**************************************************
+ * PIDトレース                                    *
+ * ファイル分割するとうまく動かないのでこのままで *
+ **************************************************/
+
+void pid(ie::Motion& motion, float target, int mile, int pwm, float kp, float ki, float kd, bool isRight) {
+    ie::PIDControl ltControl(target, kp, ki, kd);
+    ie::MileageStopper stopper(mile);
+    motion.lineTraceK(stopper, ltControl, pwm, false);
+}
+
+void beep(){
+    ev3_speaker_set_volume(100);
+    ev3_speaker_play_tone(NOTE_B5, 40);
+}
+
+void straightPid(ie::Motion& motion, float target, int mile, int speed){
+    // pid(motion, 閾値, 距離, 速度,  kp, ki, kd,   isRight);
+    // pid(motion, target, mile, speed, 0.02, 0.0, 0.014, false);//直線
+    pid(motion, target, mile, speed, 0.038, 0.0001, 0.017, false);//弱カーブP弱
+}
+
+void gentleCurvePid(ie::Motion& motion, float target, int mile, int speed){
+    // pid(motion, 閾値, 距離, 速度,  kp, ki, kd,   isRight);
+    // pid(motion, target, mile, speed, 0.038, 0.0001, 0.019, false);//弱カーブP弱
+    pid(motion, target, mile, speed, 0.038, 0.0001, 0.017, false);//弱カーブP弱
+}
+
+void sharpCurvePid(ie::Motion& motion, float target, int mile, int speed, float gain){
+    // pid(motion, 閾値, 距離, 速度,  kp, ki, kd,   isRight);
+    // pid(motion, target, mile, speed, 0.065*gain, 0.001*gain, 0.02*gain, false);//(8.7V Best)
+    // pid(motion, target, mile, speed, 0.065*gain, 0.0007*gain, 0.02*gain, false);//I弱
+    pid(motion, target, mile, speed, 0.065*gain, 0.0007*gain, 0.025*gain, false);//I弱D強
+}
+
+void pidRun_R(ie::Motion& motion, float target){
+    //↓ Rコース
+    int mile = 40;
+    straightPid(motion, target, mile, 20);//直線
+    beep();
+
+    mile = 40;
+    straightPid(motion, target, mile, 40);//直線
+    beep();
+
+    mile = 40;
+    straightPid(motion, target, mile, 60);//直線
+    beep();
+
+    mile = 40;
+    straightPid(motion, target, mile, 80);//直線
+    beep();
+
+
+    mile = 2150;
+    straightPid(motion, target, mile, 100);//直線
+    beep();
+
+    double targetDev = target - 50.0;
+    mile = 2800;
+    gentleCurvePid(motion, targetDev, mile, 83);// 弱カーブ
+    beep();
+
+    mile = 2100;
+    sharpCurvePid(motion, target, mile, 40, 0.75);//強カーブ7割
+    beep();
+
+    mile = 1480;
+    targetDev = target - 10;
+    sharpCurvePid(motion, targetDev, mile, 50, 0.33);//強カーブ4割
+    beep();
+
+    mile = 40;
+    straightPid(motion, target, mile, 60);//直線
+    beep();
+
+    mile = 40;
+    straightPid(motion, target, mile, 80);//直線
+    beep();
+
+
+    mile = 1540;
+    straightPid(motion, target, mile, 100);//直線
+    beep();
+    //↑ Rコース
+
+    //↓ Besic後
+    mile = 900;
+    targetDev = target + 20;
+    // sharpCurvePid(motion, targetDev, mile, 20, 1.5);//強カーブ15割
+    sharpCurvePid(motion, targetDev, mile, 20, 2.0);//強カーブ15割
+    beep();
+
+    // mile = 720;
+    mile = 300;
+    targetDev = target - 20;
+    // sharpCurvePid(motion, targetDev, mile, 20, 1.5);//強カーブ15割
+    sharpCurvePid(motion, targetDev, mile, 20, 2.0);//強カーブ15割
+    beep();
+}
+
+
+void pidRun_L(ie::Motion& motion, float target){
+    //↓ Lコース
+    int mile = 40;
+    straightPid(motion, target, mile, 20);//直線
+    beep();
+
+    mile = 40;
+    straightPid(motion, target, mile, 40);//直線
+    beep();
+
+    mile = 40;
+    straightPid(motion, target, mile, 60);//直線
+    beep();
+
+    mile = 40;
+    straightPid(motion, target, mile, 80);//直線
+    beep();
+
+    mile = 2050;
+    straightPid(motion, target, mile, 100);//直線
+    beep();
+
+    mile = 1390;
+    double targetDev = target - 40;
+    sharpCurvePid(motion, targetDev, mile, 70, 0.75);//強カーブ7割
+    beep();
+
+    mile = 900;
+    sharpCurvePid(motion, target, mile, 40, 0.75);//強カーブ7割
+    beep();
+
+    mile = 2300;
+    sharpCurvePid(motion, target, mile, 65, 0.60);//強カーブ7割
+    beep();
+
+    mile = 1800;
+    sharpCurvePid(motion, target, mile, 40, 0.75);//強カーブ7割
+    beep();
+
+
+    mile = 40;
+    straightPid(motion, target, mile, 40);//直線
+    beep();
+
+    mile = 40;
+    straightPid(motion, target, mile, 60);//直線
+    beep();
+
+    mile = 40;
+    straightPid(motion, target, mile, 80);//直線
+    beep();
+
+    mile = 1180;
+    straightPid(motion, target, mile, 100);//直線
+    beep();
+    //↑ Lコース
+}
+
+/**************************************************
+ * PIDトレースここまで                            *
+ **************************************************/
 
 /**
  * Lコース
@@ -145,7 +308,11 @@ void leftCourse(ie::Motion& motion, float target) {
     ie::Decoder decoder;
     int greenPosition = 14; // LCourseBlock()のためのダミー ブロック並べはやらないから使わない
 
+    #ifdef IDATEN
     LCourseIdaten(motion);
+    #else
+    pidRun_L(motion, target);
+    #endif
     LCourseBlock(motion, target, decoder, greenPosition);
     LCourseParking(motion, target);
 }
@@ -155,12 +322,14 @@ void leftCourse(ie::Motion& motion, float target) {
  * ET相撲のほう
  */
 void rightCourse(ie::Motion& motion, float target, float target2, ev3api::SonarSensor& sonarSensor, ev3api::ColorSensor& colorSensor) {
-    // RCourseIdaten(motion, target);
+    #ifdef IDATEN
+    RCourseIdaten(motion, target);
+    #else
+    pidRun_R(motion, target);
+    #endif
     RCourseSumo(motion, target, target2, sonarSensor, colorSensor);
     // RCoursePrize(motion, sonarSensor);
     RCourseParking(motion, target);
-    // ie::Prize prize(motion);
-    // prize.prizeCourse();
 }
 
 void main_task(intptr_t unused) {
@@ -199,4 +368,3 @@ void main_task(intptr_t unused) {
     #endif
     del(motion);
 }
-

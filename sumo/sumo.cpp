@@ -37,15 +37,15 @@ Sumo::Sumo(ev3api::SonarSensor& sonarSensor, ev3api::ColorSensor& colorSensor, f
 sonarSensor_(sonarSensor), colorSensor_(colorSensor), target_(target) {
     int index = -1;
 
-    markers_[++index] = COLOR_YELLOW; // 黄
-    markers_[++index] = COLOR_BLUE;   // 青
     markers_[++index] = COLOR_RED;    // 赤
+    markers_[++index] = COLOR_YELLOW; // 黄
     markers_[++index] = COLOR_GREEN;  // 緑
+    markers_[++index] = COLOR_BLUE;   // 青
 
-    markers_[++index] = COLOR_BLUE;   // 青
-    markers_[++index] = COLOR_GREEN;  // 緑
-    markers_[++index] = COLOR_YELLOW; // 黄
     markers_[++index] = COLOR_RED;    // 赤
+    markers_[++index] = COLOR_YELLOW; // 黄
+    markers_[++index] = COLOR_GREEN;  // 緑
+    markers_[++index] = COLOR_BLUE;   // 青
 }
 
 void Sumo::soundBeep() {
