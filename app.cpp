@@ -34,7 +34,7 @@
 #include "util.h"
 
 // #define TEST_MODE
-#define LEFT_COURSE // ブロック並べの方
+// #define LEFT_COURSE // ブロック並べの方
 // #define IDATEN // 韋駄天
 
 ie::Localization* localization;
@@ -74,6 +74,7 @@ void init(ie::Motion& motion, float& threshold, float& threshold2) {
     // キャリブレーション
     ie::Calibration* calibration = new ie::Calibration();
     threshold = calibration->calibrate() * 0.47; // 普通のライントレースBest0.43
+    threshold = 330.0; // 固定値用
     #ifndef LEFT_COURSE
     threshold2 = calibration->calibrate() * 0.47; // 普通のライントレースBest0.43
     #endif
@@ -132,13 +133,25 @@ void initCodeDecode(ie::Decoder d) {
 }
 
 void motionTest(ie::Motion& motion, float target) {
-    ie::LineStopper ls(80);
-    ie::PIDControl ltControl(target, 0.15, 0, 0);
-    motion.lineTrace(ls, ltControl, 30, false);
+    ev3api::SonarSensor sonarSensor(ie::SONAR_SENSOR_PORT);
+    ev3api::Clock clock;
+    msg_clear();
+    int lastdistance = sonarSensor.getDistance();
+    while (true) {
+        int distance = sonarSensor.getDistance();
+        if (lastdistance != distance) {
+            msg_f(distance, 8);
+        }
+        lastdistance = distance;
+    }
+    // ie::LineStopper ls(80);
+    // ie::PIDControl ltControl(target, 0.15, 0, 0);
+    // motion.lineTrace(ls, ltControl, 30, false);
 }
 
 /**************************************************
  * PIDトレース                                    *
+ * Author: Kaito Ishizuka                         *
  * ファイル分割するとうまく動かないのでこのままで *
  **************************************************/
 
@@ -195,9 +208,12 @@ void pidRun_R(ie::Motion& motion, float target){
     straightPid(motion, target, mile, 100);//直線
     beep();
 
-    double targetDev = target - 50.0;
+    // double targetDev = target - 50.0;
+    // double targetDev = target - 20.0;
+	double targetDev = target - 20.0;
     mile = 2800;
-    gentleCurvePid(motion, targetDev, mile, 83);// 弱カーブ
+    // gentleCurvePid(motion, targetDev, mile, 83);// 弱カーブ
+    sharpCurvePid(motion, target, mile, 80, 0.60);//強カーブ7割
     beep();
 
     mile = 2100;
@@ -206,7 +222,7 @@ void pidRun_R(ie::Motion& motion, float target){
 
     mile = 1480;
     targetDev = target - 10;
-    sharpCurvePid(motion, targetDev, mile, 50, 0.33);//強カーブ4割
+    sharpCurvePid(motion, targetDev, mile, 50, 0.30);//強カーブ4割
     beep();
 
     mile = 40;
@@ -218,13 +234,13 @@ void pidRun_R(ie::Motion& motion, float target){
     beep();
 
 
-    mile = 1540;
+    mile = 1550;
     straightPid(motion, target, mile, 100);//直線
     beep();
     //↑ Rコース
 
     //↓ Besic後
-    mile = 900;
+    mile = 890;
     targetDev = target + 20;
     // sharpCurvePid(motion, targetDev, mile, 20, 1.5);//強カーブ15割
     sharpCurvePid(motion, targetDev, mile, 20, 2.0);//強カーブ15割
@@ -261,8 +277,10 @@ void pidRun_L(ie::Motion& motion, float target){
     beep();
 
     mile = 1390;
-    double targetDev = target - 40;
-    sharpCurvePid(motion, targetDev, mile, 70, 0.75);//強カーブ7割
+    // double targetDev = target - 40;
+    double targetDev = target - 0;
+    // sharpCurvePid(motion, targetDev, mile, 70, 0.75);//強カーブ7割
+    sharpCurvePid(motion, targetDev, mile, 60, 0.65);//強カーブ7割
     beep();
 
     mile = 900;
@@ -270,7 +288,8 @@ void pidRun_L(ie::Motion& motion, float target){
     beep();
 
     mile = 2300;
-    sharpCurvePid(motion, target, mile, 65, 0.60);//強カーブ7割
+    // sharpCurvePid(motion, target, mile, 65, 0.60);//強カーブ6割
+    sharpCurvePid(motion, target, mile, 65, 0.70);//強カーブ7割
     beep();
 
     mile = 1800;
@@ -345,7 +364,7 @@ void rightCourse(ie::Motion& motion, float target, float target2, ev3api::SonarS
     #ifdef IDATEN
     RCourseIdaten(motion, target);
     #else
-    // pidRun_R(motion, target);
+    pidRun_R(motion, target);
     #endif
     RCourseSumo(motion, target, target2, sonarSensor, colorSensor);
     // RCoursePrize(motion, sonarSensor);

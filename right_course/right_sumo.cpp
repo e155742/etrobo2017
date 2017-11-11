@@ -17,7 +17,7 @@
 extern ie::Localization* localization;
 
 void RCourseSumo(ie::Motion& motion, float target, float target2, ev3api::SonarSensor& sonarSensor, ev3api::ColorSensor& colorSensor) {
-    const int crossTarget = 110 - 10;
+    const int crossTarget = target2 * 0.55; // 100
 
     ie::Sumo sumo(sonarSensor, colorSensor, target2);
     ie::OnOffControl stControl(0, 0.3, 0);
@@ -37,7 +37,7 @@ void RCourseSumo(ie::Motion& motion, float target, float target2, ev3api::SonarS
 
     // 土俵の上に移動
     ms.setTargetMileage(460); // 400
-    motion.goStraight(ms, stControl, 30); // 50
+    motion.goStraight(ms, stControl, 30);
     motion.stop();
     motion.raiseArm(15, 15);
 
@@ -97,7 +97,7 @@ void RCourseSumo(ie::Motion& motion, float target, float target2, ev3api::SonarS
     // 2枚目の土俵に移動
     sumo.trainWait(motion, 2);
     ms.setTargetMileage(350);
-    motion.goStraight(ms, stControl, 30); // 50
+    motion.goStraight(ms, stControl, 30);
     motion.stop();
     motion.raiseArm(15, 15);
     motion.stop();
@@ -152,13 +152,17 @@ void RCourseSumo(ie::Motion& motion, float target, float target2, ev3api::SonarS
     motion.lineTrace(ls, ltControl, 15, false);  // 直角までライントレース
     ms.setTargetMileage(ie::OFF_SET + 10);
     motion.goStraight(ms, stControl, 15);        // 直角は直進
+    motion.wait(100);
+    int back = 100;
+    ms.setTargetMileage(-back);
+    motion.goStraight(ms, stControl, -15);
     motion.stop();
 
 
     // 土俵から降りる
     sumo.trainWait(motion, 1);
-    ms.setTargetMileage(330);
-    motion.goStraight(ms, ltControl, 30); // 40
+    ms.setTargetMileage(330 + back);
+    motion.goStraight(ms, ltControl, 30);
     motion.raiseArm(15, 15);
     motion.stop();
 }

@@ -38,11 +38,12 @@ void RCourseIdaten(ie::Motion& motion, float target) {
     ie::OnOffControl stControl(0, 0.3, 0);
     ie::PIDControl ltControl(target, 0.1, 0, 0.001);
     ie::AngleStopper as;
-    ie::GrayStopper gs(550);
+    ie::GrayStopper gs(480); // 550
 
     // 第2ゲートへ向けて右旋回(バック)
-    ds.setTargetDirection(degToRad(54));
-    motion.setRightPwm(ds, -100);
+    ds.setTargetDirection(degToRad(59));
+    // motion.setRightPwm(ds, -100);
+    motion.setBothPwm(ds, -18, -100);
     // 第2ゲートを通過(バック)
     ms.setTargetMileage(-1350);
     motion.goStraight(ms, stControl, -100);
@@ -52,7 +53,7 @@ void RCourseIdaten(ie::Motion& motion, float target) {
     motion.setSteeringPower(ds, -100, 65);
 
     // 第1ゲートを通過(バック)
-    int margenOne = -60;
+    int margenOne = -80;
     ms.setTargetMileage(-1400 + margenOne); // 1400 // ********** 用調整 **********
     motion.goStraight(ms, stControl, -100);
     ms.setTargetMileage(-20);
@@ -67,10 +68,10 @@ void RCourseIdaten(ie::Motion& motion, float target) {
     // motion.goStraight(ms, stControl, -100);
 
     // バックストレート前のコーナまで前進
-    ms.setTargetMileage(450 - margenOne); // 600
+    ms.setTargetMileage(500 - margenOne); // 600
     motion.goStraight(ms, stControl, 100);
     // 最終を通過してストレートに向ける
-    ds.setTargetDirection(degToRad(-90));  // ********** 用調整 **********
+    ds.setTargetDirection(degToRad(-88));  // ********** 用調整 **********
     motion.setSteeringPower(ds, 100, -67); // 60
     // バックストレートからゴールへ
     stControl.setCoefficient(0, 0.4, 0);
@@ -81,14 +82,14 @@ void RCourseIdaten(ie::Motion& motion, float target) {
 
     // プライマリーのラインに乗せる
     motion.raiseArm(15, 5);
-    motion.goStraight(ls, stControl, 50);
+    motion.goStraight(ls, stControl, 100);
     ms.setTargetMileage(ie::OFF_SET + 10);
     motion.goStraight(ms, stControl, 30);
     motion.spin(ls, stControl, -10);
     motion.stop();
 
     // Lコースをライントレース
-    ms.setTargetMileage(200);
+    ms.setTargetMileage(250);
     motion.lineTrace(ms, ltControl, 20, true);
     motion.lineTrace(gs, ltControl, 20, true); // 灰色までLコースをライントレース
     motion.stop();
@@ -103,7 +104,7 @@ void RCourseIdaten(ie::Motion& motion, float target) {
     motion.goStraight(ms, stControl, 20);
     ltControl.setTarget(target);
     motion.spin(ls, stControl, 20);        // ライントレースのために回転
-    ms.setTargetMileage(740);              // 線路の直前まで移動
+    ms.setTargetMileage(690);              // 線路の直前まで移動 740
     motion.lineTrace(ms, ltControl, 20, false);
     motion.stop();
 }
