@@ -15,12 +15,11 @@ extern ie::Localization* localization;
 
 void RCourseParking(ie::Motion& motion, float target) {
     ie::PIDControl ltControl(target, 0.1, 0, 0.001);
-    // ie::PIDControl ltControl(target, 0.15, 0, 0.00);
     ie::OnOffControl stControl(0, 0.3, 0);
     ie::AngleStopper as;
     ie::MileageStopper ms;
     ie::LineStopper ls(target);
-    ie::GrayStopper gs(550);
+    ie::GrayStopper gs(500); // 550
     ie::DirectionStopper ds(*localization, degToRad(90));
 
     // ライントレース準備
@@ -32,21 +31,20 @@ void RCourseParking(ie::Motion& motion, float target) {
     // 直角までライントレース
     ms.setTargetMileage(180);
     motion.lineTrace(ms, ltControl, 20, false);
-    motion.lineTrace(gs, ltControl, 20, false);
+    motion.lineTrace(gs, ltControl, 30, false); // 20
     ms.setTargetMileage(ie::OFF_SET); // +10はいらない
-    motion.goStraight(ms, ltControl, 20);
+    motion.goStraight(ms, ltControl, 30); // 20
     localization->setDirection(0.0);
     motion.stop();
 
     // 駐車場を向く
     // motion.spin(ls, stControl, 10);
-    motion.spin(ds, stControl, 10);
+    motion.spin(ds, stControl, 15); // 10
     motion.stop();
 
     // 駐車
-    ms.setTargetMileage(450);
-    motion.goStraight(ms, ltControl, 20);
-    // motion.lineTrace(ms, ltControl, 20, false); // なんか暴走する
+    ms.setTargetMileage(420); // 450
+    motion.goStraight(ms, ltControl, 30); // 20 ライントレースだと暴走するから普通の直進
     motion.stop();
 
 }

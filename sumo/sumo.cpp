@@ -37,15 +37,15 @@ Sumo::Sumo(ev3api::SonarSensor& sonarSensor, ev3api::ColorSensor& colorSensor, f
 sonarSensor_(sonarSensor), colorSensor_(colorSensor), target_(target) {
     int index = -1;
 
-    markers_[++index] = COLOR_RED;    // 赤
-    markers_[++index] = COLOR_YELLOW; // 黄
-    markers_[++index] = COLOR_GREEN;  // 緑
     markers_[++index] = COLOR_BLUE;   // 青
+    markers_[++index] = COLOR_GREEN;  // 緑
+    markers_[++index] = COLOR_YELLOW; // 黄
+    markers_[++index] = COLOR_RED;    // 赤
 
-    markers_[++index] = COLOR_RED;    // 赤
-    markers_[++index] = COLOR_YELLOW; // 黄
     markers_[++index] = COLOR_GREEN;  // 緑
+    markers_[++index] = COLOR_RED;    // 赤
     markers_[++index] = COLOR_BLUE;   // 青
+    markers_[++index] = COLOR_YELLOW; // 黄
 }
 
 void Sumo::soundBeep() {
@@ -66,6 +66,7 @@ void Sumo::trainWait(Motion& motion, int n) {
         if (0 < distance && distance < 60) {
             // 目の前を通っているので通り過ぎるまで待機
             while (sonarSensor_.getDistance() < 60) {}
+			soundBeep();
             motion.wait(TRAIN_WAIT_TIME);
             break;
         }
@@ -117,12 +118,13 @@ void Sumo::moveBlock(Motion& motion, int markerNum, double distane) {
     ColorJudge colorJudge(hsvConverter);
     rgb_raw_t rgb;
 
+    int pwm = 25; // 15
+
     // マーカー前まで移動
     ms.setTargetMileage(distane);
-    motion.goStraight(ms, stControl, 15);
+    motion.goStraight(ms, stControl, pwm);
     motion.stop();
 
-    int pwm = 15;
     colorSensor_.getRawColor(rgb);
     if (markers_[markerNum] == colorJudge.getColorNumber(rgb.r, rgb.g, rgb.b)) {
         // 寄り切り

@@ -66,7 +66,7 @@ void sub_cyc(intptr_t exinf) {
 void init(ie::Motion& motion, float& threshold, float& threshold2) {
     motion.raiseArm(60, 15); // 動いていることがわかりやすいように
     #ifdef IDATEN
-    motion.raiseArm(15, 5);
+    motion.raiseArm(5, 5);
     # else
     motion.raiseArm(5, 5);
     # endif
@@ -74,9 +74,9 @@ void init(ie::Motion& motion, float& threshold, float& threshold2) {
     // キャリブレーション
     ie::Calibration* calibration = new ie::Calibration();
     threshold = calibration->calibrate() * 0.47; // 普通のライントレースBest0.43
-    threshold = 330.0; // 固定値用
+    // threshold = 330.0; // キャリブレーションするより固定値の方がうまく走る
     #ifndef LEFT_COURSE
-    threshold2 = calibration->calibrate() * 0.47; // 普通のライントレースBest0.43
+    threshold2 = calibration->calibrate() * 0.47; // 相撲のライントレースBest0.43
     #endif
     delete calibration;
     msg_f("Threshold", 7);
@@ -151,7 +151,6 @@ void motionTest(ie::Motion& motion, float target) {
 
 /**************************************************
  * PIDトレース                                    *
- * Author: Kaito Ishizuka                         *
  * ファイル分割するとうまく動かないのでこのままで *
  **************************************************/
 
@@ -167,163 +166,110 @@ void beep(){
 }
 
 void straightPid(ie::Motion& motion, float target, int mile, int speed){
-    // pid(motion, 閾値, 距離, 速度,  kp, ki, kd,   isRight);
-    // pid(motion, target, mile, speed, 0.02, 0.0, 0.014, false);//直線
-    pid(motion, target, mile, speed, 0.038, 0.0001, 0.017, false);//弱カーブP弱
+    // (motion, 閾値, 距離, 速度,  kp, ki, kd,   isRight);
+    pid(motion, target, mile, speed, 0.030, 0.0001, 0.019, false); // 弱カーブP弱
 }
 
 void gentleCurvePid(ie::Motion& motion, float target, int mile, int speed){
-    // pid(motion, 閾値, 距離, 速度,  kp, ki, kd,   isRight);
-    // pid(motion, target, mile, speed, 0.038, 0.0001, 0.019, false);//弱カーブP弱
-    pid(motion, target, mile, speed, 0.038, 0.0001, 0.017, false);//弱カーブP弱
+    // (motion, 閾値, 距離, 速度,  kp, ki, kd,   isRight);
+    pid(motion, target, mile, speed, 0.038, 0.0001, 0.017, false); // 弱カーブP弱
 }
 
 void sharpCurvePid(ie::Motion& motion, float target, int mile, int speed, float gain){
-    // pid(motion, 閾値, 距離, 速度,  kp, ki, kd,   isRight);
-    // pid(motion, target, mile, speed, 0.065*gain, 0.001*gain, 0.02*gain, false);//(8.7V Best)
-    // pid(motion, target, mile, speed, 0.065*gain, 0.0007*gain, 0.02*gain, false);//I弱
-    pid(motion, target, mile, speed, 0.065*gain, 0.0007*gain, 0.025*gain, false);//I弱D強
+    // (motion, 閾値, 距離, 速度,  kp, ki, kd,   isRight);
+    pid(motion, target, mile, speed, 0.065 * gain, 0.0007 * gain, 0.030 * gain, false); // I弱D強
 }
 
 void pidRun_R(ie::Motion& motion, float target){
     //↓ Rコース
-    int mile = 40;
-    straightPid(motion, target, mile, 20);//直線
+
+    int mile = 300;
+    sharpCurvePid(motion, target, mile, 40, 0.75); // 強カーブ7割
     beep();
 
-    mile = 40;
-    straightPid(motion, target, mile, 40);//直線
+    mile = 1950;
+    straightPid(motion, target, mile, 100); // 直線
     beep();
 
-    mile = 40;
-    straightPid(motion, target, mile, 60);//直線
+//    double targetDev = target - 50.0;
+	double targetDev = target - 10.0;
+    mile = 2750;
+    sharpCurvePid(motion, targetDev, mile, 80, 0.70); // 強カーブ7割
     beep();
 
-    mile = 40;
-    straightPid(motion, target, mile, 80);//直線
+    mile = 2300;
+    sharpCurvePid(motion, target, mile, 40, 0.75); // 強カーブ7割
     beep();
 
-
-    mile = 2150;
-    straightPid(motion, target, mile, 100);//直線
-    beep();
-
-    // double targetDev = target - 50.0;
-    // double targetDev = target - 20.0;
-	double targetDev = target - 20.0;
-    mile = 2800;
-    // gentleCurvePid(motion, targetDev, mile, 83);// 弱カーブ
-    sharpCurvePid(motion, target, mile, 80, 0.60);//強カーブ7割
-    beep();
-
-    mile = 2100;
-    sharpCurvePid(motion, target, mile, 40, 0.75);//強カーブ7割
-    beep();
-
-    mile = 1480;
+    mile = 1280;
     targetDev = target - 10;
-    sharpCurvePid(motion, targetDev, mile, 50, 0.30);//強カーブ4割
+    sharpCurvePid(motion, targetDev, mile, 50, 0.30); // 強カーブ4割
     beep();
 
-    mile = 40;
-    straightPid(motion, target, mile, 60);//直線
-    beep();
-
-    mile = 40;
-    straightPid(motion, target, mile, 80);//直線
-    beep();
-
-
-    mile = 1550;
-    straightPid(motion, target, mile, 100);//直線
+    mile = 1700;
+    straightPid(motion, target, mile, 100); // 直線
     beep();
     //↑ Rコース
 
     //↓ Besic後
     mile = 890;
-    targetDev = target + 20;
-    // sharpCurvePid(motion, targetDev, mile, 20, 1.5);//強カーブ15割
-    sharpCurvePid(motion, targetDev, mile, 20, 2.0);//強カーブ15割
+    targetDev = target + 40;
+    sharpCurvePid(motion, targetDev, mile, 20, 10.0); // 強カーブ15割
     beep();
 
     // mile = 720;
-    mile = 300;
+    mile = 300 + 150;
     targetDev = target - 20;
-    // sharpCurvePid(motion, targetDev, mile, 20, 1.5);//強カーブ15割
-    sharpCurvePid(motion, targetDev, mile, 20, 2.0);//強カーブ15割
+    sharpCurvePid(motion, targetDev, mile, 20, 4.0); // 強カーブ15割
     beep();
 }
 
+
 void pidRun_L(ie::Motion& motion, float target){
     //↓ Lコース
-    int mile = 40;
-    straightPid(motion, target, mile, 20);//直線
+
+    int mile = 300;
+    sharpCurvePid(motion, target, mile, 40, 0.75); // 強カーブ7割
     beep();
 
-    mile = 40;
-    straightPid(motion, target, mile, 40);//直線
+
+    mile = 2000;
+    straightPid(motion, target, mile, 100); // 直線
     beep();
 
-    mile = 40;
-    straightPid(motion, target, mile, 60);//直線
-    beep();
+    mile = 1300;
+    double targetDev = target - 20;
+    sharpCurvePid(motion, target, mile, 40, 0.75); // 強カーブ7割
 
-    mile = 40;
-    straightPid(motion, target, mile, 80);//直線
-    beep();
-
-    mile = 2050;
-    straightPid(motion, target, mile, 100);//直線
-    beep();
-
-    mile = 1390;
-    // double targetDev = target - 40;
-    double targetDev = target - 0;
-    // sharpCurvePid(motion, targetDev, mile, 70, 0.75);//強カーブ7割
-    sharpCurvePid(motion, targetDev, mile, 60, 0.65);//強カーブ7割
     beep();
 
     mile = 900;
-    sharpCurvePid(motion, target, mile, 40, 0.75);//強カーブ7割
+    sharpCurvePid(motion, target, mile, 40, 0.75); // 強カーブ7割
     beep();
 
     mile = 2300;
-    // sharpCurvePid(motion, target, mile, 65, 0.60);//強カーブ6割
-    sharpCurvePid(motion, target, mile, 65, 0.70);//強カーブ7割
+    sharpCurvePid(motion, targetDev, mile, 60, 0.75); // 強カーブ3割
     beep();
 
     mile = 1800;
-    sharpCurvePid(motion, target, mile, 40, 0.75);//強カーブ7割
+    sharpCurvePid(motion, target, mile, 40, 0.75); // 強カーブ7割
     beep();
 
-
-    mile = 40;
-    straightPid(motion, target, mile, 40);//直線
-    beep();
-
-    mile = 40;
-    straightPid(motion, target, mile, 60);//直線
-    beep();
-
-    mile = 40;
-    straightPid(motion, target, mile, 80);//直線
-    beep();
-
-    mile = 1180;
-    straightPid(motion, target, mile, 100);//直線
+    mile = 1340;
+    straightPid(motion, target, mile, 100); // 直線
     beep();
     //↑ Lコース
 
-    ie::OnOffControl stControl(0, 0.3, 0);
+	ie::OnOffControl stControl(0, 0.3, 0);
     ie::PIDControl ltControl(target, 0.08, 0, 0.0001);
     ie::MileageStopper ms;
     ie::GrayStopper gs(550);
     ie::LineStopper ls(400);
     // ゴール後の灰色まで直進
-    motion.lineTrace(gs, ltControl, 80, false);
+    // motion.lineTrace(gs, ltControl, 80, false);
 
     // 灰色分を直進
-    ms.setTargetMileage(180);
+    ms.setTargetMileage(330);
     motion.goStraight(ms, stControl, 50);
     motion.stop();
 
