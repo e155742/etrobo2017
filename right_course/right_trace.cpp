@@ -5,12 +5,13 @@
 void pidRun_R(ie::Motion& motion, float target){
     //↓ Rコース
 
+    float gain = 0.5;
     int mile = 300;
     sharpCurvePid(motion, target, mile, 40, 0.75); // 強カーブ7割
     soundBeep();
 
     mile = 1950;
-    straightPid(motion, target, mile, 100); // 直線
+    straightPid(motion, target, mile, 100, 1.0); // 直線
     soundBeep();
 
 //    double targetDev = target - 50.0;
@@ -29,7 +30,7 @@ void pidRun_R(ie::Motion& motion, float target){
     soundBeep();
 
     mile = 1700;
-    straightPid(motion, target, mile, 100); // 直線
+    straightPid(motion, target, mile, 100, 1.0); // 直線
     soundBeep();
     //↑ Rコース
 

@@ -13,14 +13,14 @@
 
 void pidRun_L(ie::Motion& motion, float target){
     //↓ Lコース
-
+    
     int mile = 300;
     sharpCurvePid(motion, target, mile, 40, 0.75); // 強カーブ7割
     soundBeep();
 
 
     mile = 2000;
-    straightPid(motion, target, mile, 100); // 直線
+    straightPid(motion, target, mile, 100, 1.0); // 直線
     soundBeep();
 
     mile = 1300;
@@ -42,7 +42,7 @@ void pidRun_L(ie::Motion& motion, float target){
     soundBeep();
 
     mile = 1340;
-    straightPid(motion, target, mile, 100); // 直線
+    straightPid(motion, target, mile, 100, 1.0); // 直線
     soundBeep();
     //↑ Lコース
 
@@ -66,4 +66,3 @@ void pidRun_L(ie::Motion& motion, float target){
     motion.goStraight(ms, stControl, 5);
     motion.spin(ls, stControl, -10);
 }
-
