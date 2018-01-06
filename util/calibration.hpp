@@ -13,14 +13,15 @@ namespace ie {
 class Calibration {
 public:
     Calibration();
-    int calibrate();
-    void calibrate(int& target);
+    float calibrate();
+    void calibrate(float& target);
 
 private:
     ev3api::ColorSensor colorSensor_;
     ev3api::TouchSensor touchSensor_;
-    int pushCenterButton(int line);
-    int pushTouchButton(int line);
+    static constexpr int SAMPLE_NUM = 10; // 中央値を得るさいの反射光のデータ数
+    static constexpr int DLY_TIME = 200; // 反射光を取る際の時間差
+    float pushTouchButton(int line);
 
 };
 

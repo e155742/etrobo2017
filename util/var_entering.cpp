@@ -97,7 +97,7 @@ void VarEntering::pushButton(std::vector<int>& nums, int maxIndex, int32_t selec
  * 本体のボタンから変数を変更。<br>
  * vector<float>型用。floatは一度int型に変換するので引数の型はvector<int>。
  *
- * @param nums          変更したいvector
+ * @param numInts       変更したいvector
  * @param maxIndex      numsの要素数
  * @param selectLineStr メッセージ"Select line"を表示させる行
  */

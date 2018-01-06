@@ -154,3 +154,11 @@ void msg_f(float n, int32_t line) {
 void msg_f(double n, int32_t line) {
   msg_template(n, line, "%lf");
 }
+
+// *******************
+// **   ビープ音   d **
+// *******************
+void soundBeep() {
+    ev3_speaker_set_volume(100);
+    ev3_speaker_play_tone(NOTE_B5, 40);
+}

@@ -160,11 +160,6 @@ void pid(ie::Motion& motion, float target, int mile, int pwm, float kp, float ki
     motion.lineTraceK(stopper, ltControl, pwm, false);
 }
 
-void beep(){
-    ev3_speaker_set_volume(100);
-    ev3_speaker_play_tone(NOTE_B5, 40);
-}
-
 void straightPid(ie::Motion& motion, float target, int mile, int speed){
     // (motion, 閾値, 距離, 速度,  kp, ki, kd,   isRight);
     pid(motion, target, mile, speed, 0.030, 0.0001, 0.019, false); // 弱カーブP弱
@@ -185,43 +180,43 @@ void pidRun_R(ie::Motion& motion, float target){
 
     int mile = 300;
     sharpCurvePid(motion, target, mile, 40, 0.75); // 強カーブ7割
-    beep();
+    soundBeep();
 
     mile = 1950;
     straightPid(motion, target, mile, 100); // 直線
-    beep();
+    soundBeep();
 
 //    double targetDev = target - 50.0;
 	double targetDev = target - 10.0;
     mile = 2750;
     sharpCurvePid(motion, targetDev, mile, 80, 0.70); // 強カーブ7割
-    beep();
+    soundBeep();
 
     mile = 2300;
     sharpCurvePid(motion, target, mile, 40, 0.75); // 強カーブ7割
-    beep();
+    soundBeep();
 
     mile = 1280;
     targetDev = target - 10;
     sharpCurvePid(motion, targetDev, mile, 50, 0.30); // 強カーブ4割
-    beep();
+    soundBeep();
 
     mile = 1700;
     straightPid(motion, target, mile, 100); // 直線
-    beep();
+    soundBeep();
     //↑ Rコース
 
     //↓ Besic後
     mile = 890;
     targetDev = target + 40;
     sharpCurvePid(motion, targetDev, mile, 20, 10.0); // 強カーブ15割
-    beep();
+    soundBeep();
 
     // mile = 720;
     mile = 300 + 150;
     targetDev = target - 20;
     sharpCurvePid(motion, targetDev, mile, 20, 4.0); // 強カーブ15割
-    beep();
+    soundBeep();
 }
 
 
@@ -230,34 +225,34 @@ void pidRun_L(ie::Motion& motion, float target){
 
     int mile = 300;
     sharpCurvePid(motion, target, mile, 40, 0.75); // 強カーブ7割
-    beep();
+    soundBeep();
 
 
     mile = 2000;
     straightPid(motion, target, mile, 100); // 直線
-    beep();
+    soundBeep();
 
     mile = 1300;
     double targetDev = target - 20;
     sharpCurvePid(motion, target, mile, 40, 0.75); // 強カーブ7割
 
-    beep();
+    soundBeep();
 
     mile = 900;
     sharpCurvePid(motion, target, mile, 40, 0.75); // 強カーブ7割
-    beep();
+    soundBeep();
 
     mile = 2300;
     sharpCurvePid(motion, targetDev, mile, 60, 0.75); // 強カーブ3割
-    beep();
+    soundBeep();
 
     mile = 1800;
     sharpCurvePid(motion, target, mile, 40, 0.75); // 強カーブ7割
-    beep();
+    soundBeep();
 
     mile = 1340;
     straightPid(motion, target, mile, 100); // 直線
-    beep();
+    soundBeep();
     //↑ Lコース
 
 	ie::OnOffControl stControl(0, 0.3, 0);

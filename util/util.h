@@ -42,6 +42,8 @@ extern void msg_f(uint64_t n, int32_t line);
 extern void msg_f(float n, int32_t line);
 extern void msg_f(double n, int32_t line);
 
+extern void soundBeep();
+
 template <class X, class Y, class Z>
 void msg_template(X n, Y line, Z format) {
   char str[64];
