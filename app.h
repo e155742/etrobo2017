@@ -14,6 +14,7 @@ extern "C" {
 #ifndef TOPPERS_MACRO_ONLY
 
 extern void sub_cyc(intptr_t exinf);
+extern void line_trace_cyc(intptr_t exinf);
 extern void main_task(intptr_t exinf);
 
 #endif /* TOPPERS_MACRO_ONLY */

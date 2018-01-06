@@ -21,14 +21,18 @@
 #include "calibration.hpp"
 #include "starter.hpp"
 
+#include "left_trace.hpp"
 #include "left_idaten.hpp"
 #include "left_block.hpp"
 #include "left_parking.hpp"
 
+#include "right_trace.hpp"
 #include "right_idaten.hpp"
 #include "right_sumo.hpp"
 #include "right_parking.hpp"
 #include "right_prize.hpp"
+
+#include "pid.hpp"
 
 #include "robo_meta_datas.hpp"
 #include "util.h"
@@ -37,6 +41,7 @@
 // #define LEFT_COURSE // ブロック並べの方
 // #define IDATEN // 韋駄天
 
+ie::Motion motion;
 ie::Localization* localization;
 
 #ifdef TEST_MODE
@@ -57,6 +62,13 @@ void sub_cyc(intptr_t exinf) {
         f = false;
     }
     localization->updatePoint();
+}
+
+/**
+ * ライントレース用の周期ハンドラ
+ */
+void line_trace_cyc(intptr_t exinf) {
+    motion.lineTraceHelper();
 }
 
 /**
@@ -149,137 +161,6 @@ void motionTest(ie::Motion& motion, float target) {
     // motion.lineTrace(ls, ltControl, 30, false);
 }
 
-/**************************************************
- * PIDトレース                                    *
- * ファイル分割するとうまく動かないのでこのままで *
- **************************************************/
-
-void pid(ie::Motion& motion, float target, int mile, int pwm, float kp, float ki, float kd, bool isRight) {
-    ie::PIDControl ltControl(target, kp, ki, kd);
-    ie::MileageStopper stopper(mile);
-    motion.lineTraceK(stopper, ltControl, pwm, false);
-}
-
-void straightPid(ie::Motion& motion, float target, int mile, int speed){
-    // (motion, 閾値, 距離, 速度,  kp, ki, kd,   isRight);
-    pid(motion, target, mile, speed, 0.030, 0.0001, 0.019, false); // 弱カーブP弱
-}
-
-void gentleCurvePid(ie::Motion& motion, float target, int mile, int speed){
-    // (motion, 閾値, 距離, 速度,  kp, ki, kd,   isRight);
-    pid(motion, target, mile, speed, 0.038, 0.0001, 0.017, false); // 弱カーブP弱
-}
-
-void sharpCurvePid(ie::Motion& motion, float target, int mile, int speed, float gain){
-    // (motion, 閾値, 距離, 速度,  kp, ki, kd,   isRight);
-    pid(motion, target, mile, speed, 0.065 * gain, 0.0007 * gain, 0.030 * gain, false); // I弱D強
-}
-
-void pidRun_R(ie::Motion& motion, float target){
-    //↓ Rコース
-
-    int mile = 300;
-    sharpCurvePid(motion, target, mile, 40, 0.75); // 強カーブ7割
-    soundBeep();
-
-    mile = 1950;
-    straightPid(motion, target, mile, 100); // 直線
-    soundBeep();
-
-//    double targetDev = target - 50.0;
-	double targetDev = target - 10.0;
-    mile = 2750;
-    sharpCurvePid(motion, targetDev, mile, 80, 0.70); // 強カーブ7割
-    soundBeep();
-
-    mile = 2300;
-    sharpCurvePid(motion, target, mile, 40, 0.75); // 強カーブ7割
-    soundBeep();
-
-    mile = 1280;
-    targetDev = target - 10;
-    sharpCurvePid(motion, targetDev, mile, 50, 0.30); // 強カーブ4割
-    soundBeep();
-
-    mile = 1700;
-    straightPid(motion, target, mile, 100); // 直線
-    soundBeep();
-    //↑ Rコース
-
-    //↓ Besic後
-    mile = 890;
-    targetDev = target + 40;
-    sharpCurvePid(motion, targetDev, mile, 20, 10.0); // 強カーブ15割
-    soundBeep();
-
-    // mile = 720;
-    mile = 300 + 150;
-    targetDev = target - 20;
-    sharpCurvePid(motion, targetDev, mile, 20, 4.0); // 強カーブ15割
-    soundBeep();
-}
-
-
-void pidRun_L(ie::Motion& motion, float target){
-    //↓ Lコース
-
-    int mile = 300;
-    sharpCurvePid(motion, target, mile, 40, 0.75); // 強カーブ7割
-    soundBeep();
-
-
-    mile = 2000;
-    straightPid(motion, target, mile, 100); // 直線
-    soundBeep();
-
-    mile = 1300;
-    double targetDev = target - 20;
-    sharpCurvePid(motion, target, mile, 40, 0.75); // 強カーブ7割
-
-    soundBeep();
-
-    mile = 900;
-    sharpCurvePid(motion, target, mile, 40, 0.75); // 強カーブ7割
-    soundBeep();
-
-    mile = 2300;
-    sharpCurvePid(motion, targetDev, mile, 60, 0.75); // 強カーブ3割
-    soundBeep();
-
-    mile = 1800;
-    sharpCurvePid(motion, target, mile, 40, 0.75); // 強カーブ7割
-    soundBeep();
-
-    mile = 1340;
-    straightPid(motion, target, mile, 100); // 直線
-    soundBeep();
-    //↑ Lコース
-
-	ie::OnOffControl stControl(0, 0.3, 0);
-    ie::PIDControl ltControl(target, 0.08, 0, 0.0001);
-    ie::MileageStopper ms;
-    ie::GrayStopper gs(550);
-    ie::LineStopper ls(400);
-    // ゴール後の灰色まで直進
-    // motion.lineTrace(gs, ltControl, 80, false);
-
-    // 灰色分を直進
-    ms.setTargetMileage(330);
-    motion.goStraight(ms, stControl, 50);
-    motion.stop();
-
-    // 左エッジから右エッジに切り替え
-    ie::AngleStopper as(90);
-    motion.spin(as, stControl, 10);
-    ms.setTargetMileage(20);
-    motion.goStraight(ms, stControl, 5);
-    motion.spin(ls, stControl, -10);
-}
-
-/**************************************************
- * PIDトレースここまで                            *
- **************************************************/
-
 /**
  * Lコース
  * ブロック並べのほう
@@ -319,7 +200,6 @@ void main_task(intptr_t unused) {
     sprintf(str, "%d mV", ev3_battery_voltage_mV());
     msg_f(str, 11);
 
-    ie::Motion motion;
     #ifndef LEFT_COURSE
     ev3api::SonarSensor sonarSensor(ie::SONAR_SENSOR_PORT);
     ev3api::ColorSensor colorSensor(ie::COLOR_SENSOR_PORT);

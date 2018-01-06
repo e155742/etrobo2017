@@ -51,7 +51,7 @@ public:
 
     void lineTrace(Control& control, int pwm, bool isRightSide);
     void lineTrace(Stopper& stopper, Control& control, int pwm, bool isRightSide);
-    void lineTraceK(Stopper& stopper, Control& control, int pwm, bool isRightSide);
+    void lineTraceHelper();
 
 private:
     ev3api::Motor leftWheel_;
@@ -59,17 +59,21 @@ private:
     ev3api::Motor tail_;
     ev3api::Motor arm_;
     ev3api::ColorSensor colorSensor_;
-    #ifdef OUTPUT_LINETRACE
-    FileOutput fo_;
-    #endif
+
     rgb_raw_t rgb_;
     int setSteeringLeftPower(int pwm, double turnRatio);
     int setSteeringRightPower(int pwm, double turnRatio);
     void onoffSetPwm(Control& control, int pwm);
     void goStraightHelper(Control& control, int pwm);
     void spinHelper(Control& control, int pwm);
-    void lineTraceHelper(Control& control, int pwm, bool isRightSide);
-    void lineTraceHelperK(Control& control, int pwm, bool isRightSide);
+
+    Control *control_;
+    int pwm_ = 0;
+    bool isRightSide_ = false;
+
+    #ifdef OUTPUT_LINETRACE
+    FileOutput fo_;
+    #endif
 
 };
 

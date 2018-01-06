@@ -15,6 +15,9 @@ APPL_CXXOBJS += \
 	pid_control.o \
 	starter.o \
 	util.o \
+	pid.o \
+	left_trace.o \
+	right_trace.o \
 	var_entering.o \
 	mileage_stopper.o \
 	angle_stopper.o \
