@@ -12,8 +12,6 @@
 
 #include "mileage_stopper.hpp"
 
-// #define ISHIZUKA_LINETRACE // KaitoIshizukaによるライントレース実装
-
 namespace ie {
 
 Motion::Motion():
@@ -416,7 +414,7 @@ void Motion::lineTraceK(Stopper& stopper, Control& control, int pwm, bool isRigh
 
     ev3_sta_cyc(LINE_TRACE_CYC);
     while (!stopper.doStop()) {
-        // lineTraceHelperK(control, pwm, isRightSide);
+        // lineTraceHelperK();
     }
     ev3_stp_cyc(LINE_TRACE_CYC);
 }
