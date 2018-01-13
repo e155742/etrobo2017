@@ -13,7 +13,7 @@
 
 void pidRun_L(ie::Motion& motion, float target){
     //↓ Lコース
-    
+
     int mile = 300;
     sharpCurvePid(motion, target, mile, 40, 0.75); // 強カーブ7割
     soundBeep();
@@ -38,21 +38,17 @@ void pidRun_L(ie::Motion& motion, float target){
     soundBeep();
 
     mile = 1800;
-    sharpCurvePid(motion, target, mile, 40, 0.75); // 強カーブ7割
+    sharpCurvePid(motion, target, mile, 40, 0.85); // 強カーブ7割
     soundBeep();
 
-    mile = 1340;
+    mile = 1240;
     straightPid(motion, target, mile, 100, 1.0); // 直線
     soundBeep();
     //↑ Lコース
 
 	ie::OnOffControl stControl(0, 0.3, 0);
-    ie::PIDControl ltControl(target, 0.08, 0, 0.0001);
     ie::MileageStopper ms;
-    ie::GrayStopper gs(550);
     ie::LineStopper ls(400);
-    // ゴール後の灰色まで直進
-    // motion.lineTrace(gs, ltControl, 80, false);
 
     // 灰色分を直進
     ms.setTargetMileage(330);

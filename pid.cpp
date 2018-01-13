@@ -5,7 +5,7 @@
 void pid(ie::Motion& motion, float target, int mile, int pwm, float kp, float ki, float kd, bool isRight) {
     ie::PIDControl ltControl(target, kp, ki, kd);
     ie::MileageStopper stopper(mile);
-    motion.lineTrace(stopper, ltControl, pwm, false);
+    motion.lineTraceK(stopper, ltControl, pwm, false);
 }
 
 void straightPid(ie::Motion& motion, float target, int mile, int speed, float gain){

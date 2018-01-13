@@ -22,17 +22,17 @@ void LCourseParking(ie::Motion& motion, float target) {
     ie::LineStopper ls(80);
     motion.goStraight(ls, stControl, 30);
     // 車体がラインを跨ぐように少しだけ前進
-    ie::MileageStopper ms(ie::OFF_SET + 10);
+    ie::MileageStopper ms(ie::OFF_SET + 15);
     motion.goStraight(ms, stControl, 30);
 
     // ライントレースをするためにラインを検知するまで回転
     ls.setTaigetThreshold(80);
     motion.spin(ls, stControl, 20);
     // 車体とラインをまっすぐにするためにライントレース
-    ms.setTargetMileage(250);
+    ms.setTargetMileage(400);
     motion.lineTrace(ms, ltControl, 15, false);
     // 灰色までライントレース
-    ie::GrayStopper gs(500);
+    ie::GrayStopper gs(target * 1.5);
     motion.lineTrace(gs, ltControl, 15, false);
 
     // 左旋回で車庫に侵入

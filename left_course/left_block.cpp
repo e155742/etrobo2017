@@ -37,20 +37,17 @@ void LCourseBlock(ie::Motion& motion, float target, ie::Decoder& decoder, int gr
 
     // バックストレートで自機方位修正
     // ブロック置き場での修正は誤差が出る可能性が高い
-    ms.setTargetMileage(150);
-    // ie::PIDControl ltControl(target, 0.08, 0, 0.0001);
-    motion.lineTrace(ms, ltControl, 10, true);
+    ms.setTargetMileage(200);
+    motion.lineTrace(ms, ltControl, 15, true);
     localization->setDirection(degToRad(-90));
 
     // ブロック置き場までライントレース
+    ltControl.setKonstant(0.5, 0, 0.015);
     ms.setTargetMileage(700);
     motion.lineTrace(ms, ltControl, 20, true);
     ie::ColorStopper cs;
     motion.lineTrace(cs, ltControl, 20, true);
     motion.wait(100);
-
-    // // 自己位置推定の座標を修正
-    // bf.revisionBotPoint(9, 30);
 
     // バックして白色地帯に乗せる
     ms.setTargetMileage(-350); // 320
@@ -58,7 +55,7 @@ void LCourseBlock(ie::Motion& motion, float target, ie::Decoder& decoder, int gr
     motion.wait(100);
 
     // ブロック並べフィールドの右端を向く
-    ie::DirectionStopper ds(*localization, degToRad(88.5)); // 90
+    ie::DirectionStopper ds(*localization, degToRad(87)); // 90
     motion.spin(ds, stControl, 15);
     motion.wait(100);
 
@@ -76,7 +73,7 @@ void LCourseBlock(ie::Motion& motion, float target, ie::Decoder& decoder, int gr
     motion.setLeftPwm(ds, 30);
 
     // 駐車場ラインに乗せる
-    ms.setTargetMileage(250);
+    ms.setTargetMileage(150);
     motion.goStraight(ms, stControl, 30);
     ds.setTargetDirection(degToRad(0));
     motion.spin(ds, stControl, 20);

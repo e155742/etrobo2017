@@ -18,8 +18,7 @@ namespace ie {
 
 Motion::Motion():
 leftWheel_(LEFT_WHEEL_PORT), rightWheel_(RIGHT_WHEEL_PORT),
-tail_(TAIL_MOTOR_PORT), arm_(ARM_MOTOR_PORT), colorSensor_(COLOR_SENSOR_PORT),
-control_(new OnOffControl(0))
+tail_(TAIL_MOTOR_PORT), arm_(ARM_MOTOR_PORT), colorSensor_(COLOR_SENSOR_PORT)
 #ifdef OUTPUT_LINETRACE
 , fo_("PID_control_value.txt")
 #endif
@@ -331,7 +330,38 @@ void Motion::goPoint(Localization& l, Control& control, int pwm, point_t pointX,
     }
 }
 
-void Motion::lineTraceHelper() {
+inline void Motion::lineTraceHelper(Control& control, int pwm, bool isRightSide) {
+    colorSensor_.getRawColor(rgb_);
+    float value = static_cast<float>(rgb_.r + rgb_.g + rgb_.b);
+    double controlValue = control.getControlValue(value);
+
+    if (!isRightSide) { controlValue *= -1;}
+    if (controlValue < -pwm) {controlValue = -pwm;}
+    if (pwm < controlValue) {controlValue = pwm;}
+
+    #ifdef ISHIZUKA_LINETRACE
+    // KaitoIshizukaによる謎実装
+    controlValue *= 0.02; // 謎の値
+	int pwm_L = roundInt(pwm * (1.0 - controlValue));
+	int pwm_R = roundInt(pwm * (1.0 + controlValue));
+    setBothPwm(pwm_L, pwm_R);
+    #else
+    // 一般的なの実装
+    if (controlValue < 0) {
+        // 右旋回
+        setBothPwm(pwm, pwm + controlValue);
+    } else {
+        // 左旋回
+        setBothPwm(pwm - controlValue, pwm);
+    }
+    #endif
+
+    #ifdef OUTPUT_LINETRACE
+    fo_.fileWrite(controlValue);
+    #endif
+}
+
+void Motion::lineTraceHelperK() {
     colorSensor_.getRawColor(rgb_);
     float value = static_cast<float>(rgb_.r + rgb_.g + rgb_.b);
     double controlValue = control_->getControlValue(value);
@@ -359,18 +389,25 @@ void Motion::lineTraceHelper() {
  */
 inline void Motion::lineTrace(Control& control, int pwm, bool isRightSide) {
     onoffSetPwm(control, pwm);
-    lineTraceHelper();
+    lineTraceHelper(control, pwm, isRightSide);
 }
 
 /**
  * 指定したパワーでライントレースする。<br>
  *
- * @param stopper     停止判定用のStopperクラス
+ * @param stopper 停止判定用のStopperクラス
  * @param control     ライントレース制御用のControlクラス
  * @param pwm         モーターのパワー
  * @param isRightSide ラインの右側走るならtrue、左を走るならfalse
  */
 void Motion::lineTrace(Stopper& stopper, Control& control, int pwm, bool isRightSide) {
+    onoffSetPwm(control, pwm);
+    while (!stopper.doStop()) {
+        lineTraceHelper(control, pwm, isRightSide);
+    }
+}
+
+void Motion::lineTraceK(Stopper& stopper, Control& control, int pwm, bool isRightSide) {
     onoffSetPwm(control, pwm);
 
     control_ = &control;

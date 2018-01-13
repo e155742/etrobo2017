@@ -5,7 +5,6 @@
 void pidRun_R(ie::Motion& motion, float target){
     //↓ Rコース
 
-    float gain = 0.5;
     int mile = 300;
     sharpCurvePid(motion, target, mile, 40, 0.75); // 強カーブ7割
     soundBeep();
