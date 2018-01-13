@@ -30,7 +30,7 @@ void LCourseBlock(ie::Motion& motion, float target, ie::Decoder& decoder, int gr
 
     // // ライントレースに移るために旋回
     ie::OnOffControl stControl(0, 0.3, 0);
-    ie::PIDControl ltControl(target, 0.08, 0, 0.0001);
+    ie::PIDControl ltControl(target, 0.1, 0, 0.001);
     ie::GrayStopper gs(550);
     ie::LineStopper ls(400);
     ie::MileageStopper ms;
@@ -42,7 +42,7 @@ void LCourseBlock(ie::Motion& motion, float target, ie::Decoder& decoder, int gr
     localization->setDirection(degToRad(-90));
 
     // ブロック置き場までライントレース
-    ltControl.setKonstant(0.5, 0, 0.015);
+//    ltControl.setKonstant(0.5, 0, 0.015);
     ms.setTargetMileage(700);
     motion.lineTrace(ms, ltControl, 20, true);
     ie::ColorStopper cs;

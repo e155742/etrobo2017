@@ -29,7 +29,7 @@ void LCourseParking(ie::Motion& motion, float target) {
     ls.setTaigetThreshold(80);
     motion.spin(ls, stControl, 20);
     // 車体とラインをまっすぐにするためにライントレース
-    ms.setTargetMileage(400);
+    ms.setTargetMileage(300);
     motion.lineTrace(ms, ltControl, 15, false);
     // 灰色までライントレース
     ie::GrayStopper gs(target * 1.5);
