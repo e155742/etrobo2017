@@ -42,7 +42,6 @@ void LCourseBlock(ie::Motion& motion, float target, ie::Decoder& decoder, int gr
     localization->setDirection(degToRad(-90));
 
     // ブロック置き場までライントレース
-//    ltControl.setKonstant(0.5, 0, 0.015);
     ms.setTargetMileage(700);
     motion.lineTrace(ms, ltControl, 20, true);
     ie::ColorStopper cs;
