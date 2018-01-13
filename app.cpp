@@ -38,7 +38,7 @@
 #include "util.h"
 
 // #define TEST_MODE
- #define LEFT_COURSE // ブロック並べの方
+#define LEFT_COURSE // ブロック並べの方
 // #define IDATEN // 韋駄天
 
 ie::Motion motion;
@@ -51,8 +51,8 @@ ev3api::Motor tail(ie::TAIL_MOTOR_PORT);
 #endif
 
 /**
- * 20ms間隔で呼び出される周期ハンドラ<br>
- * 自己位置推定を行っている
+ * 自己位置推定用の周期ハンドラ<br>
+ * 20ms周期
  */
 void sub_cyc(intptr_t exinf) {
     static bool f = true;
@@ -66,9 +66,10 @@ void sub_cyc(intptr_t exinf) {
 
 /**
  * ライントレース用の周期ハンドラ
+ * 4ms周期
  */
 void line_trace_cyc(intptr_t exinf) {
-    motion.lineTraceHelper();
+    motion.lineTraceHelperK();
 }
 
 /**
@@ -77,15 +78,11 @@ void line_trace_cyc(intptr_t exinf) {
  */
 void init(ie::Motion& motion, float& threshold, float& threshold2) {
     motion.raiseArm(60, 15); // 動いていることがわかりやすいように
-    #ifdef IDATEN
     motion.raiseArm(5, 5);
-    # else
-    motion.raiseArm(5, 5);
-    # endif
 
     // キャリブレーション
     ie::Calibration* calibration = new ie::Calibration();
-    threshold = calibration->calibrate() * 0.47; // 普通のライントレースBest0.43
+    threshold = calibration->calibrate() * 0.46; // 0.47 // 普通のライントレースBest0.43
     // threshold = 330.0; // キャリブレーションするより固定値の方がうまく走る
     #ifndef LEFT_COURSE
     threshold2 = calibration->calibrate() * 0.47; // 相撲のライントレースBest0.43

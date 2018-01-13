@@ -12,8 +12,6 @@
 
 #include "mileage_stopper.hpp"
 
-// #define ISHIZUKA_LINETRACE // KaitoIshizukaによるライントレース実装
-
 namespace ie {
 
 Motion::Motion():
@@ -331,7 +329,29 @@ void Motion::goPoint(Localization& l, Control& control, int pwm, point_t pointX,
     }
 }
 
-void Motion::lineTraceHelper() {
+inline void Motion::lineTraceHelper(Control& control, int pwm, bool isRightSide) {
+    colorSensor_.getRawColor(rgb_);
+    float value = static_cast<float>(rgb_.r + rgb_.g + rgb_.b);
+    double controlValue = control.getControlValue(value);
+
+    if (!isRightSide) { controlValue *= -1;}
+    if (controlValue < -pwm) {controlValue = -pwm;}
+    if (pwm < controlValue) {controlValue = pwm;}
+
+    if (controlValue < 0) {
+        // 右旋回
+        setBothPwm(pwm, pwm + controlValue);
+    } else {
+        // 左旋回
+        setBothPwm(pwm - controlValue, pwm);
+    }
+
+    #ifdef OUTPUT_LINETRACE
+    fo_.fileWrite(controlValue);
+    #endif
+}
+
+void Motion::lineTraceHelperK() {
     colorSensor_.getRawColor(rgb_);
     float value = static_cast<float>(rgb_.r + rgb_.g + rgb_.b);
     double controlValue = control_->getControlValue(value);
@@ -359,18 +379,25 @@ void Motion::lineTraceHelper() {
  */
 inline void Motion::lineTrace(Control& control, int pwm, bool isRightSide) {
     onoffSetPwm(control, pwm);
-    lineTraceHelper();
+    lineTraceHelper(control, pwm, isRightSide);
 }
 
 /**
  * 指定したパワーでライントレースする。<br>
  *
- * @param stopper     停止判定用のStopperクラス
+ * @param stopper 停止判定用のStopperクラス
  * @param control     ライントレース制御用のControlクラス
  * @param pwm         モーターのパワー
  * @param isRightSide ラインの右側走るならtrue、左を走るならfalse
  */
 void Motion::lineTrace(Stopper& stopper, Control& control, int pwm, bool isRightSide) {
+    onoffSetPwm(control, pwm);
+    while (!stopper.doStop()) {
+        lineTraceHelper(control, pwm, isRightSide);
+    }
+}
+
+void Motion::lineTraceK(Stopper& stopper, Control& control, int pwm, bool isRightSide) {
     onoffSetPwm(control, pwm);
 
     control_ = &control;
@@ -379,7 +406,7 @@ void Motion::lineTrace(Stopper& stopper, Control& control, int pwm, bool isRight
 
     ev3_sta_cyc(LINE_TRACE_CYC);
     while (!stopper.doStop()) {
-        // lineTraceHelperK(control, pwm, isRightSide);
+        // lineTraceHelperK();
     }
     ev3_stp_cyc(LINE_TRACE_CYC);
 }
