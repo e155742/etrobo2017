@@ -38,7 +38,7 @@
 #include "util.h"
 
 // #define TEST_MODE
-#define LEFT_COURSE // ブロック並べの方
+//#define LEFT_COURSE // ブロック並べの方
 // #define IDATEN // 韋駄天
 
 ie::Motion motion;

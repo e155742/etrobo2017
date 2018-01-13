@@ -14,40 +14,49 @@
 void pidRun_L(ie::Motion& motion, float target){
     //↓ Lコース
 
+    ie::MileageStopper ms;
+
     int mile = 300;
-    sharpCurvePid(motion, target, mile, 40, 0.75); // 強カーブ7割
+    ms.setTargetMileage(mile);
+    sharpCurvePid(motion,ms, target, 40, 0.75); // 強カーブ7割
     soundBeep();
 
 
     mile = 2000;
-    straightPid(motion, target, mile, 100, 1.0); // 直線
+    ms.setTargetMileage(mile);
+    straightPid(motion,ms, target, 100, 1.0); // 直線
     soundBeep();
 
     mile = 1300;
+    ms.setTargetMileage(mile);
     double targetDev = target - 20;
-    sharpCurvePid(motion, target, mile, 40, 0.75); // 強カーブ7割
+    sharpCurvePid(motion,ms, target, 40, 0.75); // 強カーブ7割
 
     soundBeep();
 
     mile = 900;
-    sharpCurvePid(motion, target, mile, 40, 0.75); // 強カーブ7割
+    ms.setTargetMileage(mile);
+    sharpCurvePid(motion,ms, target, 40, 0.75); // 強カーブ7割
     soundBeep();
 
     mile = 2300;
-    sharpCurvePid(motion, targetDev, mile, 60, 0.75); // 強カーブ3割
+    ms.setTargetMileage(mile);
+    sharpCurvePid(motion,ms, targetDev, 60, 0.75); // 強カーブ3割
     soundBeep();
 
     mile = 1800;
-    sharpCurvePid(motion, target, mile, 40, 0.85); // 強カーブ7割
+    ms.setTargetMileage(mile);
+    sharpCurvePid(motion,ms, target,40, 0.85); // 強カーブ7割
     soundBeep();
 
     mile = 1240;
-    straightPid(motion, target, mile, 100, 1.0); // 直線
+    ms.setTargetMileage(mile);
+    straightPid(motion,ms, target, 100, 1.0); // 直線
     soundBeep();
     //↑ Lコース
 
 	ie::OnOffControl stControl(0, 0.3, 0);
-    ie::MileageStopper ms;
+//    ie::MileageStopper ms;
     ie::LineStopper ls(400);
 
     // 灰色分を直進
