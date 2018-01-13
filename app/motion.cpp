@@ -16,8 +16,7 @@ namespace ie {
 
 Motion::Motion():
 leftWheel_(LEFT_WHEEL_PORT), rightWheel_(RIGHT_WHEEL_PORT),
-tail_(TAIL_MOTOR_PORT), arm_(ARM_MOTOR_PORT), colorSensor_(COLOR_SENSOR_PORT),
-control_(new OnOffControl(0))
+tail_(TAIL_MOTOR_PORT), arm_(ARM_MOTOR_PORT), colorSensor_(COLOR_SENSOR_PORT)
 #ifdef OUTPUT_LINETRACE
 , fo_("PID_control_value.txt")
 #endif
@@ -338,6 +337,14 @@ inline void Motion::lineTraceHelper(Control& control, int pwm, bool isRightSide)
     if (controlValue < -pwm) {controlValue = -pwm;}
     if (pwm < controlValue) {controlValue = pwm;}
 
+    #ifdef ISHIZUKA_LINETRACE
+    // KaitoIshizukaによる謎実装
+    controlValue *= 0.02; // 謎の値
+	int pwm_L = roundInt(pwm * (1.0 - controlValue));
+	int pwm_R = roundInt(pwm * (1.0 + controlValue));
+    setBothPwm(pwm_L, pwm_R);
+    #else
+    // 一般的なの実装
     if (controlValue < 0) {
         // 右旋回
         setBothPwm(pwm, pwm + controlValue);
@@ -345,6 +352,7 @@ inline void Motion::lineTraceHelper(Control& control, int pwm, bool isRightSide)
         // 左旋回
         setBothPwm(pwm - controlValue, pwm);
     }
+    #endif
 
     #ifdef OUTPUT_LINETRACE
     fo_.fileWrite(controlValue);
