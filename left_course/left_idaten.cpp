@@ -12,7 +12,7 @@
 extern ie::Localization* localization;
 
 /**
- * 韋駄天
+ * 韋駄天(ガチ)
  */
 void LCourseIdaten(ie::Motion& motion) {
     dly_tsk(1); // これがないとフリーズする。
@@ -60,7 +60,7 @@ void LCourseIdaten(ie::Motion& motion) {
 
     // 終了
     motion.wait(100);
-    motion.raiseArm(15, 5);
+    motion.raiseArm(5, 5);
     // ブロック並べのためにLコースのラインに乗せる
     ds.setTargetDirection(0);
     motion.spin(ds, stControl, 20);

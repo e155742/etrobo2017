@@ -23,7 +23,7 @@ void RCourseParking(ie::Motion& motion, float target) {
     ie::DirectionStopper ds(*localization, degToRad(90));
 
     // ライントレース準備
-    motion.raiseArm(15,15);
+    motion.raiseArm(5,5);
     as.setAngle(-30);
     motion.spin(as, stControl, -30);
     motion.spin(ls, stControl, 10);

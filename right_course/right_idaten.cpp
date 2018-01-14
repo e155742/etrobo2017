@@ -81,7 +81,7 @@ void RCourseIdaten(ie::Motion& motion, float target) {
     // 終了
 
     // プライマリーのラインに乗せる
-    motion.raiseArm(15, 5);
+    motion.raiseArm(5, 5);
     motion.goStraight(ls, stControl, 100);
     ms.setTargetMileage(ie::OFF_SET + 10);
     motion.goStraight(ms, stControl, 30);
