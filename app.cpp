@@ -82,7 +82,7 @@ void init(ie::Motion& motion, float& threshold, float& threshold2) {
 
     // キャリブレーション
     ie::Calibration* calibration = new ie::Calibration();
-    threshold = calibration->calibrate() * 0.46; // 0.47 // 普通のライントレースBest0.43
+    threshold = calibration->calibrate() * 0.45; // 0.47 // 普通のライントレースBest0.43
     // threshold = 330.0; // キャリブレーションするより固定値の方がうまく走る
     #ifndef LEFT_COURSE
     threshold2 = calibration->calibrate() * 0.47; // 相撲のライントレースBest0.43

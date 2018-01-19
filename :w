@@ -40,7 +40,7 @@ void pidRun_R(ie::Motion& motion, float target){
     mile = 2750;
     pid.setTarget(targetDev);
     ms.setTargetMileage(mile);
-    pid.pid(ms, 70, 2, 0.7);//80だと曲がりきれない可能性70へ変更
+    pid.pid(ms, 80, 2, 0.7);
     //sharpCurvePid(motion,ms, targetDev, 80, 0.70); // 強カーブ7割
     soundBeep();
 
@@ -59,82 +59,60 @@ void pidRun_R(ie::Motion& motion, float target){
     //sharpCurvePid(motion,ms, targetDev, 50, 0.30); // 強カーブ4割
     soundBeep();
 
-    mile = 1700;
+    mile = 1700-200;
     ms.setTargetMileage(mile);
     pid.setTarget(target);
     pid.pid(ms, 100, 0, 1.0);
     //0Pid(motion,ms, target, 100, 1.0); // 直線
     soundBeep();
-
-
     //↑ Rコース
 
-    /*
     //↓ 踏切おろし
-    motion.wait(2000);
-    mile = 80;
+    //Basic後灰色一旦通り過ぎる
+    targetDev = target + 40;
+    mile = 800;
+    pid.setTarget(targetDev);
     ms.setTargetMileage(mile);
-    pid.setTarget(target);
-    pid.pid(ms, 100, 0, 1.0);
-    //0Pid(motion,ms, target, 100, 1.0); // 直線
+    pid.pid(ms, 20, 2, 10.0);
+    //sharpCurvePid(motion,ms, targetDev, 20, 10.0); // 強カーブ15割
     soundBeep();
-    //灰色を過ぎたところからスタート
+
     //180度右へ
-    as.setAngle(90);
     motion.spin(as, stControl, 10);
-    soundBeep();
+    ie::LineStopper ls(target*0.75);
+    motion.spin(ls, stControl, 10);
 
-    as.setAngle(90);
-    motion.spin(as, stControl, 10);
-    soundBeep();
-    //ie::LineStopper ls(80);
-    //motion.spin(ls, stControl, 10);
-
-    // 距離少しpid。灰色検知安定のため
-    mile = 50;
-    ms.setTargetMileage(mile);
-    targetDev=target+30;
+    //反転後灰色直前まで進む
+    targetDev = target + 40;
+    mile = 600;
     pid.setTarget(targetDev);
-    pid.setEdge(true);
+    ms.setTargetMileage(mile);
     pid.pid(ms, 20, 2, 10.0);
+    //sharpCurvePid(motion,ms, targetDev, 20, 10.0); // 強カーブ15割
+    soundBeep();
 
-    // 回転後、灰色検知走行
-    pid.setTarget(target);
-    pid.setEdge(true);
+    //灰色検知
     pid.pid(gs, 20, 2, 10.0);
-    soundBeep();
-    motion.wait(1000);
-
-    // 灰色検知後、黒検知
-    targetDev = target + 110;
-    pid.setTarget(targetDev);
-    ie::LineStopper ls(target*0.45);//testの値
-    pid.pid(ls, 20, 2, 10.0);
+    //sharpCurvePid(motion,gs, target, 20, 10.0); // 強カーブ15割
     soundBeep();
 
-    //灰色から駅まで
-    mile = 450;
+    mile = 800;
     ms.setTargetMileage(mile);
     pid.setTarget(target);
-    pid.setEdge(true);
     pid.pid(ms, 20, 2, 10.0);
-    //sharpCurvePid(motion,ms, target, 20, 10.0); // 強カーブ15割
+    sharpCurvePid(motion,ms, target, 20, 10.0); // 強カーブ15割
     soundBeep();
 
 
     //90度右へ
-    as.setAngle(90);
     motion.spin(as, stControl, 10);
     soundBeep();
 
-    while(1){
     motion.stop();
-    }
 
 
 
     //↑ 踏切おろし
-    */
 
     //↓ Besic後
     targetDev = target + 40;
@@ -147,7 +125,7 @@ void pidRun_R(ie::Motion& motion, float target){
 
     // mile = 720;
     targetDev = target - 20;
-    mile = 300 + 50;
+    mile = 300 + 150;
     pid.setTarget(targetDev);
     ms.setTargetMileage(mile);
     pid.pid(ms, 20, 2, 10.0);
