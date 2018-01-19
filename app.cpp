@@ -38,8 +38,8 @@
 #include "util.h"
 
 // #define TEST_MODE
-#define LEFT_COURSE // ブロック並べの方
-#define IDATEN // 韋駄天
+// #define LEFT_COURSE // ブロック並べの方
+// #define IDATEN // 韋駄天
 
 ie::Motion motion;
 ie::Localization* localization;
@@ -172,8 +172,8 @@ void leftCourse(ie::Motion& motion, float target) {
     int greenPosition = 14; // LCourseBlock()のためのダミー ブロック並べはやらないから使わない
 
     #ifdef IDATEN
-    // LCourseIdaten(motion);
-    LCourseIdaten2(motion);
+    LCourseIdaten(motion);
+    // LCourseIdaten2(motion);
     #else
     pidRun_L(motion, target);
     #endif

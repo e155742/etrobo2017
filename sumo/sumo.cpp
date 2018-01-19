@@ -42,10 +42,10 @@ sonarSensor_(sonarSensor), colorSensor_(colorSensor), target_(target) {
     markers_[++index] = COLOR_GREEN;  // 緑
     markers_[++index] = COLOR_BLUE;   // 青
 
-    markers_[++index] = COLOR_BLUE;   // 青
-    markers_[++index] = COLOR_YELLOW; // 黄
     markers_[++index] = COLOR_RED;    // 赤
+    markers_[++index] = COLOR_YELLOW; // 黄
     markers_[++index] = COLOR_GREEN;  // 緑
+    markers_[++index] = COLOR_BLUE;   // 青
 }
 
 /**
