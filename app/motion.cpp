@@ -419,4 +419,17 @@ void Motion::lineTraceK(Stopper& stopper, Control& control, int pwm, bool isRigh
     ev3_stp_cyc(LINE_TRACE_CYC);
 }
 
+/**
+ * ev3_stp_cyc(LINE_TRACE_CYC);はこの関数の呼び出し元で実行すること。
+ */
+void Motion::lineTraceK(Control& control, int pwm, bool isRightSide) {
+    onoffSetPwm(control, pwm);
+
+    control_ = &control;
+    pwm_ = pwm;
+    isRightSide_ = isRightSide;
+
+    ev3_sta_cyc(LINE_TRACE_CYC);
+}
+
 }

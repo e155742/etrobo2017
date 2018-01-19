@@ -2,6 +2,9 @@
 #include "right_trace.hpp"
 #include "util.h"
 
+#include "localization.hpp"
+
+#include "pid_control.hpp"
 #include "onoff_control.hpp"
 
 #include "mileage_stopper.hpp"
@@ -29,14 +32,15 @@ void pidRun_R(ie::Motion& motion, float target){
     soundBeep();
 
     mile = 1950;
-    pid.setTarget(target);
+	  double targetDev = target - 10.0;
+    pid.setTarget(targetDev);
     ms.setTargetMileage(mile);
-    pid.pid(ms, 100, 0, 1.0);
-    //0Pid(motion,ms, target, 100, 1.0); // 直線
+    pid.pid(ms, 100, 2, 1.0);//curve0で動かないから1にした。
+    //Pid(motion,ms, target, 100, 1.0); // 直線
     soundBeep();
 
 //    double targetDev = target - 50.0;
-	double targetDev = target - 10.0;
+	  targetDev = target - 10.0;
     mile = 2750;
     pid.setTarget(targetDev);
     ms.setTargetMileage(mile);
@@ -61,8 +65,16 @@ void pidRun_R(ie::Motion& motion, float target){
 
     mile = 1700;
     ms.setTargetMileage(mile);
-    pid.setTarget(target);
-    pid.pid(ms, 100, 0, 1.0);
+    targetDev = target - 20;
+    pid.setTarget(targetDev);
+    pid.pid(ms, 100, 2, 1.0);//curve0で動かないから1にした。
+    // ie::PIDControl pidControl(target, 0.065, 0.0007, 0.030);
+    // motion.lineTraceK(pidControl, 100, false);
+    // while (localization->getPointX() < -3780.0) {
+    //     // loop
+    // }
+    // ev3_stp_cyc(LINE_TRACE_CYC);
+    //pid.pid(ms, 100, 0, 1.0);
     //0Pid(motion,ms, target, 100, 1.0); // 直線
     soundBeep();
 
@@ -141,13 +153,13 @@ void pidRun_R(ie::Motion& motion, float target){
     mile = 890;
     pid.setTarget(targetDev);
     ms.setTargetMileage(mile);
-    pid.pid(ms, 20, 2, 10.0);
+    pid.pid(ms, 20, 2, 10.0+10.0);//10.0 から20.0に引き上げ
     //sharpCurvePid(motion,ms, targetDev, 20, 10.0); // 強カーブ15割
     soundBeep();
 
     // mile = 720;
     targetDev = target - 20;
-    mile = 300 + 50;
+    mile = 300;
     pid.setTarget(targetDev);
     ms.setTargetMileage(mile);
     pid.pid(ms, 20, 2, 10.0);
