@@ -52,6 +52,7 @@ public:
     void lineTrace(Control& control, int pwm, bool isRightSide);
     void lineTrace(Stopper& stopper, Control& control, int pwm, bool isRightSide);
     void lineTraceK(Stopper& stopper, Control& control, int pwm, bool isRightSide);
+    void lineTraceK(Control& control, int pwm, bool isRightSide);
     void lineTraceHelperK();
 
 private:
