@@ -38,7 +38,7 @@
 #include "util.h"
 
 // #define TEST_MODE
-//#define LEFT_COURSE // ブロック並べの方
+// #define LEFT_COURSE // ブロック並べの方
 // #define IDATEN // 韋駄天
 
 ie::Motion motion;
@@ -142,20 +142,25 @@ void initCodeDecode(ie::Decoder d) {
 }
 
 void motionTest(ie::Motion& motion, float target) {
-    ev3api::SonarSensor sonarSensor(ie::SONAR_SENSOR_PORT);
-    ev3api::Clock clock;
-    msg_clear();
-    int lastdistance = sonarSensor.getDistance();
-    while (true) {
-        int distance = sonarSensor.getDistance();
-        if (lastdistance != distance) {
-            msg_f(distance, 8);
-        }
-        lastdistance = distance;
-    }
+    // ev3api::SonarSensor sonarSensor(ie::SONAR_SENSOR_PORT);
+    // ev3api::Clock clock;
+    // msg_clear();
+    // int lastdistance = sonarSensor.getDistance();
+    // while (true) {
+    //     int distance = sonarSensor.getDistance();
+    //     if (lastdistance != distance) {
+    //         msg_f(distance, 8);
+    //     }
+    //     lastdistance = distance;
+    // }
     // ie::LineStopper ls(80);
     // ie::PIDControl ltControl(target, 0.15, 0, 0);
     // motion.lineTrace(ls, ltControl, 30, false);
+
+    ie::OnOffControl stControl(0, 0.3, 0);
+    ie::MileageStopper ms;
+    ms.setTargetMileage(3000);
+    motion.goStraight(ms, stControl, 100);
 }
 
 /**
@@ -168,6 +173,7 @@ void leftCourse(ie::Motion& motion, float target) {
 
     #ifdef IDATEN
     LCourseIdaten(motion);
+    // LCourseIdaten2(motion);
     #else
     pidRun_L(motion, target);
     #endif

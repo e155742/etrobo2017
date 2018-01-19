@@ -28,7 +28,7 @@ void RCourseSumo(ie::Motion& motion, float target, float target2, ev3api::SonarS
     ie::LineStopper ls;
     ie::DirectionStopper ds(*localization);
 
-    motion.raiseArm(15, 5);
+    motion.raiseArm(5, 5);
     motion.stop();
 
     // 1枚目の土俵
@@ -39,7 +39,7 @@ void RCourseSumo(ie::Motion& motion, float target, float target2, ev3api::SonarS
     ms.setTargetMileage(460); // 400
     motion.goStraight(ms, stControl, 30);
     motion.stop();
-    motion.raiseArm(15, 15);
+    motion.raiseArm(5, 15);
 
     // ライントレース準備の回転
     as.setAngle(-30);
@@ -80,7 +80,7 @@ void RCourseSumo(ie::Motion& motion, float target, float target2, ev3api::SonarS
     sumo.moveBlock(motion, 3, 118);
 
     // 真正面を向く
-    motion.raiseArm(15, 15);
+    motion.raiseArm(5, 15);
     ls.setTaigetThreshold(target2);
     motion.spin(ls, stControl, 10);
 
@@ -106,7 +106,7 @@ void RCourseSumo(ie::Motion& motion, float target, float target2, ev3api::SonarS
     ms.setTargetMileage(350+back);
     motion.goStraight(ms, stControl, 30);
     motion.stop();
-    motion.raiseArm(15, 15);
+    motion.raiseArm(5, 15);
     motion.stop();
 
     // ライントレース準備の回転
@@ -148,7 +148,7 @@ void RCourseSumo(ie::Motion& motion, float target, float target2, ev3api::SonarS
     sumo.moveBlock(motion, 7, 118);
 
     // 正面を向く
-    motion.raiseArm(15, 15);
+    motion.raiseArm(5, 15);
     ls.setTaigetThreshold(target2);
     motion.spin(ls, stControl, 10);
 
@@ -173,6 +173,6 @@ void RCourseSumo(ie::Motion& motion, float target, float target2, ev3api::SonarS
     sumo.trainWait(motion, 1);
     ms.setTargetMileage(330 + back);
     motion.goStraight(ms, ltControl, 30);
-    motion.raiseArm(15, 15);
+    motion.raiseArm(5, 15);
     motion.stop();
 }

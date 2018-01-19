@@ -85,4 +85,9 @@ void pidRun_L(ie::Motion& motion, float target){
     ms.setTargetMileage(20);
     motion.goStraight(ms, stControl, 5);
     motion.spin(ls, stControl, -10);
+
+    unsigned int aaa = 0, bbb = 1;
+    ie::PidTrace pt(motion, target, false);
+    pt.pid(ls, 100, aaa, 0.40);
+    pt.pid(ls, 100, bbb, 0.40);
 }
