@@ -89,10 +89,9 @@ void Sumo::moveTocross(Motion& motion, Localization* localization, double lineTh
 
     ms.setTargetMileage(75); // 50
     motion.lineTrace(ms, ltControl, 15, false);  // 車体をまっすぐにする
-    // localization->setDirection(0.0);             // 方位を0に
     motion.lineTrace(ls, ltControl, 20, false);  // 直角までライントレース 少し早いくらいが車体がブレない
     ms.setTargetMileage(ie::OFF_SET + 10);
-    localization->setDirection(0.0);             // 方位を0に
+    localization->setDirection(0);             // 方位を0に
     motion.goStraight(ms, stControl, 10);        // トレッド軸にラインが来るように移動
     motion.wait(200); // 念のため停止
 }

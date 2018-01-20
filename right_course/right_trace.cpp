@@ -14,6 +14,7 @@
 
 #include "pid_trace.hpp"
 
+extern ie::Localization* localization;
 
 void pidRun_R(ie::Motion& motion, float target){
     //↓ Rコース
@@ -67,13 +68,15 @@ void pidRun_R(ie::Motion& motion, float target){
     ms.setTargetMileage(mile);
     targetDev = target - 20;
     pid.setTarget(targetDev);
+
     pid.pid(ms, 100, 2, 1.0);//curve0で動かないから1にした。
     // ie::PIDControl pidControl(target, 0.065, 0.0007, 0.030);
     // motion.lineTraceK(pidControl, 100, false);
-    // while (localization->getPointX() < -3780.0) {
+    // while (localization->getPointX() > -3780.0) {
     //     // loop
     // }
     // ev3_stp_cyc(LINE_TRACE_CYC);
+
     //pid.pid(ms, 100, 0, 1.0);
     //0Pid(motion,ms, target, 100, 1.0); // 直線
     soundBeep();

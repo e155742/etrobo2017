@@ -50,6 +50,8 @@ void RCourseSumo(ie::Motion& motion, float target, float target2, ev3api::SonarS
     // 手前から2番目の直角まで移動
     dly_tsk(1);
     sumo.moveTocross(motion, localization, crossTarget);
+    ds.setTargetDirection(0);
+    motion.spin(ds, stControl, 10);
 
     // 前半の土俵の中心まで戻る
     ms.setTargetMileage(-150);
@@ -91,7 +93,7 @@ void RCourseSumo(ie::Motion& motion, float target, float target2, ev3api::SonarS
     motion.lineTrace(ls, ltControl, 15, false);  // 直角までライントレース
     ms.setTargetMileage(ie::OFF_SET + 10);
     motion.goStraight(ms, stControl, 15);        // 直角は直進
-    ds.setTargetDirection(degToRad(-90));        // 真横を向く
+    ds.setTargetDirection(0);        // 真横を向く
     motion.spin(ds, stControl, 10);
     motion.stop();
 
@@ -118,6 +120,8 @@ void RCourseSumo(ie::Motion& motion, float target, float target2, ev3api::SonarS
     // 手前から4番目の直角まで移動
     dly_tsk(1);
     sumo.moveTocross(motion, localization, crossTarget);
+    ds.setTargetDirection(0);        // 真横を向く
+    motion.spin(ds, stControl, 10);
 
     // 後半の土俵の中心まで戻る
     ms.setTargetMileage(-150);
@@ -159,7 +163,7 @@ void RCourseSumo(ie::Motion& motion, float target, float target2, ev3api::SonarS
     motion.lineTrace(ls, ltControl, 15, false);  // 直角までライントレース
     ms.setTargetMileage(ie::OFF_SET + 10);
     motion.goStraight(ms, stControl, 15);        // 直角は直進
-    ds.setTargetDirection(degToRad(-90));        // 真横を向く
+    ds.setTargetDirection(0);        // 真横を向く
     motion.spin(ds, stControl, 10);
 
     motion.wait(100);

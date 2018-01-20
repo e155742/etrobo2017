@@ -43,19 +43,16 @@ void LCourseIdaten(ie::Motion& motion) {
     motion.goStraight(ms, stControl, -40);
     ms.setTargetMileage(-20);
     motion.goStraight(ms, stControl, -20);
-    // ms.setTargetMileage(-1550);  // ********** 用調整 **********
-    // motion.goStraight(ms, stControl, -100);
 
     // バックストレート前のコーナまで前進
-    ms.setTargetMileage(500 - margenOne); // 600
+    ms.setTargetMileage(500 - margenOne);  // 600
     motion.goStraight(ms, stControl, 100);
     // 最終を通過してストレートに向ける
     ds.setTargetDirection(degToRad(-90));  // ********** 用調整 **********
     motion.setSteeringPower(ds, 100, -60);
     // バックストレートからゴールへ
     stControl.setCoefficient(0, 0.4, 0);
-    ms.setTargetMileage(2570);     // ********** 用調整 ********** //2610
-    // motion.goPoint(*localization, stControl, 50, localization->getPointX() - 3500, localization->getPointY() - 250, 1000);
+    ms.setTargetMileage(2570);             // ********** 用調整 **********
     motion.goStraight(ms, stControl, 100);
 
     // 終了
